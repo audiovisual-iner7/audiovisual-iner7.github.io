@@ -30,6 +30,7 @@
         #workRequestForm, .conditional-field {
             display: none;
         }
+        
         /* Animación suave para mostrar el formulario */
         .fade-in {
             animation: fadeIn 0.5s ease-in-out forwards;
@@ -38,21 +39,90 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Estilos para la imagen de fondo del portal de bienvenida */
+        #initialButtonContainer {
+            background-image: url('./img/2023_Informe-General_03_Fachada\ \(1\).jpg'); /* CAMBIA ESTA RUTA */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            
+        }
+        
+        /* Overlay semi-transparente para mejorar la legibilidad del texto */
+        #initialButtonContainer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 60, 125, 0.1); /* Overlay azul semi-transparente */
+            z-index: 1;
+        }
+
+                .welcome-title {
+            color: #ffffff !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-weight: 400;
+        }
+        
+        /* Contenido por encima del overlay */
+        #initialButtonContainer > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Estilos para el logo en el header */
+        .header-logo {
+            height: 50px; /* Altura fija para el header */
+            width: auto; /* Mantiene la proporción */
+            max-width: 137px; /* Ancho máximo proporcional */
+            object-fit: contain; /* Mantiene la proporción sin distorsión */
+        }
+        
+        /* Responsive para el logo */
+        @media (max-width: 768px) {
+            .header-logo {
+                height: 40px;
+                max-width: 110px;
+            }
+        }
+        
+        /* Ajuste del header para acomodar el logo */
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <header class="bg-brand shadow-md">
         <div class="container mx-auto px-6 py-4">
-            <h1 class="text-2xl font-bold text-white">Portal de Solicitudes Internas</h1>
+            <div class="header-content">
+                <!-- Logo de la institución -->
+                <img src="img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo">
+                <!-- CAMBIA "ruta-a-tu-logo.png" por la ruta real de tu imagen -->
+                
+                <h1 class="text-2xl font-bold text-white">Portal de Solicitudes Internas</h1>
+            </div>
         </div>
     </header>
 
     <main class="container mx-auto p-4 md:p-8">
         <!-- Contenedor del Botón Inicial -->
         <div id="initialButtonContainer" class="text-center py-20">
-            <h2 class="text-3xl font-semibold text-gray-700 mb-4">Bienvenido</h2>
-            <p class="text-gray-500 mb-8">Para iniciar una nueva solicitud, por favor presione el siguiente botón.</p>
+            <h2 class="text-3xl font-semibold text-white mb-4">Bienvenido</h2>
+            <p class="text-white mb-8">Para iniciar una nueva solicitud, por favor presione el siguiente botón.</p>
             <button id="startRequestBtn" class="bg-brand text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-brand-light transition-colors duration-300 transform hover:scale-105">
                 Solicitar Trabajo
             </button>
@@ -421,7 +491,7 @@
     </main>
 
     <footer class="bg-gray-800 text-white text-center p-4 mt-12">
-        <p>&copy; 2024 Nombre de la Institución. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Instituo Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
     </footer>
 
     <script>
@@ -638,99 +708,7 @@
         }
     });
 
-    /*
-    ================================================================================================
-    CÓDIGO Y GUÍA FINAL PARA GOOGLE APPS SCRIPT (script.google.com) - VERSIÓN 4.0
-    ================================================================================================
-    
-    El siguiente código es correcto. El problema de CORS casi siempre se debe al proceso de implementación.
-    Siga los pasos de la "GUÍA DE IMPLEMENTACIÓN INFALIBLE" a continuación.
 
-    --------------------------------- CÓDIGO DEL SCRIPT ---------------------------------
-    
-    // >>> INSTRUCCIÓN <<<
-    // Pegue aquí el ID de su carpeta de Google Drive.
-    const DRIVE_FOLDER_ID = "PEGUE_AQUI_EL_ID_DE_SU_CARPETA_DE_DRIVE";
-
-    // Maneja las solicitudes POST (envío de datos del formulario)
-    function doPost(e) {
-      try {
-        var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Solicitudes');
-        if (!sheet) {
-          sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Solicitudes');
-          sheet.appendRow(['Timestamp', 'Email', 'Nombre', 'Area', 'Telefono', 'Descripcion', 'Tipo de Trabajo', 'Items Adicionales', 'Archivos Adjuntos']);
-        }
-        
-        var data = JSON.parse(e.postData.contents);
-        var fileUrls = [];
-
-        if (DRIVE_FOLDER_ID && data.files && data.files.length > 0) {
-          var folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-          for (var i = 0; i < data.files.length; i++) {
-            var file = data.files[i];
-            var decodedData = Utilities.base64Decode(file.data);
-            var blob = Utilities.newBlob(decodedData, file.mimeType, file.filename);
-            var driveFile = folder.createFile(blob);
-            fileUrls.push(driveFile.getUrl());
-          }
-        }
-        
-        var newRow = [
-          data.timestamp || new Date(),
-          data.email || '',
-          data.requesterName || '',
-          data.area || '',
-          data.phone || '',
-          data.description || '',
-          data.workType || '',
-          data.items || '',
-          fileUrls.join(', ')
-        ];
-        
-        sheet.appendRow(newRow);
-        
-        return ContentService
-          .createTextOutput(JSON.stringify({ 'result': 'success' }))
-          .setMimeType(ContentService.MimeType.JSON)
-          .setHeader('Access-Control-Allow-Origin', '*');
-          
-      } catch (error) {
-        return ContentService
-          .createTextOutput(JSON.stringify({ 'result': 'error', 'error': error.toString() }))
-          .setMimeType(ContentService.MimeType.JSON)
-          .setHeader('Access-Control-Allow-Origin', '*');
-      }
-    }
-
-    // Maneja las solicitudes OPTIONS (verificación de CORS)
-    function doOptions(e) {
-      return ContentService.createTextOutput()
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeader('Access-Control-Allow-Origin', '*')
-        .setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        .setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    }
-
-    --------------------------------- GUÍA DE IMPLEMENTACIÓN INFALIBLE ---------------------------------
-    
-    Para asegurarse de que la URL pública tenga el código más reciente y los permisos correctos,
-    cree una implementación COMPLETAMENTE NUEVA.
-
-    1.  Vaya a su editor de Apps Script.
-    2.  Asegúrese de que el código de arriba esté pegado en el editor.
-    3.  En el menú superior, haga clic en "Implementar" > "Nueva implementación".
-    4.  Haga clic en el ícono del engranaje (⚙️) y seleccione "Aplicación web".
-    5.  Configure las opciones EXACTAMENTE así:
-        -   Descripción: Formulario de Solicitudes v4 (o cualquier nombre nuevo)
-        -   Ejecutar como: Yo (su dirección de correo)
-        -   Quién tiene acceso: Cualquier persona
-    6.  Haga clic en "Implementar".
-    7.  Se generará una NUEVA URL de aplicación web. Copie esta NUEVA URL.
-    8.  Vuelva a su archivo index.html y pegue esta NUEVA URL en la variable `scriptURL`.
-
-    Este proceso garantiza que no haya configuraciones viejas o problemas de caché afectando la implementación.
-
-    */
     </script>
 </body>
 </html>

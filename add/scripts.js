@@ -284,7 +284,7 @@ tour.addStep({
 
 tour.addStep({
   id: 'step-tel',
-  text: 'Proporcionar un número de teléfono o extensión de contacto es importante para que podamos comunicarnos contigo si necesitamos más información sobre tu solicitud. O para avisarte sobre el estado de la misma.',
+  text: 'Proporcionar un número de teléfono o extensión de contacto es importante para que podamos comunicarnos contigo si necesitamos más información sobre tu solicitud. \n O para avisarte sobre el estado de la misma.',
   attachTo: {
     element: '#phone', // Se ancla al campo de teléfono
     on: 'bottom'
@@ -326,7 +326,7 @@ tour.addStep({
 
 tour.addStep({
   id: 'step-items',
-  text: 'Puedes agregar varias tareas de trabajo. Por ejemplo, si necesitas imprimir documentos y también engargolarlos, puedes agregar ambos trabajos aquí. O si también necesitas imprimir otro documento o solicitar otro servicio, puedes hacerlo. Es importante indicar la cantidad de cada trabajo que necesitas.!!!Este paso es opcional, si no deseas especificar puedes dejarlo en blanco solo se muy claro en la descripción de tu solicitud.',
+  text: 'Puedes agregar varias tareas de trabajo. Por ejemplo, si necesitas imprimir documentos y también engargolarlos, puedes agregar ambos trabajos aquí. \n O si también necesitas imprimir otro documento o solicitar otro servicio, puedes hacerlo.  \n Es importante indicar la cantidad de cada trabajo que necesitas.  \n ¡¡Este paso es opcional!!, si no deseas especificar puedes dejarlo en blanco solo se muy claro en la descripción de tu solicitud.',
   attachTo: {
     element: '#product',
     on: 'bottom'

@@ -324,6 +324,7 @@
                             <option value='Urgencias Respiratorias'>Urgencias Respiratorias</option>
                             <option value='Vasculitis Sistémicas Primarias'>Vasculitis Sistémicas Primarias</option>
                             <option value='Vigilancia Epidemiológica'>Vigilancia Epidemiológica</option>
+                            <option value='OTRO'>OTRO</option>
                         </select>
                     </div>
                     <div>
@@ -362,6 +363,7 @@
                             <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
                             <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
                             <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
+                            <option value='OTRO'>OTRO</option>
                         </select>
                     </div>
                 </div>
@@ -441,6 +443,23 @@
                             <option value="ROLLO FOTOGRÁFICO BRILLANTE">ROLLO FOTOGRÁFICO BRILLANTE</option>
                         </select>
                     </div>
+
+                    <div id="engarContainer" class="conditional-field">
+                        <label for="enType" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de hoja</label>
+                        <select id="enType" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+                            <option value="CARTA">TAMAÑO CARTA</option>
+                            <option value="OFICIO">TAMAÑO OFICIO</option>
+                            <option value="DOBLE CARTA">TAMAÑO DOBLE CARTA</option>
+                        </select>
+                    </div>
+                    <div id="orientacionContainer" class="conditional-field mt-4">
+                        <div class="flex items-center">
+                            <input id="horizontal" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                            <label for="horizontal" class="ml-2 block text-sm text-gray-900">Horizontal</label>
+                            <input id="vertical" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                            <label for="vertical" class="ml-2 block text-sm text-gray-900">Vertical</label>
+                        </div>
+                    </div>
                 </div>
                 <!-- Tabla de Items Agregados -->
                 <div class="mt-6">
@@ -472,7 +491,7 @@
     <footer class="bg-gray-800 text-white text-center p-4 mt-12">
         <p>&copy; 2025 Instituo Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/js/shepherd.min.js"></script>
 
     <script src=./scripts.js></script>

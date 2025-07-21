@@ -14,6 +14,10 @@
         const paperTypeContainer = document.getElementById('paperTypeContainer');
         const rollTypeContainer = document.getElementById('rollTypeContainer');
         const doubleSidedContainer = document.getElementById('doubleSidedContainer');
+        const orientacionContainer = document.getElementById('orientacionContainer');
+        const vertical = document.getElementById('vertical');
+        const horizontal = document.getElementById('horizontal');
+        const engarContainer = document.getElementById('engarContainer');
         const fileUpload = document.getElementById('fileUpload');
         const fileList = document.getElementById('fileList');
         const fileError = document.getElementById('fileError');
@@ -22,6 +26,7 @@
         const paperOptions = ["IMPRESIÓN PAPEL REUSO", "IMPRESIONES CARTA", "IMPRESIONES OFICIO", "IMPRESIONES PAPEL ESPECIAL", "IMPRESIONES TABLOIDE", "HOJAS CARTA", "HOJAS OFICIO", "HOJAS TABLOIDE", "HOJAS DE REUSO", "HOJAS PAPEL ESPECIAL"];
         const impressionOptions = ["IMPRESIÓN PAPEL REUSO", "IMPRESIONES CARTA", "IMPRESIONES OFICIO", "IMPRESIONES PAPEL ESPECIAL", "IMPRESIONES TABLOIDE"];
         const plotterOption = "CENTÍMETROS PLOTTER";
+        const engargoladosOptions = "ENGARGOLADOS";
 
         // 1. Mostrar el formulario
         startRequestBtn.addEventListener('click', () => {
@@ -38,6 +43,8 @@
             paperTypeContainer.style.display = 'none';
             rollTypeContainer.style.display = 'none';
             doubleSidedContainer.style.display = 'none';
+            engarContainer.style.display = 'none';
+            orientacionContainer.style.display = 'none';
 
             // Mostrar campos basados en la selección
             if (paperOptions.includes(selectedValue)) {
@@ -48,6 +55,10 @@
             }
             if (selectedValue === plotterOption) {
                 rollTypeContainer.style.display = 'block';
+            }
+            if (selectedValue === engargoladosOptions) {
+                engarContainer.style.display = 'block';
+                orientacionContainer.style.display = 'block';
             }
         });
 
@@ -66,6 +77,12 @@
             }
             if (doubleSidedContainer.style.display === 'block' && doubleSidedCheckbox.checked) {
                 productName += ' (Ambas Caras)';
+            }
+            if (engarContainer.style.display === 'block' && vertical.checked) {
+                productName += ` - Tamaño: ${document.getElementById('enType').value} - Orientación: Vertical`;
+            }
+            if (engarContainer.style.display === 'block' && horizontal.checked) {
+                productName += ` - Tamaño: ${document.getElementById('enType').value} - Orientación: Horizontal`;
             }
 
             if (quantity > 0) {
@@ -194,6 +211,8 @@
                     paperTypeContainer.style.display = 'none';
                     rollTypeContainer.style.display = 'none';
                     doubleSidedContainer.style.display = 'none';
+                    orientacionContainer.style.display = 'none';
+                    engarContainer.style.display = 'none';
                 } else {
                     throw new Error(res.error || 'Error desconocido del servidor.');
                 }

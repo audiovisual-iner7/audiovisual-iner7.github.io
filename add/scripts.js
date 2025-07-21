@@ -210,3 +210,163 @@
             });
         }
     });
+
+    // Asegúrate de incluir la librería de Shepherd.js y su CSS en tu HTML
+
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    classes: 'shepherd-theme-arrows', // Un tema visual ya incluido
+    scrollTo: true
+  }
+});
+
+// Paso 1: Botón inicial
+tour.addStep({
+  id: 'step-welcome',
+  text: '¡Bienvenido! Para comenzar a llenar tu solicitud de trabajo, haz clic aquí.',
+  attachTo: {
+    element: '#startRequestBtn',
+    on: 'bottom'
+  },
+  buttons: [{
+    text: 'Siguiente',
+    action: () => {
+        // Simula un clic para mostrar el formulario antes de ir al siguiente paso
+        document.getElementById('startRequestBtn').click();
+        tour.next();
+    }
+  }]
+});
+
+// Paso 2: Información del solicitante
+
+tour.addStep({
+  id: 'step-email',
+  text: 'El correo electrónico es obligatorio para que podamos contactarte. Asegúrate de que sea correcto.',
+  attachTo: {
+    element: '#email', // Se ancla al campo de email
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+
+
+tour.addStep({
+  id: 'step-nombre',
+  text: 'Escribir el nombre del solicitante es importante para identificar quién está haciendo la solicitud.',
+  attachTo: {
+    element: '#requesterName', // Se ancla al campo de nombre
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+tour.addStep({
+  id: 'step-area',
+  text: 'Selecciona el área a la que pertenece tu solicitud. Esto nos ayuda a dirigirla al departamento correcto. Si no estás seguro, elige "Otro" y especifica en el campo de descripción.',
+  attachTo: {
+    element: '#area', // Se ancla al campo de área
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+tour.addStep({
+  id: 'step-tel',
+  text: 'Proporcionar un número de teléfono o extensión de contacto es importante para que podamos comunicarnos contigo si necesitamos más información sobre tu solicitud. O para avisarte sobre el estado de la misma.',
+  attachTo: {
+    element: '#phone', // Se ancla al campo de teléfono
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+
+// Paso 3: Descripción del trabajo
+tour.addStep({
+  id: 'step-description',
+  text: 'Describe de forma detallada qué necesitas. ¡Mientras más específico seas, mejor!',
+  attachTo: {
+    element: '#description',
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+tour.addStep({
+  id: 'step-workType',
+  text: 'Selecciona el tipo de trabajo que estás solicitando. Esto nos ayuda a entender mejor tus necesidades. Si no estás seguro, elige "Otro" y especifica en el campo de descripción.',
+  attachTo: {
+    element: '#workType',
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+
+tour.addStep({
+  id: 'step-items',
+  text: 'Puedes agregar varias tareas de trabajo. Por ejemplo, si necesitas imprimir documentos y también engargolarlos, puedes agregar ambos trabajos aquí. O si también necesitas imprimir otro documento o solicitar otro servicio, puedes hacerlo. Es importante indicar la cantidad de cada trabajo que necesitas.!!!Este paso es opcional, si no deseas especificar puedes dejarlo en blanco solo se muy claro en la descripción de tu solicitud.',
+  attachTo: {
+    element: '#product',
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+
+tour.addStep({
+  id: 'step-documents',
+  text: 'Puedes enviarnos documentos relacionados con tu solicitud. Asegúrate de que sean claros y legibles. Puedes subir hasta 3 archivos, cada uno con un tamaño máximo de 10 MB. Aceptamos formatos PDF, DOCX, JPG y PNG. Si por ejemplo necesitas impresiones de un archivo o documento o si un diseño debe contener cierta imagen, etc. Si tu archivo pesa mas, contacta a la oficina de Audiovisual o deberás traernos el archivo.',
+  attachTo: {
+    element: '#fileUpload',
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Siguiente', action: tour.next }
+  ]
+});
+
+tour.addStep({
+  id: 'step-finish',
+  text: 'Si ya estas seguro de que toda la información es correcta, puedes enviar tu solicitud. Si quieres hacer alguna modificación, una vez enviado el formulario porfavor contactarnos si tienes dudas o necesitas ayuda a la extensión 5147 o 5239.',
+  attachTo: {
+    element: '#statusMessage',
+    on: 'bottom'
+  },
+  buttons: [
+    { text: 'Atrás', action: tour.back },
+    { text: 'Finalizar', action: tour.complete }
+  ]
+});
+
+
+// Inicia el tutorial solo si no se ha visto antes
+if (!localStorage.getItem('tutorialSolicitudVisto')) {
+  tour.start();
+  localStorage.setItem('tutorialSolicitudVisto', 'true');
+}

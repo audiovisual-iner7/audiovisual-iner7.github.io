@@ -238,59 +238,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function sendDataToGoogle(data) {
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz7dPGWOXudgEg8f8ZOh-qmGoxE0f_48Aesk-RwMeTCiVHNRfua7db1OomX-aCI8nrnYQ/exec';
+  function sendDataToGoogle(data) {
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz7dPGWOXudgEg8f8ZOh-qmGoxE0f_48Aesk-RwMeTCiVHNRfua7db1OomX-aCI8nrnYQ/exec';
 
-        fetch(scriptURL, {
-            method: 'POST',
-            body: JSON.stringify(data)
-            // Removemos todos los headers y configuraciones que pueden causar preflight
-        })
-        .then(response => {
-            // Con Google Apps Script, a veces necesitamos manejar la respuesta como texto primero
-            return response.text();
-        })
-        .then(text => {
-            try {
-                const res = JSON.parse(text);
-                if (res.result === 'success') {
-                    statusMessage.textContent = '¡Solicitud enviada con éxito!';
-                    statusMessage.className = 'text-green-600';
-                    form.reset();
-                    itemsTableBody.innerHTML = '';
-                    if (noItemsRow) {
-                        itemsTableBody.appendChild(noItemsRow);
-                        noItemsRow.style.display = 'table-row';
-                    }
-                    fileList.innerHTML = '';
-                    digitalPrintContainer.style.display = 'none';
-                    plotterContainer.style.display = 'none';
-                    engarContainer.style.display = 'none';
-                    orientacionContainer.style.display = 'none';
-                } else {
-                    throw new Error(res.error || 'Error desconocido del servidor.');
-                }
-            } catch (parseError) {
-                // Si no se puede parsear como JSON, mostrar el texto crudo para debug
-                console.log('Respuesta del servidor:', text);
-                throw new Error('Respuesta inválida del servidor');
+    fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(data)
+        // ← Solo esto, nada más
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.result === 'success') {
+            statusMessage.textContent = '¡Solicitud enviada con éxito!';
+            statusMessage.className = 'text-green-600';
+            form.reset();
+            itemsTableBody.innerHTML = '';
+            if (noItemsRow) {
+                itemsTableBody.appendChild(noItemsRow);
+                noItemsRow.style.display = 'table-row';
             }
-        })
-        .catch(error => {
-            console.error('Error!', error.message);
-            statusMessage.textContent = 'Error al enviar. Intente de nuevo.';
-            statusMessage.className = 'text-red-600';
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            loadingSpinner.classList.add('hidden');
-            setTimeout(() => { statusMessage.textContent = ''; }, 6000);
-        });
-    }
+            fileList.innerHTML = '';
+            digitalPrintContainer.style.display = 'none';
+            plotterContainer.style.display = 'none';
+            engarContainer.style.display = 'none';
+            orientacionContainer.style.display = 'none';
+        } else {
+            throw new Error(res.error || 'Error desconocido del servidor.');
+        }
+    })
+    .catch(error => {
+        console.error('Error!', error.message);
+        statusMessage.textContent = 'Error al enviar. Intente de nuevo.';
+        statusMessage.className = 'text-red-600';
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        loadingSpinner.classList.add('hidden');
+        setTimeout(() => { statusMessage.textContent = ''; }, 6000);
+    });
+}
 
 
 
-    
+
     // --- Configuración del Tour con Shepherd.js ---
     const tour = new Shepherd.Tour({
       useModalOverlay: true,

@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function sendDataToGoogle(data) {
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwy-6eVTxYKXP51cjQurYEwXQwjB_N0-MQhwCUegXzZhr3OuQF-SmiljQ447-iTEmEv/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz7dPGWOXudgEg8f8ZOh-qmGoxE0f_48Aesk-RwMeTCiVHNRfua7db1OomX-aCI8nrnYQ/exec';
 
         fetch(scriptURL, {
             method: 'POST',

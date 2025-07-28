@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitud de Trabajo Institucional</title>
-    <!-- Tailwind CSS para un diseño moderno y responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts para una tipografía limpia -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -119,17 +117,13 @@
     <header class="bg-brand shadow-md">
         <div class="container mx-auto px-6 py-4">
             <div class="header-content">
-                <!-- Logo de la institución -->
                 <a href="index.html"><img src="img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
-                <!-- CAMBIA "ruta-a-tu-logo.png" por la ruta real de tu imagen -->
-                
                 <a href="index.html"><h1 class="text-2xl font-bold text-white">Portal de Solicitudes de la Oficina de Audiovisual</h1></a>
             </div>
         </div>
     </header>
 
     <main class="container mx-auto p-4 md:p-8">
-        <!-- Contenedor del Botón Inicial -->
         <div id="initialButtonContainer" class="text-center py-20">
             <div id="texto_benvenida">
                 <h2 class="text-3xl font-semibold text-white mb-4">Bienvenido</h2>
@@ -140,10 +134,8 @@
             </div>
         </div>
 
-        <!-- Formulario de Solicitud (inicialmente oculto) -->
         <form id="workRequestForm" class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-8 max-w-4xl mx-auto">
             
-            <!-- Sección 1: Información del Solicitante -->
             <div>
                 <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">1. Información del Solicitante</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -334,76 +326,31 @@
                 </div>
             </div>
 
-            <!-- Sección 2: Detalles del Trabajo -->
             <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">2. Detalles del Trabajo</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción Detallada del Trabajo</label>
-                        <textarea id="description" name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Por favor, sea lo más específico posible..."></textarea>
-                    </div>
-                    <div>
-                        <label for="workType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Trabajo</label>
-                        <select id="workType" name="workType" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="" disabled selected>Seleccione un tipo...</option>
-                            <option value='AUDIOGRABACIÓN'>AUDIOGRABACIÓN</option>
-                            <option value='DIBUJO E ILUSTRACIÓN'>DIBUJO E ILUSTRACIÓN</option>
-                            <option value='DISEÑO'>DISEÑO</option>
-                            <option value='EDIFIÓN DE FOTOGRAFÍA DIGITAL'>EDIFIÓN DE FOTOGRAFÍA DIGITAL</option>
-                            <option value='ENGARGOLADO'>ENGARGOLADO</option>
-                            <option value='ESCANEO'>ESCANEO</option>
-                            <option value='IMPRESIÓN DIGITAL'>IMPRESIÓN DIGITAL</option>
-                            <option value='IMPRESIÓN EN DUPLICADOR DIGITAL '>IMPRESIÓN EN DUPLICADOR DIGITAL </option>
-                            <option value='IMPRESIÓN EN PLOTTER'>IMPRESIÓN EN PLOTTER</option>
-                            <option value='INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO'>INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO</option>
-                            <option value='MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC'>MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC</option>
-                            <option value='SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN'>SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN</option>
-                            <option value='MONTAJE EN SOPORTE PROPIO O NUEVO'>MONTAJE EN SOPORTE PROPIO O NUEVO</option>
-                            <option value='SOLICITUD DE TOMA DE FOTOGRAFÍAS'>SOLICITUD DE TOMA DE FOTOGRAFÍAS</option>
-                            <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
-                            <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
-                            <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
-                            <option value='OTRO'>OTRO</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sección 3: Solicitud de Items -->
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">3. Items Adicionales (Opcional)</h3>
+                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">2. Items de la Solicitud (Opcional)</h3>
                 <div class="bg-gray-50 p-4 rounded-lg space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                         <div class="md:col-span-3">
-                            <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Item a Solicitar</label>
-                            <select id="product" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                                <option value="" disabled selected>Seleccione el entregable:</option>
-                                <option value='ANIMACIÓN'>ANIMACIÓN</option>
-                                <option value='APOYO ADMINISTRATIVO'>APOYO ADMINISTRATIVO</option>
-                                <option value='APOYO AUDIOVISUAL'>APOYO AUDIOVISUAL</option>
-                                <option value='APOYO TÉCNICO INFORMÁTICO'>APOYO TÉCNICO INFORMÁTICO</option>
-                                <option value='APOYO TÉCNICO'>APOYO TÉCNICO</option>
+                            <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Trabajo / Item a Solicitar</label>
+                            <select id="product" name="product" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+                                <option value="" disabled selected>Seleccione un tipo de trabajo...</option>
                                 <option value='AUDIOGRABACIÓN'>AUDIOGRABACIÓN</option>
-                                <option value='CENTÍMETROS PLOTTER'>CENTÍMETROS PLOTTER</option>
                                 <option value='DIBUJO E ILUSTRACIÓN'>DIBUJO E ILUSTRACIÓN</option>
-                                <option value='DISEÑO IMPRESIÓN MONTAJE Y CORTE'>DISEÑO IMPRESIÓN MONTAJE Y CORTE</option>
                                 <option value='DISEÑO'>DISEÑO</option>
                                 <option value='EDICIÓN DE FOTOGRAFÍA DIGITAL'>EDICIÓN DE FOTOGRAFÍA DIGITAL</option>
-                                <option value='ENGARGOLADOS'>ENGARGOLADOS</option>
-                                <option value='ESCANEOS'>ESCANEOS</option>
-                                <option value='FOTOGRAFÍAS BANCO DE IMÁGEN'>FOTOGRAFÍAS BANCO DE IMÁGEN</option>
-                                <option value='FOTOGRAFÍAS COMPARTIDAS'>FOTOGRAFÍAS COMPARTIDAS</option>
-                                <option value='IMPRESIÓN PAPEL REUSO'>IMPRESIONES PAPEL REUSO</option>
-                                <option value='IMPRESIONES CARTA'>IMPRESIONES CARTA</option>
-                                <option value='IMPRESIONES OFICIO'>IMPRESIONES OFICIO</option>
-                                <option value='IMPRESIONES PAPEL ESPECIAL'>IMPRESIONES PAPEL ESPECIAL</option>
-                                <option value='IMPRESIONES TABLOIDE'>IMPRESIONES TABLOIDE</option>
-                                <option value='PRESTAMO DE EQUIPO'>PRESTAMO DE EQUIPO</option>
-                                <option value='PRODUCCIÓN AUDIOVISUAL'>PRODUCCIÓN AUDIOVISUAL</option>
-                                <option value='SOLICITUD DE VECTORIZADO'>VECTORIZADO</option>
-                                <option value='VIDEO BANCO DE IMÁGEN'>VIDEO BANCO DE IMÁGEN</option>
-                                <option value='VIDEOS COMPARTIDOS'>VIDEOS COMPARTIDOS</option>
-                                <option value='VIDEOS EDITADOS'>VIDEOS EDITADOS</option>
+                                <option value='ENGARGOLADO'>ENGARGOLADO</option>
+                                <option value='ESCANEO'>ESCANEO</option>
+                                <option value='IMPRESIÓN DIGITAL'>IMPRESIÓN DIGITAL</option>
+                                <option value='IMPRESIÓN EN PLOTTER'>IMPRESIÓN EN PLOTTER</option>
+                                <option value='INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO'>INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO</option>
+                                <option value='MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC'>MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC</option>
+                                <option value='SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN'>SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN</option>
+                                <option value='MONTAJE EN SOPORTE PROPIO O NUEVO'>MONTAJE EN SOPORTE PROPIO O NUEVO</option>
+                                <option value='SOLICITUD DE TOMA DE FOTOGRAFÍAS'>SOLICITUD DE TOMA DE FOTOGRAFÍAS</option>
+                                <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
+                                <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
+                                <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
+                                <option value='OTRO'>OTRO</option>
                             </select>
                         </div>
                         <div class="md:col-span-1">
@@ -414,34 +361,53 @@
                             <button type="button" id="addItemBtn" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300">Agregar</button>
                         </div>
                     </div>
-                    <!-- Campos condicionales -->
-                    <div id="paperTypeContainer" class="conditional-field">
-                        <label for="paperType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Papel</label>
-                        <select id="paperType" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="BOND">BOND</option>
-                            <option value="OPALINA PAPEL">OPALINA PAPEL</option>
-                            <option value="OPALINA CARTULINA">OPALINA CARTULINA</option>
-                            <option value="NACARADO">NACARADO</option>
-                            <option value="ALBANENE">ALBANENE</option>
-                            <option value="ADHERIBLE">ADHERIBLE</option>
-                            <option value="OTROS">OTROS</option>
-                        </select>
-                    </div>
-                    <div id="doubleSidedContainer" class="conditional-field mt-4">
+                    <div id="digitalPrintContainer" class="conditional-field space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="paperType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Papel</label>
+                                <select id="paperType" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+                                    <option value="BOND">BOND</option>
+                                    <option value="OPALINA PAPEL">OPALINA PAPEL</option>
+                                    <option value="OPALINA CARTULINA">OPALINA CARTULINA</option>
+                                    <option value="NACARADO">NACARADO</option>
+                                    <option value="ALBANENE">ALBANENE</option>
+                                    <option value="ADHERIBLE">ADHERIBLE</option>
+                                    <option value="OTROS">OTROS</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="paperSize" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de Papel</label>
+                                <select id="paperSize" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+                                    <option value="CARTA">CARTA</option>
+                                    <option value="OFICIO">OFICIO</option>
+                                    <option value="TABLOIDE">TABLOIDE (DOBLE CARTA)</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="flex items-center">
                             <input id="doubleSided" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
                             <label for="doubleSided" class="ml-2 block text-sm text-gray-900">Imprimir en ambas caras</label>
                         </div>
                     </div>
-                    <div id="rollTypeContainer" class="conditional-field">
-                        <label for="rollType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Rollo</label>
-                        <select id="rollType" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="ROLLO BOND">ROLLO BOND</option>
-                            <option value="ROLLO ADHERIBLE PAPEL">ROLLO ADHERIBLE PAPEL</option>
-                            <option value="ROLLO ADHERIBLE VINIL">ROLLO ADHERIBLE VINIL</option>
-                            <option value="ROLLO FOTOGRÁFICO MATE">ROLLO FOTOGRÁFICO MATE</option>
-                            <option value="ROLLO FOTOGRÁFICO BRILLANTE">ROLLO FOTOGRÁFICO BRILLANTE</option>
-                        </select>
+                    <div id="plotterContainer" class="conditional-field">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="plotterWidth" class="block text-sm font-medium text-gray-700 mb-1">Ancho (cm)</label>
+                                <input type="number" id="plotterWidth" min="1" max="90" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 90">
+                                <div id="plotterWidthError" class="hidden flex items-center text-red-600 text-sm mt-1">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                    <span>El ancho no debe exceder los 90 cm.</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="plotterLength" class="block text-sm font-medium text-gray-700 mb-1">Largo (cm)</label>
+                                <input type="number" id="plotterLength" min="1" max="150" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 120">
+                                <div id="plotterLengthError" class="hidden flex items-center text-red-600 text-sm mt-1">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                                    <span>El largo no debe exceder los 150 cm.</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="engarContainer" class="conditional-field">
@@ -453,33 +419,45 @@
                         </select>
                     </div>
                     <div id="orientacionContainer" class="conditional-field mt-4">
-                        <div class="flex items-center">
-                            <input id="horizontal" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
-                            <label for="horizontal" class="ml-2 block text-sm text-gray-900">Horizontal</label>
-                            <input id="vertical" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
-                            <label for="vertical" class="ml-2 block text-sm text-gray-900">Vertical</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Orientación</label>
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center">
+                                <input id="horizontal" name="orientation" type="radio" value="Horizontal" class="h-4 w-4 text-brand border-gray-300 focus:ring-brand">
+                                <label for="horizontal" class="ml-2 block text-sm text-gray-900">Horizontal</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="vertical" name="orientation" type="radio" value="Vertical" class="h-4 w-4 text-brand border-gray-300 focus:ring-brand">
+                                <label for="vertical" class="ml-2 block text-sm text-gray-900">Vertical</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Tabla de Items Agregados -->
                 <div class="mt-6">
                     <h4 class="text-md font-medium text-gray-600 mb-2">Items Agregados:</h4>
                     <div class="overflow-x-auto"><table class="min-w-full bg-white border border-gray-200"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-4 text-sm font-semibold text-gray-600">Item</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Cantidad</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Acción</th></tr></thead><tbody id="itemsTableBody"><tr id="noItemsRow"><td colspan="3" class="text-center py-4 text-gray-500">Aún no se han agregado items.</td></tr></tbody></table></div>
                 </div>
             </div>
 
-            <!-- Sección 4: Carga de Archivos -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">3. Detalles del Trabajo</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción Detallada del Trabajo</label>
+                        <textarea id="description" name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Por favor, sea lo más específico posible..."></textarea>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">4. Archivos Adjuntos (Opcional)</h3>
                 <div class="bg-gray-50 p-4 rounded-lg border-dashed border-2 border-gray-300">
                     <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-2">Seleccione hasta 3 archivos (máx. 10MB por archivo)</label>
-                    <input type="file" id="fileUpload" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20">
+                    <input type="file" id="fileUpload" name="files" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20">
                     <div id="fileList" class="mt-3 text-sm text-gray-600"></div>
                     <div id="fileError" class="mt-2 text-sm text-red-600"></div>
                 </div>
             </div>
 
-            <!-- Botones de Envío -->
             <div class="pt-6 border-t border-gray-200 flex justify-end items-center space-x-4">
                 <div id="loadingSpinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
                 <div id="statusMessage" class="text-sm font-medium"></div>
@@ -494,6 +472,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/js/shepherd.min.js"></script>
 
-    <script src=./scripts.js></script>
+    <script src="./scripts.js"></script>
 </body>
 </html>

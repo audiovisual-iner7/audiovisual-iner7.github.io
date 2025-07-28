@@ -243,30 +243,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetch(scriptURL, {
             method: 'POST',
-            mode: 'cors', 
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-            redirect: 'follow'
+            body: JSON.stringify(data)
+            // Removemos todos los headers y configuraciones que pueden causar preflight
         })
-        .then(response => response.json())
-        .then(res => {
-            if (res.result === 'success') {
-                statusMessage.textContent = '¡Solicitud enviada con éxito!';
-                statusMessage.className = 'text-green-600';
-                form.reset();
-                itemsTableBody.innerHTML = '';
-                if (noItemsRow) {
-                    itemsTableBody.appendChild(noItemsRow);
-                    noItemsRow.style.display = 'table-row';
+        .then(response => {
+            // Con Google Apps Script, a veces necesitamos manejar la respuesta como texto primero
+            return response.text();
+        })
+        .then(text => {
+            try {
+                const res = JSON.parse(text);
+                if (res.result === 'success') {
+                    statusMessage.textContent = '¡Solicitud enviada con éxito!';
+                    statusMessage.className = 'text-green-600';
+                    form.reset();
+                    itemsTableBody.innerHTML = '';
+                    if (noItemsRow) {
+                        itemsTableBody.appendChild(noItemsRow);
+                        noItemsRow.style.display = 'table-row';
+                    }
+                    fileList.innerHTML = '';
+                    digitalPrintContainer.style.display = 'none';
+                    plotterContainer.style.display = 'none';
+                    engarContainer.style.display = 'none';
+                    orientacionContainer.style.display = 'none';
+                } else {
+                    throw new Error(res.error || 'Error desconocido del servidor.');
                 }
-                fileList.innerHTML = '';
-                digitalPrintContainer.style.display = 'none';
-                plotterContainer.style.display = 'none';
-                engarContainer.style.display = 'none';
-                orientacionContainer.style.display = 'none';
-            } else {
-                throw new Error(res.error || 'Error desconocido del servidor.');
+            } catch (parseError) {
+                // Si no se puede parsear como JSON, mostrar el texto crudo para debug
+                console.log('Respuesta del servidor:', text);
+                throw new Error('Respuesta inválida del servidor');
             }
         })
         .catch(error => {
@@ -281,6 +288,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+
+
+    
     // --- Configuración del Tour con Shepherd.js ---
     const tour = new Shepherd.Tour({
       useModalOverlay: true,

@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Promise.all(filePromises)
                 .then(fileDataArray => {
                     data.files = fileDataArray;
+                    data.action = "solicitud";
                     sendDataToGoogle(data);
                 })
                 .catch(error => {
@@ -234,16 +235,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     loadingSpinner.classList.add('hidden');
                 });
         } else {
+            data.action = "solicitud";
             sendDataToGoogle(data);
         }
     });
 
   function sendDataToGoogle(data) {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbz7dPGWOXudgEg8f8ZOh-qmGoxE0f_48Aesk-RwMeTCiVHNRfua7db1OomX-aCI8nrnYQ/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw8I9ZV5R8k3-Td1BnMgO1omTf-hHFs95DUyDPDip_Y_99-uFd09wNE2NeN7r0fZVpHHA/exec';
 
     fetch(scriptURL, {
         method: 'POST',
         body: JSON.stringify(data)
+        
         // ← Solo esto, nada más
     })
     .then(response => response.json())

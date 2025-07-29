@@ -110,6 +110,82 @@
             align-items: center;
             gap: 1rem;
         }
+
+        /* Estilos para las ilustraciones de orientación */
+        .page-illustration {
+            position: relative;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 2px;
+        }
+
+        .page-illustration.vertical {
+            width: 40px;
+            height: 55px;
+        }
+
+        .page-illustration.horizontal {
+            width: 55px;
+            height: 40px;
+        }
+
+        /* Costillas/bindings */
+        .binding-left, .binding-right, .binding-top, .binding-bottom {
+            position: absolute;
+            background-color: var(--brand-color);
+            border-radius: 1px;
+        }
+
+        .binding-left {
+            left: -2px;
+            top: 5px;
+            bottom: 5px;
+            width: 4px;
+        }
+
+        .binding-right {
+            right: -2px;
+            top: 5px;
+            bottom: 5px;
+            width: 4px;
+        }
+
+        .binding-top {
+            top: -2px;
+            left: 5px;
+            right: 5px;
+            height: 4px;
+        }
+
+        .binding-bottom {
+            bottom: -2px;
+            left: 5px;
+            right: 5px;
+            height: 4px;
+        }
+
+        /* Estados de selección */
+        .orientation-card input:checked + label {
+            border-color: var(--brand-color);
+            background-color: rgba(0, 60, 125, 0.05);
+        }
+
+        .orientation-card input:checked + label .page-illustration {
+            background-color: rgba(0, 60, 125, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-illustration.vertical {
+                width: 35px;
+                height: 48px;
+            }
+            
+            .page-illustration.horizontal {
+                width: 48px;
+                height: 35px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -418,16 +494,61 @@
                             <option value="DOBLE CARTA">TAMAÑO DOBLE CARTA</option>
                         </select>
                     </div>
+
+                    <!-- Orientación Visual -->
                     <div id="orientacionContainer" class="conditional-field mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Orientación</label>
-                        <div class="flex items-center space-x-6">
-                            <div class="flex items-center">
-                                <input id="horizontal" name="orientation" type="radio" value="Horizontal" class="h-4 w-4 text-brand border-gray-300 focus:ring-brand">
-                                <label for="horizontal" class="ml-2 block text-sm text-gray-900">Horizontal</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Orientación y Posición de la Costilla</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Vertical - Izquierda -->
+                            <div class="orientation-card">
+                                <input id="vertical-izquierda" name="orientation" type="radio" value="Vertical - Costilla Izquierda" class="sr-only">
+                                <label for="vertical-izquierda" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+                                    <div class="flex flex-col items-center">
+                                        <div class="page-illustration vertical mb-2">
+                                            <div class="binding-left"></div>
+                                        </div>
+                                        <span class="text-xs text-center font-medium">Vertical<br>Izquierda</span>
+                                    </div>
+                                </label>
                             </div>
-                            <div class="flex items-center">
-                                <input id="vertical" name="orientation" type="radio" value="Vertical" class="h-4 w-4 text-brand border-gray-300 focus:ring-brand">
-                                <label for="vertical" class="ml-2 block text-sm text-gray-900">Vertical</label>
+                            
+                            <!-- Vertical - Arriba -->
+                            <div class="orientation-card">
+                                <input id="vertical-arriba" name="orientation" type="radio" value="Vertical - Costilla Arriba" class="sr-only">
+                                <label for="vertical-arriba" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+                                    <div class="flex flex-col items-center">
+                                        <div class="page-illustration vertical mb-2">
+                                            <div class="binding-top"></div>
+                                        </div>
+                                        <span class="text-xs text-center font-medium">Vertical<br>Arriba</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Horizontal - Izquierda -->
+                            <div class="orientation-card">
+                                <input id="horizontal-izquierda" name="orientation" type="radio" value="Horizontal - Costilla Izquierda" class="sr-only">
+                                <label for="horizontal-izquierda" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+                                    <div class="flex flex-col items-center">
+                                        <div class="page-illustration horizontal mb-2">
+                                            <div class="binding-left"></div>
+                                        </div>
+                                        <span class="text-xs text-center font-medium">Horizontal<br>Izquierda</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Horizontal - Arriba -->
+                            <div class="orientation-card">
+                                <input id="horizontal-arriba" name="orientation" type="radio" value="Horizontal - Costilla Arriba" class="sr-only">
+                                <label for="horizontal-arriba" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+                                    <div class="flex flex-col items-center">
+                                        <div class="page-illustration horizontal mb-2">
+                                            <div class="binding-top"></div>
+                                        </div>
+                                        <span class="text-xs text-center font-medium">Horizontal<br>Arriba</span>
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>

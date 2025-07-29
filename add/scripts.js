@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data.timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
         
         delete data.product;
-        delete data.orientation;
+        
 
         const files = fileUpload.files;
         if (files.length > 0) {

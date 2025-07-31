@@ -224,12 +224,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <td class="text-sm" title="${solicitud.descripcion}">${descripcionCorta}</td>
             <td class="text-sm" ">${solicitud.comentarios}</td>
 
-            <td>
-                <button class="assign-btn bg-brand text-white px-3 py-1 rounded text-sm hover:bg-brand-light transition-colors" 
-                        data-index="${index}">
-                    Asignar
-                </button>
-            </td>
         `;
 
         // Agregar event listener al botón de asignar
@@ -257,115 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- 4. MODAL DE ASIGNACIÓN ---
-    
-    function openAssignModal(solicitud, index) {
-        currentTaskToAssign = { ...solicitud, index };
-        
-        // Mostrar detalles de la tarea
-        assignTaskDetails.innerHTML = `
-            <div class="space-y-2">
-                <div><strong>Solicitante:</strong> ${solicitud.nombre}</div>
-                <div><strong>Área:</strong> ${solicitud.area}</div>
-                <div><strong>Fecha:</strong> ${new Date(solicitud.fecha).toLocaleDateString('es-MX')}</div>
-                <div><strong>Descripción:</strong> ${solicitud.descripcion}</div>
-                <div><strong>Artículos:</strong> ${solicitud.articulos}</div>
-            </div>
-        `;
-        
-        // Limpiar campos
-        assignTo.value = '';
-        assignComments.value = '';
-        
-        // Mostrar modal
-        assignModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeAssignModal() {
-        assignModal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        currentTaskToAssign = null;
-    }
-
-    // Event listeners del modal
-    closeModalBtn.addEventListener('click', closeAssignModal);
-    cancelAssignBtn.addEventListener('click', closeAssignModal);
-    
-    // Cerrar modal al hacer click fuera
-    assignModal.addEventListener('click', function(e) {
-        if (e.target === assignModal) {
-            closeAssignModal();
-        }
-    });
-
-    // Confirmar asignación
-    confirmAssignBtn.addEventListener('click', async function() {
-        const assignedTo = assignTo.value.trim();
-        const comments = assignComments.value.trim();
-        
-        if (!assignedTo) {
-            alert('Por favor, seleccione a quién asignar la tarea.');
-            return;
-        }
-
-        setAssignLoading(true);
-
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'assignTask',
-                    taskData: currentTaskToAssign,
-                    assignedTo: assignedTo,
-                    comments: comments,
-                    assignedBy: currentUser.username
-                }),
-                
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                closeAssignModal();
-                loadPendientes(); // Recargar la lista
-                
-                // Mostrar mensaje de éxito
-                showSuccessMessage(`Tarea asignada exitosamente a ${assignedTo}`);
-            } else {
-                alert(result.message || 'Error al asignar la tarea.');
-            }
-        } catch (error) {
-            console.error('Error al asignar tarea:', error);
-            alert('Error de conexión al asignar la tarea.');
-        } finally {
-            setAssignLoading(false);
-        }
-    });
-
-    function setAssignLoading(loading) {
-        confirmAssignBtn.disabled = loading;
-        if (loading) {
-            assignBtnText.textContent = 'Asignando...';
-            assignSpinner.classList.remove('hidden');
-        } else {
-            assignBtnText.textContent = 'Asignar Tarea';
-            assignSpinner.classList.add('hidden');
-        }
-    }
-
-    function showSuccessMessage(message) {
-        // Crear y mostrar mensaje de éxito temporal
-        const successDiv = document.createElement('div');
-        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        successDiv.textContent = message;
-        
-        document.body.appendChild(successDiv);
-        
-        setTimeout(() => {
-            successDiv.remove();
-        }, 3000);
-    }
 
     // --- 5. MANEJO DE TECLADO ---
     

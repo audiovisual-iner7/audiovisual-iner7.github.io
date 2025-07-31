@@ -367,11 +367,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
 
-        // Paso 3: Descripción del trabajo
-        
-
-        
-
+        // Paso 3: Descripción del trabajo 
+  
 
         tour.addStep({
         id: 'step-items',
@@ -390,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         id: 'step-workType',
         text: 'Aquí debes describir lo mas detalladamente posible el trabajo que necesitas. \n Por ejemplo, si necesitas imprimir un documento, especifica el tipo de papel, tamaño, si es a color o en blanco y negro. Si es un diseño, incluye detalles sobre los elementos gráficos, colores y cualquier otro requisito específico. Además de la Justificación del trabajo.',
         attachTo: {
-            element: '#workType',
+            element: '#description',
             on: 'bottom'
         },
         buttons: [

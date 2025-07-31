@@ -227,8 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         // Agregar event listener al botón de asignar
-        const assignBtn = row.querySelector('.assign-btn');
-        assignBtn.addEventListener('click', () => openAssignModal(solicitud, index));
+       
 
         return row;
     }

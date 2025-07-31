@@ -252,7 +252,8 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(res => {
         if (res.result === 'success') {
-            statusMessage.textContent = '¡Solicitud enviada con éxito!';
+            var folio = res.folio ;
+            statusMessage.textContent = '¡Solicitud enviada con éxito! Tu folio es: ' + folio;
             statusMessage.className = 'text-green-600';
             form.reset();
             itemsTableBody.innerHTML = '';

@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedServices = []; // Para almacenar los servicios seleccionados
     let selectedServicio = null;
     let serviciosCart = [];
+    var solicitudProceso = null;
 
     // Lista de servicios
     const serviciosList = [
@@ -65,9 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal elements
     const assignModal = document.getElementById('assignModal');
 
-
     let currentUser = null;
-
 
     // --- 1. MANEJO DE AUTENTICACIÓN ---
     
@@ -205,6 +204,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function traerSolicitud(folioSolicitud) {       
+        
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'solicitudFolio',
+                    folio: folioSolicitud
+                }),
+                
+            });
+
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                displayPendientes(result.pendientes);
+            } else {
+                console.error('Error al cargar solicitud:', result.message);
+                showNoPendientes('Error al cargar la solicitud.');
+            }
+        } catch (error) {
+            console.error('Error en loadPendientes:', error);
+            showNoPendientes('Error de conexión al cargar la solicitud.');
+        }
+    }
+
     function showLoadingPendientes() {
         loadingPendientes.classList.remove('hidden');
         pendientesContainer.classList.add('hidden');
@@ -218,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Guardar para usar en el combo - MOVER ESTAS LÍNEAS AQUÍ
+        // Guardar para usar en el combo
         pendientesList = pendientes;
         populateFolioCombo(pendientes);
 
@@ -246,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createPendienteRow(solicitud, index) {
         const row = document.createElement('tr');
         row.className = 'hover:bg-gray-50';
-        const folio = solicitud.folio ;
+        const folio = solicitud.folio;
         // Formatear fecha
         const fecha = new Date(solicitud.fecha).toLocaleDateString('es-MX');
         
@@ -262,12 +287,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <td class="text-sm">${fecha}</td>
             <td class="font-medium">${solicitud.solicitante}</td>
             <td class="text-sm" title="${solicitud.descripcion}">${descripcionCorta}</td>
-            <td class="text-sm" ">${solicitud.comentarios}</td>
-
+            <td class="text-sm">${solicitud.comentarios}</td>
         `;
-
-        // Agregar event listener al botón de asignar
-       
 
         return row;
     }
@@ -290,507 +311,620 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
     // --- 5. MANEJO DE TECLADO ---
     
     // Cerrar modal con Escape
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !assignModal.classList.contains('hidden')) {
+        if (e.key === 'Escape' && assignModal && !assignModal.classList.contains('hidden')) {
             closeAssignModal();
         }
     });
 
-
     // --- NUEVAS FUNCIONES PARA EL FORMULARIO ---
 
-        // Elementos del DOM para el formulario (agregar al inicio con los otros elementos)
-        const folioSolicitud = document.getElementById('folioSolicitud');
-        const duplicadorDigital = document.getElementById('duplicadorDigital');
-        const numeroMasters = document.getElementById('numeroMasters');
-        const serviciosBusqueda = document.getElementById('serviciosBusqueda');
-        const serviciosDropdown = document.getElementById('serviciosDropdown');
-        const serviciosSeleccionados = document.getElementById('serviciosSeleccionados');
-        const serviciosCartContainer = document.getElementById('serviciosCart');
-        const nuevaSolicitudForm = document.getElementById('nuevaSolicitudForm');
+    // Elementos del DOM para el formulario
+    const folioSolicitud = document.getElementById('folioSolicitud');
+    const duplicadorDigital = document.getElementById('duplicadorDigital');
+    const numeroMasters = document.getElementById('numeroMasters');
+    const serviciosBusqueda = document.getElementById('serviciosBusqueda');
+    const serviciosDropdown = document.getElementById('serviciosDropdown');
+    const serviciosSeleccionados = document.getElementById('serviciosSeleccionados');
+    const serviciosCartContainer = document.getElementById('serviciosCart');
+    const nuevaSolicitudForm = document.getElementById('nuevaSolicitudForm');
 
-        function populateFolioCombo(pendientes) {
-            if (!folioSolicitud) return; // Si no existe el elemento, no hacer nada
-            
-            // Limpiar opciones existentes excepto la primera
-            folioSolicitud.innerHTML = '<option value="">Seleccionar folio...</option>';
-            
-            // Agregar folios de pendientes
-            pendientes.forEach(pendiente => {
-                const option = document.createElement('option');
-                option.value = pendiente.folio;
-                option.textContent = `${pendiente.folio} - ${pendiente.solicitante}`;
-                option.dataset.pendiente = JSON.stringify(pendiente);
-                folioSolicitud.appendChild(option);
-            });
+    // --- FUNCIONES PARA SERVICIOS ---
+
+    // Poblar el dropdown de servicios
+    function populateServiciosDropdown(servicios = null) {
+        const dropdown = document.getElementById('serviciosDropdown');
+        if (!dropdown) return;
+        
+        const serviciosToShow = servicios || serviciosList;
+        dropdown.innerHTML = '';
+        
+        if (serviciosToShow.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'px-3 py-2 text-gray-500 text-sm';
+            noResults.textContent = 'No se encontraron servicios';
+            dropdown.appendChild(noResults);
+            dropdown.classList.remove('hidden');
+            return;
         }
+        
+        serviciosToShow.forEach(servicio => {
+            const item = document.createElement('div');
+            item.className = 'service-dropdown-item px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0';
+            item.textContent = servicio;
+            item.addEventListener('click', () => selectServicio(servicio));
+            dropdown.appendChild(item);
+        });
+        
+        dropdown.classList.remove('hidden');
+    }
 
-        function autoFillFormData(pendiente) {
-            // Llenar campos que coincidan
-            if (pendiente.fecha) {
-                const fechaInput = document.getElementById('fechaSolicitud');
-                if (fechaInput) fechaInput.value = formatDateForInput(pendiente.fecha);
+    // Filtrar servicios
+    function filterServicios(searchTerm) {
+        if (!searchTerm || searchTerm.length === 0) {
+            return serviciosList; // Mostrar todos si no hay búsqueda
+        }
+        
+        return serviciosList.filter(servicio => 
+            servicio.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
+    // Seleccionar servicio
+    function selectServicio(servicio) {
+        selectedServicio = servicio;
+        document.getElementById('serviciosBusqueda').value = servicio;
+        document.getElementById('serviciosDropdown').classList.add('hidden');
+        document.getElementById('agregarServicioBtn').disabled = false;
+        showServiceSpecificFields(servicio);
+    }
+
+    // Limpiar selección
+    function clearServicioSelection() {
+        selectedServicio = null;
+        document.getElementById('agregarServicioBtn').disabled = true;
+        hideAllSpecificFields();
+    }
+
+    // Mostrar campos específicos según el servicio
+    function showServiceSpecificFields(servicio) {
+        // Ocultar todos los campos específicos primero
+        hideAllSpecificFields();
+        
+        const servicioUpper = servicio.toUpperCase();
+        
+        // Campos para impresiones
+        if (servicioUpper.includes('IMPRESIONES')) {
+            showImpresionFields();
+        }
+        // Campos para hojas (pero no impresiones)
+        else if (servicioUpper.includes('HOJAS')) {
+            showHojasFields();
+        }
+        // Campos para plotter
+        else if (servicioUpper.includes('CENTÍMETROS PLOTTER')) {
+            showPlotterFields();
+        }
+        // Campos para diseño
+        else if (servicioUpper.includes('DISEÑO')) {
+            showDisenoFields();
+        }
+        // Campos para fotografía
+        else if (servicioUpper.includes('FOTOGRAFÍAS') || servicioUpper.includes('EDICIÓN DE FOTOGRAFÍA')) {
+            showFotografiaFields();
+        }
+        // Campos para video
+        else if (servicioUpper.includes('VIDEO') || servicioUpper.includes('PRODUCCIÓN AUDIOVISUAL')) {
+            showVideoFields();
+        }
+        // Campos para CD/DVD
+        else if (servicioUpper.includes('CD:') || servicioUpper.includes('DVD:')) {
+            showDiscFields();
+        }
+    }
+
+    function hideAllSpecificFields() {
+        const containers = [
+            'impresionFields',
+            'hojasFields',
+            'plotterFields',
+            'disenoFields', 
+            'fotografiaFields',
+            'videoFields',
+            'discFields'
+        ];
+        
+        containers.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.classList.add('hidden');
+        });
+    }
+
+    function showImpresionFields() {
+        const container = document.getElementById('impresionFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    function showHojasFields() {
+        const container = document.getElementById('hojasFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    function showPlotterFields() {
+        const container = document.getElementById('plotterFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    function showDisenoFields() {
+        const container = document.getElementById('disenoFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    function showFotografiaFields() {
+        const container = document.getElementById('fotografiaFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    function showVideoFields() {
+        const container = document.getElementById('videoFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    function showDiscFields() {
+        const container = document.getElementById('discFields');
+        if (container) container.classList.remove('hidden');
+    }
+
+    // Validar campos específicos del servicio
+    function validateServiceFields(servicio) {
+        const servicioUpper = servicio.toUpperCase();
+        
+        if (servicioUpper.includes('IMPRESIONES')) {
+            const tipoPapel = document.getElementById('tipoPapelImpresion')?.value;
+            const numeroHojas = document.getElementById('numeroHojasImpresion')?.value;
+            const numeroImpresiones = document.getElementById('numeroImpresiones')?.value;
+            
+            if (!tipoPapel || !numeroHojas || !numeroImpresiones) {
+                alert('Por favor complete todos los campos requeridos para impresiones');
+                return false;
             }
-            if (pendiente.solicitante) {
-                const solicitanteInput = document.getElementById('nombreSolicitante');
-                if (solicitanteInput) solicitanteInput.value = pendiente.solicitante;
-            }
-            if (pendiente.descripcion) {
-                const descripcionInput = document.getElementById('descripcionTrabajo');
-                if (descripcionInput) descripcionInput.value = pendiente.descripcion;
-            }
-        }
-
-        function clearFormData() {
-            // Limpiar campos autocompletables
-            const fechaInput = document.getElementById('fechaSolicitud');
-            const solicitanteInput = document.getElementById('nombreSolicitante');
-            const descripcionInput = document.getElementById('descripcionTrabajo');
             
-            if (fechaInput) fechaInput.value = '';
-            if (solicitanteInput) solicitanteInput.value = '';
-            if (descripcionInput) descripcionInput.value = '';
-        }
-
-        function formatDateForInput(dateString) {
-            const date = new Date(dateString);
-            return date.toISOString().split('T')[0];
-        }
-
-        function displayServiceDropdown(services) {
-            if (!serviciosDropdown) return;
+            const hojas = parseInt(numeroHojas);
+            const impresiones = parseInt(numeroImpresiones);
             
-            serviciosDropdown.innerHTML = '';
-            
-            if (services.length === 0) {
-                serviciosDropdown.classList.add('hidden');
-                return;
+            if (impresiones < hojas || impresiones > hojas * 2) {
+                alert(`Las impresiones deben estar entre ${hojas} y ${hojas * 2}`);
+                return false;
             }
-
-            services.forEach(service => {
-                const item = document.createElement('div');
-                item.className = 'service-dropdown-item';
-                item.textContent = service;
-                item.addEventListener('click', () => addServiceToCart(service));
-                serviciosDropdown.appendChild(item);
-            });
-
-            serviciosDropdown.classList.remove('hidden');
         }
-
-        function addServiceToCart(serviceName) {
-            // Verificar si el servicio ya está en el carrito
-            if (selectedServices.find(s => s.name === serviceName)) {
-                alert('Este servicio ya está agregado');
-                return;
-            }
-
-            const service = {
-                name: serviceName,
-                quantity: 1,
-                specifications: ''
-            };
-
-            selectedServices.push(service);
-            updateServicesCart();
+        else if (servicioUpper.includes('HOJAS')) {
+            const tipoPapel = document.getElementById('tipoPapelHojas')?.value;
+            const cantidadHojas = document.getElementById('cantidadHojas')?.value;
             
-            // Limpiar búsqueda
-            if (serviciosBusqueda) serviciosBusqueda.value = '';
-            if (serviciosDropdown) serviciosDropdown.classList.add('hidden');
-        }
-
-        function updateServicesCart() {
-            if (!serviciosSeleccionados || !serviciosCartContainer) return; // ← Cambiar aquí
-            
-            if (selectedServices.length === 0) {
-                serviciosSeleccionados.classList.add('hidden');
-                return;
+            if (!tipoPapel || !cantidadHojas) {
+                alert('Por favor complete todos los campos requeridos para hojas');
+                return false;
             }
-
-            serviciosSeleccionados.classList.remove('hidden');
-            serviciosCartContainer.innerHTML = ''; // ← Cambiar aquí
-
-            selectedServices.forEach((service, index) => {
-                const cartItem = createCartItem(service, index);
-                serviciosCartContainer.appendChild(cartItem); // ← Cambiar aquí
-            });
         }
+        else if (servicioUpper.includes('CENTÍMETROS PLOTTER')) {
+            const tipoRollo = document.getElementById('tipoRolloPlotter')?.value;
+            const centimetros = document.getElementById('centimetrosPlotter')?.value;
+            
+            if (!tipoRollo || !centimetros) {
+                alert('Por favor complete todos los campos requeridos para plotter');
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
-        function createCartItem(service, index) {
-            const div = document.createElement('div');
-            div.className = 'cart-item';
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-medium text-gray-900">${service.name}</h4>
-                    <button type="button" onclick="removeService(${index})" class="text-red-600 hover:text-red-800">
-                        <i class="fas fa-times"></i>
+    // Obtener datos específicos del servicio
+    function getServiceSpecificData(servicio) {
+        const servicioUpper = servicio.toUpperCase();
+        const detalles = {};
+        
+        if (servicioUpper.includes('IMPRESIONES')) {
+            detalles.tipoPapel = document.getElementById('tipoPapelImpresion')?.value || '';
+            detalles.numeroHojas = document.getElementById('numeroHojasImpresion')?.value || '';
+            detalles.numeroImpresiones = document.getElementById('numeroImpresiones')?.value || '';
+        }
+        else if (servicioUpper.includes('HOJAS')) {
+            detalles.tipoPapel = document.getElementById('tipoPapelHojas')?.value || '';
+            detalles.cantidadHojas = document.getElementById('cantidadHojas')?.value || '';
+        }
+        else if (servicioUpper.includes('CENTÍMETROS PLOTTER')) {
+            detalles.tipoRollo = document.getElementById('tipoRolloPlotter')?.value || '';
+            detalles.centimetros = document.getElementById('centimetrosPlotter')?.value || '';
+        }
+        
+        return detalles;
+    }
+
+    // Agregar servicio al carrito
+    function addServicioToCart(servicio = null) {
+        const servicioToAdd = servicio || selectedServicio;
+        
+        if (!servicioToAdd) {
+            alert('Seleccione un servicio primero');
+            return;
+        }
+        
+        if (serviciosCart.some(item => item.nombre === servicioToAdd)) {
+            alert('Este servicio ya está agregado');
+            return;
+        }
+        
+        // Validar campos requeridos antes de agregar
+        if (!validateServiceFields(servicioToAdd)) {
+            return;
+        }
+        
+        // Recopilar datos específicos del servicio
+        const servicioData = {
+            nombre: servicioToAdd,
+            cantidad: 1,
+            detalles: getServiceSpecificData(servicioToAdd)
+        };
+        
+        serviciosCart.push(servicioData);
+        renderServiciosCart();
+        document.getElementById('serviciosSeleccionados').classList.remove('hidden');
+        
+        // Limpiar selección y ocultar campos específicos
+        document.getElementById('serviciosBusqueda').value = '';
+        hideAllSpecificFields();
+        selectedServicio = null;
+        document.getElementById('agregarServicioBtn').disabled = true;
+        document.getElementById('serviciosDropdown').classList.add('hidden');
+    }
+
+    // Renderizar el carrito de servicios
+    function renderServiciosCart() {
+        const cartContainer = document.getElementById('serviciosCart');
+        
+        if (!cartContainer) {
+            console.error('Elemento serviciosCart no encontrado en el HTML');
+            return;
+        }
+        
+        cartContainer.innerHTML = '';
+        
+        serviciosCart.forEach((servicio, index) => {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item flex justify-between items-center p-3 bg-gray-50 border rounded-lg mb-2';
+            cartItem.innerHTML = `
+                <div class="flex-1">
+                    <span class="font-medium text-gray-800">${servicio.nombre}</span>
+                    ${Object.keys(servicio.detalles).length > 0 ? 
+                        `<div class="text-xs text-gray-600 mt-1">${JSON.stringify(servicio.detalles)}</div>` : ''}
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                        <label class="text-sm text-gray-600">Cant:</label>
+                        <input type="number" min="1" value="${servicio.cantidad}" 
+                            class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
+                            onchange="updateServicioCantidad(${index}, this.value)">
+                    </div>
+                    <button type="button" onclick="editServicio(${index})" 
+                            class="px-2 py-1 text-blue-600 hover:text-blue-800 text-sm border border-blue-300 rounded hover:bg-blue-50 transition-colors">
+                        Editar
+                    </button>
+                    <button type="button" onclick="removeServicioFromCart(${index})" 
+                            class="px-2 py-1 text-red-600 hover:text-red-800 text-sm border border-red-300 rounded hover:bg-red-50 transition-colors">
+                        Eliminar
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Cantidad</label>
-                        <input type="number" min="1" value="${service.quantity}" 
-                            onchange="updateServiceQuantity(${index}, this.value)"
-                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Especificaciones</label>
-                        <input type="text" value="${service.specifications}" 
-                            onchange="updateServiceSpecifications(${index}, this.value)"
-                            placeholder="Detalles adicionales..."
-                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    </div>
-                </div>
             `;
-            return div;
+            cartContainer.appendChild(cartItem);
+        });
+        
+        const serviciosSeleccionados = document.getElementById('serviciosSeleccionados');
+        if (serviciosSeleccionados) {
+            if (serviciosCart.length === 0) {
+                serviciosSeleccionados.classList.add('hidden');
+            } else {
+                serviciosSeleccionados.classList.remove('hidden');
+            }
+        }
+    }
+
+    // Funciones globales para el manejo del carrito
+    window.updateServicioCantidad = function(index, cantidad) {
+        serviciosCart[index].cantidad = parseInt(cantidad) || 1;
+        renderServiciosCart();
+    };
+
+    window.editServicio = function(index) {
+        const servicio = serviciosCart[index];
+        const nuevaCantidad = prompt(`Editar cantidad para "${servicio.nombre}":`, servicio.cantidad);
+        
+        if (nuevaCantidad !== null && nuevaCantidad > 0) {
+            serviciosCart[index].cantidad = parseInt(nuevaCantidad);
+            renderServiciosCart();
+        }
+    };
+
+    window.removeServicioFromCart = function(index) {
+        if (confirm('¿Está seguro de eliminar este servicio?')) {
+            serviciosCart.splice(index, 1);
+            renderServiciosCart();
+        }
+    };
+
+    // --- FUNCIONES PARA EL FORMULARIO ---
+
+    function populateFolioCombo(pendientes) {
+        if (!folioSolicitud) return;
+        
+        // Limpiar opciones existentes excepto la primera
+        folioSolicitud.innerHTML = '<option value="">Seleccionar folio...</option>';
+        
+        // Agregar folios de pendientes
+        pendientes.forEach(pendiente => {
+            const option = document.createElement('option');
+            option.value = pendiente.folio;
+            option.textContent = `${pendiente.folio} - ${pendiente.solicitante}`;
+            option.dataset.pendiente = JSON.stringify(pendiente);
+            folioSolicitud.appendChild(option);
+        });
+    }
+
+    function autoFillFormData(pendiente) {
+        var solicitudFol = traerSolicitud(pendiente.folio);
+        // Llenar campos que coincidan
+        if (pendiente.fecha) {
+            const fechaInput = document.getElementById('fechaSolicitud');
+            if (fechaInput) fechaInput.value = formatDateForInput(pendiente.fecha);
+        }
+        if (pendiente.solicitante) {
+            const solicitanteInput = document.getElementById('nombreSolicitante');
+            if (solicitanteInput) solicitanteInput.value = pendiente.solicitante;
+        }
+        if (pendiente.descripcion) {
+            const descripcionInput = document.getElementById('descripcionTrabajo');
+            if (descripcionInput) descripcionInput.value = pendiente.descripcion;
         }
 
-        // Funciones globales para el manejo del carrito
-        window.removeService = function(index) {
-            selectedServices.splice(index, 1);
-            updateServicesCart();
-        };
-
-        window.updateServiceQuantity = function(index, quantity) {
-            selectedServices[index].quantity = parseInt(quantity) || 1;
-        };
-
-        window.updateServiceSpecifications = function(index, specifications) {
-            selectedServices[index].specifications = specifications;
-        };
-
-        // Event listeners para el formulario
-        if (folioSolicitud) {
-            folioSolicitud.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption.dataset.pendiente) {
-                    const pendiente = JSON.parse(selectedOption.dataset.pendiente);
-                    autoFillFormData(pendiente);
-                } else {
-                    clearFormData();
-                }
-            });
+        if(solicitudFol) {
+            const areaInput = document.getElementById('area');
+            if (areaInput) areaInput.value = solicitudFol.area;
         }
 
-        if (duplicadorDigital) {
-            duplicadorDigital.addEventListener('change', function() {
-                if (this.checked) {
-                    if (numeroMasters) numeroMasters.classList.remove('hidden');
-                    const cantidadInput = document.getElementById('cantidadMasters');
-                    if (cantidadInput) cantidadInput.required = true;
-                } else {
-                    if (numeroMasters) numeroMasters.classList.add('hidden');
-                    const cantidadInput = document.getElementById('cantidadMasters');
-                    if (cantidadInput) {
-                        cantidadInput.required = false;
-                        cantidadInput.value = '';
-                    }
-                }
-            });
+        solicitudProceso = solicitudFol;
+    }
+
+    function clearFormData() {
+        // Limpiar campos autocompletables
+        const fechaInput = document.getElementById('fechaSolicitud');
+        const solicitanteInput = document.getElementById('nombreSolicitante');
+        const descripcionInput = document.getElementById('descripcionTrabajo');
+        
+        if (fechaInput) fechaInput.value = '';
+        if (solicitanteInput) solicitanteInput.value = '';
+        if (descripcionInput) descripcionInput.value = '';
+    }
+
+    function formatDateForInput(dateString) {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    }
+
+    // Validación para impresiones
+    function validateImpresiones() {
+        const hojasInput = document.getElementById('numeroHojasImpresion');
+        const impresionesInput = document.getElementById('numeroImpresiones');
+        
+        if (!hojasInput || !impresionesInput) return;
+        
+        const hojas = parseInt(hojasInput.value) || 0;
+        const impresiones = parseInt(impresionesInput.value) || 0;
+        
+        if (hojas > 0 && impresiones > 0) {
+            const minImpresiones = hojas;
+            const maxImpresiones = hojas * 2;
+            
+            if (impresiones < minImpresiones) {
+                impresionesInput.setCustomValidity(`Mínimo ${minImpresiones} impresiones`);
+                impresionesInput.title = `Las impresiones no pueden ser menores al número de hojas (${hojas})`;
+            } else if (impresiones > maxImpresiones) {
+                impresionesInput.setCustomValidity(`Máximo ${maxImpresiones} impresiones`);
+                impresionesInput.title = `Las impresiones no pueden ser más del doble de hojas (${maxImpresiones})`;
+            } else {
+                impresionesInput.setCustomValidity('');
+                impresionesInput.title = '';
+            }
         }
+    }
 
-        if (serviciosBusqueda) {
-            serviciosBusqueda.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                
-                if (query.length === 0) {
-                    if (serviciosDropdown) serviciosDropdown.classList.add('hidden');
-                    return;
-                }
+    // --- EVENT LISTENERS ---
 
-                const filteredServices = serviciosList.filter(service => 
-                    service.toLowerCase().includes(query)
-                );
+    // Event listeners para el formulario
+    if (folioSolicitud) {
+        folioSolicitud.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.dataset.pendiente) {
+                const pendiente = JSON.parse(selectedOption.dataset.pendiente);
+                autoFillFormData(pendiente);
+            } else {
+                clearFormData();
+            }
+        });
+    }
 
-                displayServiceDropdown(filteredServices);
-            });
-        }
-
-        if (nuevaSolicitudForm) {
-            nuevaSolicitudForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Recopilar datos del formulario
-                const formData = new FormData(this);
-                const solicitudData = Object.fromEntries(formData.entries());
-                
-                // Agregar servicios seleccionados
-                solicitudData.servicios = selectedServices;
-                
-                console.log('Datos de la solicitud:', solicitudData);
-                
-                // Aquí puedes enviar los datos a tu Google Apps Script
-                // submitNuevaSolicitud(solicitudData);
-                
-                alert('Funcionalidad de envío pendiente de implementar');
-            });
-        }
-
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', function(e) {
-            if (serviciosBusqueda && serviciosDropdown) {
-                if (!serviciosBusqueda.contains(e.target) && !serviciosDropdown.contains(e.target)) {
-                    serviciosDropdown.classList.add('hidden');
+    if (duplicadorDigital) {
+        duplicadorDigital.addEventListener('change', function() {
+            if (this.checked) {
+                if (numeroMasters) numeroMasters.classList.remove('hidden');
+                const cantidadInput = document.getElementById('cantidadMasters');
+                if (cantidadInput) cantidadInput.required = true;
+            } else {
+                if (numeroMasters) numeroMasters.classList.add('hidden');
+                const cantidadInput = document.getElementById('cantidadMasters');
+                if (cantidadInput) {
+                    cantidadInput.required = false;
+                    cantidadInput.value = '';
                 }
             }
         });
+    }
 
-
-        // Función para filtrar servicios
-        function filterServicios(searchTerm) {
-            if (!searchTerm || searchTerm.length < 2) {
-                return [];
-            }
-            
-            return serviciosList.filter(servicio => 
-                servicio.toLowerCase().includes(searchTerm.toLowerCase())
-            ).slice(0, 10); // Limitar a 10 resultados
-        }
-
-        // Función para mostrar dropdown de servicios
-        function showServiciosDropdown(servicios) {
-            const dropdown = document.getElementById('serviciosDropdown');
-            
-            if (servicios.length === 0) {
-                dropdown.classList.add('hidden');
-                selectedServicio = null;
-                document.getElementById('agregarServicioBtn').disabled = true;
-                return;
-            }
-            
-            dropdown.innerHTML = '';
-            servicios.forEach(servicio => {
-                const item = document.createElement('div');
-                item.className = 'service-dropdown-item';
-                item.textContent = servicio;
-                item.addEventListener('click', () => {
-                    selectServicio(servicio);
-                });
-                dropdown.appendChild(item);
-            });
-            
-            dropdown.classList.remove('hidden');
-        }
-
-        // NUEVA función para seleccionar servicio
-        function selectServicio(servicio) {
-            selectedServicio = servicio;
-            document.getElementById('serviciosBusqueda').value = servicio;
-            document.getElementById('serviciosDropdown').classList.add('hidden');
-            document.getElementById('agregarServicioBtn').disabled = false;
-        }
-
-
-        // Función para agregar servicio al carrito
-        // Función para agregar servicio al carrito (ACTUALIZADA)
-        function addServicioToCart(servicio = null) {
-            const servicioToAdd = servicio || selectedServicio;
-            
-            if (!servicioToAdd) {
-                alert('Seleccione un servicio primero');
-                return;
-            }
-            
-            if (serviciosCart.some(item => item.nombre === servicioToAdd)) {
-                alert('Este servicio ya está agregado');
-                return;
-            }
-            
-            serviciosCart.push({
-                nombre: servicioToAdd,
-                cantidad: 1
-            });
-            
-            renderServiciosCart();
-            
-            // Limpiar búsqueda
-            const busquedaInput = document.getElementById('serviciosBusqueda');
-            const agregarBtn = document.getElementById('agregarServicioBtn');
-            
-            if (busquedaInput) busquedaInput.value = '';
-            if (agregarBtn) agregarBtn.disabled = true;
-            selectedServicio = null;
-        }
-
-
-        // Función para renderizar el carrito de servicios (ACTUALIZADA)
-        function renderServiciosCart() {
-            const cartContainer = document.getElementById('serviciosCart');
-            
-            // VERIFICAR que el elemento existe
-            if (!cartContainer) {
-                console.error('Elemento serviciosCart no encontrado en el HTML');
-                return;
-            }
-            
-            cartContainer.innerHTML = '';
-            
-            serviciosCart.forEach((servicio, index) => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item flex justify-between items-center p-3 bg-gray-50 border rounded-lg mb-2';
-                cartItem.innerHTML = `
-                    <div class="flex-1">
-                        <span class="font-medium text-gray-800">${servicio.nombre}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-1">
-                            <label class="text-sm text-gray-600">Cant:</label>
-                            <input type="number" min="1" value="${servicio.cantidad}" 
-                                class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
-                                onchange="updateServicioCantidad(${index}, this.value)">
-                        </div>
-                        <button type="button" onclick="editServicio(${index})" 
-                                class="px-2 py-1 text-blue-600 hover:text-blue-800 text-sm border border-blue-300 rounded hover:bg-blue-50 transition-colors">
-                            Editar
-                        </button>
-                        <button type="button" onclick="removeServicioFromCart(${index})" 
-                                class="px-2 py-1 text-red-600 hover:text-red-800 text-sm border border-red-300 rounded hover:bg-red-50 transition-colors">
-                            Eliminar
-                        </button>
-                    </div>
-                `;
-                cartContainer.appendChild(cartItem);
-            });
-            
-            const serviciosSeleccionados = document.getElementById('serviciosSeleccionados');
-            if (serviciosSeleccionados) {
-                if (serviciosCart.length === 0) {
-                    serviciosSeleccionados.classList.add('hidden');
-                } else {
-                    serviciosSeleccionados.classList.remove('hidden');
-                }
-            }
-        }
-
-        // NUEVA función para editar servicio
-        function editServicio(index) {
-            const servicio = serviciosCart[index];
-            const nuevaCantidad = prompt(`Editar cantidad para "${servicio.nombre}":`, servicio.cantidad);
-            
-            if (nuevaCantidad !== null && nuevaCantidad > 0) {
-                serviciosCart[index].cantidad = parseInt(nuevaCantidad);
-                renderServiciosCart();
-            }
-        }
-
-        // Función para eliminar servicio del carrito (SIN CAMBIOS)
-        function removeServicioFromCart(index) {
-            if (confirm('¿Está seguro de eliminar este servicio?')) {
-                serviciosCart.splice(index, 1);
-                renderServiciosCart();
-            }
-        }
-
-        // Event listener para el buscador de servicios
-    document.getElementById('serviciosBusqueda').addEventListener('input', function(e) {
-        const searchTerm = e.target.value;
-        const filteredServicios = filterServicios(searchTerm);
-        showServiciosDropdown(filteredServicios);
-        
-        // Resetear selección si el usuario está escribiendo
-        if (selectedServicio && !searchTerm.includes(selectedServicio)) {
-            selectedServicio = null;
-            document.getElementById('agregarServicioBtn').disabled = true;
+    // Event listener para validar impresiones
+    document.addEventListener('input', function(e) {
+        if (e.target.id === 'numeroHojasImpresion' || e.target.id === 'numeroImpresiones') {
+            validateImpresiones();
         }
     });
 
-            // Event listener para el botón agregar
-            document.getElementById('agregarServicioBtn').addEventListener('click', function() {
-                addServicioToCart();
-            });
+    // Event listener para el input de búsqueda
+    if (serviciosBusqueda) {
+        serviciosBusqueda.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim();
 
-            // Ocultar dropdown al hacer click fuera
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.service-search-container')) {
-                    document.getElementById('serviciosDropdown').classList.add('hidden');
+            // Si el valor coincide exactamente con un servicio, seleccionarlo
+            const exactMatch = serviciosList.find(servicio =>
+                servicio.toLowerCase() === searchTerm.toLowerCase()
+            );
+
+            if (exactMatch) {
+                selectedServicio = exactMatch;
+                document.getElementById('agregarServicioBtn').disabled = false;
+                showServiceSpecificFields(exactMatch);
+            } else {
+                // Si no hay coincidencia exacta, limpiar selección
+                if (selectedServicio && selectedServicio.toLowerCase() !== searchTerm.toLowerCase()) {
+                    clearServicioSelection();
                 }
-            });
-            
+            }
 
-        function showServiceSpecificFields(servicio) {
-            // Ocultar todos los campos específicos primero
-            hideAllSpecificFields();
-            
-            const servicioUpper = servicio.toUpperCase();
-            
-            // Campos para impresiones
-            if (servicioUpper.includes('IMPRESIONES')) {
-                showImpresionFields();
+            // Filtrar y mostrar opciones
+            const filteredServicios = filterServicios(searchTerm);
+            populateServiciosDropdown(filteredServicios);
+        });
+
+        // Event listener para mostrar dropdown al hacer focus en el input
+        serviciosBusqueda.addEventListener('focus', function(e) {
+            const searchTerm = e.target.value.trim();
+            const filteredServicios = filterServicios(searchTerm);
+            populateServiciosDropdown(filteredServicios);
+        });
+
+        // Event listener para navegación con teclado
+        serviciosBusqueda.addEventListener('keydown', function(e) {
+            const dropdown = document.getElementById('serviciosDropdown');
+            const items = dropdown.querySelectorAll('.service-dropdown-item');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (items.length > 0) {
+                    const selected = dropdown.querySelector('.service-dropdown-item.selected');
+                    if (selected) {
+                        selected.classList.remove('selected', 'bg-blue-100');
+                        const next = selected.nextElementSibling;
+                        if (next && next.classList.contains('service-dropdown-item')) {
+                            next.classList.add('selected', 'bg-blue-100');
+                        } else {
+                            items[0].classList.add('selected', 'bg-blue-100');
+                        }
+                    } else {
+                        items[0].classList.add('selected', 'bg-blue-100');
+                    }
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (items.length > 0) {
+                    const selected = dropdown.querySelector('.service-dropdown-item.selected');
+                    if (selected) {
+                        selected.classList.remove('selected', 'bg-blue-100');
+                        const prev = selected.previousElementSibling;
+                        if (prev && prev.classList.contains('service-dropdown-item')) {
+                            prev.classList.add('selected', 'bg-blue-100');
+                        } else {
+                            items[items.length - 1].classList.add('selected', 'bg-blue-100');
+                        }
+                    } else {
+                        items[items.length - 1].classList.add('selected', 'bg-blue-100');
+                    }
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const selected = dropdown.querySelector('.service-dropdown-item.selected');
+                if (selected) {
+                    selectServicio(selected.textContent);
+                }
+            } else if (e.key === 'Escape') {
+                dropdown.classList.add('hidden');
+                this.blur();
             }
-            
-            // Campos para hojas (pero no impresiones)
-            else if (servicioUpper.includes('HOJAS')) {
-                showHojasFields();
+        });
+    }
+
+    // Event listener para mostrar/ocultar dropdown al hacer clic en la flecha
+    const toggleDropdownBtn = document.getElementById('toggleDropdownBtn');
+    if (toggleDropdownBtn) {
+        toggleDropdownBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const dropdown = document.getElementById('serviciosDropdown');
+            const input = document.getElementById('serviciosBusqueda');
+
+            if (dropdown.classList.contains('hidden')) {
+                // Mostrar todos los servicios
+                populateServiciosDropdown();
+                input.focus();
+            } else {
+                dropdown.classList.add('hidden');
             }
-            
-            // Campos para plotter
-            else if (servicioUpper.includes('CENTÍMETROS PLOTTER')) {
-                showPlotterFields();
-            }
-            
-            // Campos para diseño
-            else if (servicioUpper.includes('DISEÑO')) {
-                showDisenoFields();
-            }
-            
-            // Campos para fotografía
-            else if (servicioUpper.includes('FOTOGRAFÍAS') || servicioUpper.includes('EDICIÓN DE FOTOGRAFÍA')) {
-                showFotografiaFields();
-            }
-            
-            // Campos para video
-            else if (servicioUpper.includes('VIDEO') || servicioUpper.includes('PRODUCCIÓN AUDIOVISUAL')) {
-                showVideoFields();
-            }
-            
-            // Campos para CD/DVD
-            else if (servicioUpper.includes('CD:') || servicioUpper.includes('DVD:')) {
-                showDiscFields();
-            }
+        });
+    }
+
+    // Event listener para el botón agregar
+    const agregarServicioBtn = document.getElementById('agregarServicioBtn');
+    if (agregarServicioBtn) {
+        agregarServicioBtn.addEventListener('click', function() {
+            addServicioToCart();
+        });
+    }
+
+    // Cerrar dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        const container = document.querySelector('.service-search-container');
+        if (container && !container.contains(e.target)) {
+            const dropdown = document.getElementById('serviciosDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
         }
+    });
 
-        function hideAllSpecificFields() {
-            const containers = [
-                'impresionFields',
-                'hojasFields',
-                'plotterFields',
-                'disenoFields', 
-                'fotografiaFields',
-                'videoFields',
-                'discFields'
-            ];
+    if (nuevaSolicitudForm) {
+        nuevaSolicitudForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            containers.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-        }
+            // Recopilar datos del formulario
+            const formData = new FormData(this);
+            const solicitudData = Object.fromEntries(formData.entries());
+            
+            // Agregar servicios seleccionados
+            solicitudData.servicios = serviciosCart;
+            
+            console.log('Datos de la solicitud:', solicitudData);
+            
+            // Aquí puedes enviar los datos a tu Google Apps Script
+            // submitNuevaSolicitud(solicitudData);
+            
+            alert('Funcionalidad de envío pendiente de implementar');
+        });
+    }
 
-        function showImpresionFields() {
-            const container = document.getElementById('impresionFields');
-            if (container) container.classList.remove('hidden');
-        }
-
-        function showHojasFields() {
-            const container = document.getElementById('hojasFields');
-            if (container) container.classList.remove('hidden');
-        }
-
-        function showPlotterFields() {
-            const container = document.getElementById('plotterFields');
-            if (container) container.classList.remove('hidden');
-        }
-
-        console.log('=== DEBUG ELEMENTOS ===');
-        console.log('serviciosBusqueda:', document.getElementById('serviciosBusqueda'));
-        console.log('agregarServicioBtn:', document.getElementById('agregarServicioBtn'));
-        console.log('serviciosDropdown:', document.getElementById('serviciosDropdown'));
-        console.log('serviciosCart:', document.getElementById('serviciosCart'));
-        console.log('serviciosSeleccionados:', document.getElementById('serviciosSeleccionados'));
-        console.log('folioSolicitud:', document.getElementById('folioSolicitud'));
+    console.log('=== DEBUG ELEMENTOS ===');
+    console.log('serviciosBusqueda:', document.getElementById('serviciosBusqueda'));
+    console.log('agregarServicioBtn:', document.getElementById('agregarServicioBtn'));
+    console.log('serviciosDropdown:', document.getElementById('serviciosDropdown'));
+    console.log('serviciosCart:', document.getElementById('serviciosCart'));
+    console.log('serviciosSeleccionados:', document.getElementById('serviciosSeleccionados'));
+    console.log('folioSolicitud:', document.getElementById('folioSolicitud'));
 
 });

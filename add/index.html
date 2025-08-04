@@ -10,585 +10,470 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/css/shepherd.css"/>
     <style>
-        /* Usamos la fuente Inter para un look más profesional */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Estilo para el color principal de la institución */
-        :root {
-            --brand-color: #003C7D;
-            --brand-color-light: #0056b3;
-            --brand-color-dark: #002a59;
-        }
-        .bg-brand { background-color: var(--brand-color); }
-        .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
-        .border-brand { border-color: var(--brand-color); }
-        .text-brand { color: var(--brand-color); }
-        
-        /* Ocultar elementos inicialmente */
-        #workRequestForm, .conditional-field {
-            display: none;
-        }
-        
-        /* Animación suave para mostrar el formulario */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Estilos para la imagen de fondo del portal de bienvenida */
-        #initialButtonContainer {
-            background-image: url('./img/2023_Informe-General_03_Fachada\ \(1\).jpg'); /* CAMBIA ESTA RUTA */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-            
-        }
-        
-        /* Overlay semi-transparente para mejorar la legibilidad del texto */
-        #initialButtonContainer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 60, 125, .1); /* Overlay azul semi-transparente */
-            z-index: 1;
-        }
+    /* Usamos la fuente Inter para un look más profesional */
+    body {
+    font-family: 'Inter', sans-serif;
+    }
+    /* Estilo para el color principal de la institución */
+    :root {
+    --brand-color: #003C7D;
+    --brand-color-light: #0056b3;
+    --brand-color-dark: #002a59;
+    }
+    .bg-brand { background-color: var(--brand-color); }
+    .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
+    .border-brand { border-color: var(--brand-color); }
+    .text-brand { color: var(--brand-color); }
+    
+    /* Ocultar elementos inicialmente */
+    #workRequestForm, .conditional-field {
+    display: none;
+    }
+    
+    /* Animación suave para mostrar el formulario */
+    .fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Estilos para la imagen de fondo del portal de bienvenida */
+    #initialButtonContainer {
+    background-image: url('./img/2023_Informe-General_03_Fachada\ \(1\).jpg'); /* CAMBIA ESTA RUTA */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    
+    }
+    
+    /* Overlay semi-transparente para mejorar la legibilidad del texto */
+    #initialButtonContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 60, 125, .1); /* Overlay azul semi-transparente */
+    z-index: 1;
+    }
 
-        #texto_benvenida{
-          margin-top: 15%;
-          margin-left: 20% ;
-          margin-right: 20% ;
-          padding-top: 1%;
-          padding-bottom: 2%;
-          background: rgba(0, 60, 125, .4)
-        }
+    #texto_benvenida{
+    margin-top: 15%;
+    margin-left: 20% ;
+    margin-right: 20% ;
+    padding-top: 1%;
+    padding-bottom: 2%;
+    background: rgba(0, 60, 125, .4)
+    }
 
-        .welcome-title {
-            color: #ffffff !important;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            font-weight: 700;
-        }
+    .welcome-title {
+    color: #ffff !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    }
 
-        .welcome-text {
-            color: #ffffff !important;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-            font-weight: 400;
-        }
-        
-        /* Contenido por encima del overlay */
-        #initialButtonContainer > * {
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Estilos para el logo en el header */
-        .header-logo {
-            height: 50px; /* Altura fija para el header */
-            width: auto; /* Mantiene la proporción */
-            max-width: 137px; /* Ancho máximo proporcional */
-            object-fit: contain; /* Mantiene la proporción sin distorsión */
-        }
-        
-        /* Responsive para el logo */
-        @media (max-width: 768px) {
-            .header-logo {
-                height: 40px;
-                max-width: 110px;
-            }
-        }
-        
-        /* Ajuste del header para acomodar el logo */
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+    .welcome-text {
+    color: #ffff !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    font-weight: 400;
+    }
+    
+    /* Contenido por encima del overlay */
+    #initialButtonContainer > * {
+    position: relative;
+    z-index: 2;
+    }
+    
+    /* Estilos para el logo en el header */
+    .header-logo {
+    height: 50px; /* Altura fija para el header */
+    width: auto; /* Mantiene la proporción */
+    max-width: 137px; /* Ancho máximo proporcional */
+    object-fit: contain; /* Mantiene la proporción sin distorsión */
+    }
+    
+    /* Responsive para el logo */
+    @media (max-width: 768px) {
+    .header-logo {
+    height: 40px;
+    max-width: 110px;
+    }
+    }
+    
+    /* Ajuste del header para acomodar el logo */
+    .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    }
 
-        /* Estilos para las ilustraciones de orientación */
-        .page-illustration {
-            position: relative;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 2px;
-        }
+    /* Estilos para las ilustraciones de orientación */
+    .page-illustration {
+    position: relative;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 2px;
+    }
 
-        .page-illustration.vertical {
-            width: 40px;
-            height: 55px;
-        }
+    .page-illustration.vertical {
+    width: 40px;
+    height: 55px;
+    }
 
-        .page-illustration.horizontal {
-            width: 55px;
-            height: 40px;
-        }
+    .page-illustration.horizontal {
+    width: 55px;
+    height: 40px;
+    }
 
-        /* Costillas/bindings */
-        .binding-left, .binding-right, .binding-top, .binding-bottom {
-            position: absolute;
-            background-color: var(--brand-color);
-            border-radius: 1px;
-        }
+    /* Costillas/bindings */
+    .binding-left, .binding-right, .binding-top, .binding-bottom {
+    position: absolute;
+    background-color: var(--brand-color);
+    border-radius: 1px;
+    }
 
-        .binding-left {
-            left: -2px;
-            top: 5px;
-            bottom: 5px;
-            width: 4px;
-        }
+    .binding-left {
+    left: -2px;
+    top: 5px;
+    bottom: 5px;
+    width: 4px;
+    }
 
-        .binding-right {
-            right: -2px;
-            top: 5px;
-            bottom: 5px;
-            width: 4px;
-        }
+    .binding-right {
+    right: -2px;
+    top: 5px;
+    bottom: 5px;
+    width: 4px;
+    }
 
-        .binding-top {
-            top: -2px;
-            left: 5px;
-            right: 5px;
-            height: 4px;
-        }
+    .binding-top {
+    top: -2px;
+    left: 5px;
+    right: 5px;
+    height: 4px;
+    }
 
-        .binding-bottom {
-            bottom: -2px;
-            left: 5px;
-            right: 5px;
-            height: 4px;
-        }
+    .binding-bottom {
+    bottom: -2px;
+    left: 5px;
+    right: 5px;
+    height: 4px;
+    }
 
-        /* Estados de selección */
-        .orientation-card input:checked + label {
-            border-color: var(--brand-color);
-            background-color: rgba(0, 60, 125, 0.05);
-        }
+    /* Estados de selección */
+    .orientation-card input:checked + label {
+    border-color: var(--brand-color);
+    background-color: rgba(0, 60, 125, 0.05);
+    }
 
-        .orientation-card input:checked + label .page-illustration {
-            background-color: rgba(0, 60, 125, 0.1);
-        }
+    .orientation-card input:checked + label .page-illustration {
+    background-color: rgba(0, 60, 125, 0.1);
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .page-illustration.vertical {
-                width: 35px;
-                height: 48px;
-            }
-            
-            .page-illustration.horizontal {
-                width: 48px;
-                height: 35px;
-            }
-        }
+    /* NUEVOS ESTILOS PARA EL COMBOBOX */
+    .combobox-container {
+    position: relative;
+    }
+
+    .combobox-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .combobox-option {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    }
+
+    .combobox-option:hover {
+    background-color: #f9fafb;
+    }
+
+    .combobox-option.highlighted {
+    background-color: var(--brand-color);
+    color: white;
+    }
+
+    .combobox-option:last-child {
+    border-bottom: none;
+    }
+
+    .combobox-input {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+    .page-illustration.vertical {
+    width: 35px;
+    height: 48px;
+    }
+    
+    .page-illustration.horizontal {
+    width: 48px;
+    height: 35px;
+    }
+    }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <header class="bg-brand shadow-md">
-        <div class="container mx-auto px-6 py-4">
-            <div class="header-content">
-                <a href="index.html"><img src="img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
-                <a href="index.html"><h1 class="text-2xl font-bold text-white">Portal de Solicitudes de la Oficina de Audiovisual</h1></a>
-            </div>
-        </div>
+    <div class="container mx-auto px-6 py-4">
+    <div class="header-content">
+    <a href="index.html"><img src="img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
+    <a href="index.html"><h1 class="text-2xl font-bold text-white">Portal de Solicitudes de la Oficina de Audiovisual</h1></a>
+    </div>
+    </div>
     </header>
 
     <main class="container mx-auto p-4 md:p-8">
-        <div id="initialButtonContainer" class="text-center py-20">
-            <div id="texto_benvenida">
-                <h2 class="text-3xl font-semibold text-white mb-4">Bienvenido</h2>
-                <p class="text-2xl text-white mb-8">Para iniciar una nueva solicitud, por favor presione el siguiente botón.</p>
-                <button id="startRequestBtn" class="bg-brand text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-brand-light transition-colors duration-300 transform hover:scale-105">
-                    Solicitar Trabajo
-                </button>
-            </div>
-        </div>
+    <div id="initialButtonContainer" class="text-center py-20">
+    <div id="texto_benvenida">
+    <h2 class="text-3xl font-semibold text-white mb-4">Bienvenido</h2>
+    <p class="text-2xl text-white mb-8">Para iniciar una nueva solicitud, por favor presione el siguiente botón.</p>
+    <button id="startRequestBtn" class="bg-brand text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-brand-light transition-colors duration-300 transform hover:scale-105">
+    Solicitar Trabajo
+    </button>
+    </div>
+    </div>
 
-        <form id="workRequestForm" class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-8 max-w-4xl mx-auto">
-            
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">1. Información del Solicitante</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="nombre.apellido@institucion.com">
-                    </div>
-                    <div>
-                        <label for="requesterName" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo del Solicitante</label>
-                        <input type="text" id="requesterName" name="requesterName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. Juan Pérez">
-                    </div>
-                    <div>
-                        <label for="area" class="block text-sm font-medium text-gray-700 mb-1">Área o Departamento</label>
-                        <select id="area" name="area" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="" disabled selected>Seleccione un área...</option>
-                            <option value='Clínica Asma e Inmunoalergia'>Clínica Asma e Inmunoalergia</option>
-                            <option value='Clínica Enfermedad Pulmonar Obstructiva Crónica y Bronquiectasias y Tabaquismo ​'>Clínica Enfermedad Pulmonar Obstructiva Crónica y Bronquiectasias y Tabaquismo ​</option>
-                            <option value='Clínica Enfermedades Intersticiales del Pulmón ​'>Clínica Enfermedades Intersticiales del Pulmón ​</option>
-                            <option value='Clínica Fibrosis Quística ​'>Clínica Fibrosis Quística ​</option>
-                            <option value='Clínica Implante Coclear'>Clínica Implante Coclear</option>
-                            <option value='Clínica Inmunocompromiso por Enfermedades Infecciosas ​'>Clínica Inmunocompromiso por Enfermedades Infecciosas ​</option>
-                            <option value='Clínica Intolerancia a la Aspirina, Poliposis y Asma (IAPA) ​'>Clínica Intolerancia a la Aspirina, Poliposis y Asma (IAPA) ​</option>
-                            <option value='Clínica Investigación Traslacional en Envejecimiento y Enfermedades Fibrosantes ​'>Clínica Investigación Traslacional en Envejecimiento y Enfermedades Fibrosantes ​</option>
-                            <option value='Clínica Laringología, Fonocirugía y Cirugía de Cabeza y Cuello ​'>Clínica Laringología, Fonocirugía y Cirugía de Cabeza y Cuello ​</option>
-                            <option value='Clínica Pleura'>Clínica Pleura</option>
-                            <option value='Clínica Tuberculosis'>Clínica Tuberculosis</option>
-                            <option value='Clínica Vasculitis Sistémicas Primarias'>Clínica Vasculitis Sistémicas Primarias</option>
-                            <option value='Coordinación Administración Clínica de Enfermería ​'>Coordinación Administración Clínica de Enfermería ​</option>
-                            <option value='Coordinación Administración de Recursos Humanos de Enfermería'>Coordinación Administración de Recursos Humanos de Enfermería</option>
-                            <option value='Coordinación Admisión Hospitalaria y Registros Médicos'>Coordinación Admisión Hospitalaria y Registros Médicos</option>
-                            <option value='Coordinación Ambulancias'>Coordinación Ambulancias</option>
-                            <option value='Coordinación Arte y Cultura'>Coordinación Arte y Cultura</option>
-                            <option value='Coordinación Atención Médica Ambulatoria'>Coordinación Atención Médica Ambulatoria</option>
-                            <option value='Coordinación Atención Médica de Hospitalización'>Coordinación Atención Médica de Hospitalización</option>
-                            <option value='Coordinación Camillería'>Coordinación Camillería</option>
-                            <option value='Coordinación Cardiología y ecocardiografía ​'>Coordinación Cardiología y ecocardiografía ​</option>
-                            <option value='Coordinación Centro de Simulación Clínica en Medicina Respiratoria'>Coordinación Centro de Simulación Clínica en Medicina Respiratoria</option>
-                            <option value='Coordinación Clínicas'>Coordinación Clínicas</option>
-                            <option value='Coordinación Desarrollo Tecnológico'>Coordinación Desarrollo Tecnológico</option>
-                            <option value='Coordinación Donación de Órganos y Tejidos'>Coordinación Donación de Órganos y Tejidos</option>
-                            <option value='Coordinación Enseñanza de Enfermería ​'>Coordinación Enseñanza de Enfermería ​</option>
-                            <option value='Coordinación Enseñanza y Capacitación'>Coordinación Enseñanza y Capacitación</option>
-                            <option value='Coordinación Epidemiología y Estadística'>Coordinación Epidemiología y Estadística</option>
-                            <option value='Coordinación Geriatría y Cuidados Paliativos'>Coordinación Geriatría y Cuidados Paliativos</option>
-                            <option value='Coordinación Gestión de Tecnología Médica'>Coordinación Gestión de Tecnología Médica</option>
-                            <option value='Coordinación Gestión del Cuidado y Calidad de Enfermería'>Coordinación Gestión del Cuidado y Calidad de Enfermería</option>
-                            <option value='Coordinación Hemodinamia'>Coordinación Hemodinamia</option>
-                            <option value='Coordinación Hipertensión Pulmonar'>Coordinación Hipertensión Pulmonar</option>
-                            <option value='Coordinación Infectología'>Coordinación Infectología</option>
-                            <option value='Coordinación Ingeniería en Servicio'>Coordinación Ingeniería en Servicio</option>
-                            <option value='Coordinación Investigación de Enfermería ​'>Coordinación Investigación de Enfermería ​</option>
-                            <option value='Coordinación Investigación Educativa en Medicina Basada en Evidencia'>Coordinación Investigación Educativa en Medicina Basada en Evidencia</option>
-                            <option value='Coordinación Medicina Interna'>Coordinación Medicina Interna</option>
-                            <option value='Coordinación Nefrología'>Coordinación Nefrología</option>
-                            <option value='Coordinación Oncología Torácica'>Coordinación Oncología Torácica</option>
-                            <option value='Coordinación Salud Mental'>Coordinación Salud Mental</option>
-                            <option value='Coordinación Salud Ocupacional y Preventiva ​'>Coordinación Salud Ocupacional y Preventiva ​</option>
-                            <option value='Coordinación Síndrome metabólico'>Coordinación Síndrome metabólico</option>
-                            <option value='Coordinación Supervisión de Trabajo Social'>Coordinación Supervisión de Trabajo Social</option>
-                            <option value='Coordinación Trasplante'>Coordinación Trasplante</option>
-                            <option value='Coordinación Vigilancia Epidemiológica'>Coordinación Vigilancia Epidemiológica</option>
-                            <option value='Departamento Adquisiciones'>Departamento Adquisiciones</option>
-                            <option value='Departamento Apoyo Técnico'>Departamento Apoyo Técnico</option>
-                            <option value='Departamento Apoyo Técnico en Administración'>Departamento Apoyo Técnico en Administración</option>
-                            <option value='Departamento Apoyo Técnico en Enseñanza'>Departamento Apoyo Técnico en Enseñanza</option>
-                            <option value='Departamento Áreas Críticas'>Departamento Áreas Críticas</option>
-                            <option value='Departamento Asuntos Jurídicos y Unidad de Transparencia'>Departamento Asuntos Jurídicos y Unidad de Transparencia</option>
-                            <option value='Departamento Biomedicina Molecular e Investigación Traslacional'>Departamento Biomedicina Molecular e Investigación Traslacional</option>
-                            <option value='Departamento Calidad'>Departamento Calidad</option>
-                            <option value='Departamento Centro de Investigación en Enfermedades Infecciosas'>Departamento Centro de Investigación en Enfermedades Infecciosas</option>
-                            <option value='Departamento Control de Bienes'>Departamento Control de Bienes</option>
-                            <option value='Departamento Coordinación Técnica'>Departamento Coordinación Técnica</option>
-                            <option value='Departamento Educación Continua'>Departamento Educación Continua</option>
-                            <option value='Departamento Empleo y Capacitación'>Departamento Empleo y Capacitación</option>
-                            <option value='Departamento Enfermería'>Departamento Enfermería</option>
-                            <option value='Departamento Enlace Administrativo'>Departamento Enlace Administrativo</option>
-                            <option value='Departamento Epidemiología Hospitalaria e Infectología'>Departamento Epidemiología Hospitalaria e Infectología</option>
-                            <option value='Departamento Farmacia Hospitalaria'>Departamento Farmacia Hospitalaria</option>
-                            <option value='Departamento Fisiología Respiratoria'>Departamento Fisiología Respiratoria</option>
-                            <option value='Departamento Formación de Posgrado'>Departamento Formación de Posgrado</option>
-                            <option value='Departamento Formación de Pregrado'>Departamento Formación de Pregrado</option>
-                            <option value='Departamento Imagenología'>Departamento Imagenología</option>
-                            <option value='Departamento Ingeniería Biomédica'>Departamento Ingeniería Biomédica</option>
-                            <option value='Departamento Investigación en Cirugía Experimental'>Departamento Investigación en Cirugía Experimental</option>
-                            <option value='Departamento Investigación en Enfermedades Crónico-Degenerativas'>Departamento Investigación en Enfermedades Crónico-Degenerativas</option>
-                            <option value='Departamento Investigación en Fibrosis Pulmonar'>Departamento Investigación en Fibrosis Pulmonar</option>
-                            <option value='Departamento Investigación en Hiperreactividad Bronquial'>Departamento Investigación en Hiperreactividad Bronquial</option>
-                            <option value='Departamento Investigación en Inmunogenética y Alergia'>Departamento Investigación en Inmunogenética y Alergia</option>
-                            <option value='Departamento Investigación en Microbiología ​'>Departamento Investigación en Microbiología ​</option>
-                            <option value='Departamento Investigación en Tabaquismo y EPOC ​'>Departamento Investigación en Tabaquismo y EPOC ​</option>
-                            <option value='Departamento Investigación en Toxicología y Medicina Ambiental'>Departamento Investigación en Toxicología y Medicina Ambiental</option>
-                            <option value='Departamento Investigación en Virología y Micología'>Departamento Investigación en Virología y Micología</option>
-                            <option value='Departamento Laboratorio Clínico'>Departamento Laboratorio Clínico</option>
-                            <option value='Departamento Nutrición Clínica'>Departamento Nutrición Clínica</option>
-                            <option value='Departamento Otorrinolaringología y Cirugía de Cabeza y Cuello'>Departamento Otorrinolaringología y Cirugía de Cabeza y Cuello</option>
-                            <option value='Departamento Rehabilitación Pulmonar'>Departamento Rehabilitación Pulmonar</option>
-                            <option value='Departamento Relaciones Laborales'>Departamento Relaciones Laborales</option>
-                            <option value='Departamento Relaciones Públicas y Comunicación'>Departamento Relaciones Públicas y Comunicación</option>
-                            <option value='Departamento Remuneraciones'>Departamento Remuneraciones</option>
-                            <option value='Departamento Tecnologías de la Información y Comunicaciones'>Departamento Tecnologías de la Información y Comunicaciones</option>
-                            <option value='Departamento Trabajo Social'>Departamento Trabajo Social</option>
-                            <option value='Departamento Unidad de Igualdad, Género e Inclusión'>Departamento Unidad de Igualdad, Género e Inclusión</option>
-                            <option value='Dirección Enseñanza'>Dirección Enseñanza</option>
-                            <option value='Dirección General'>Dirección General</option>
-                            <option value='Dirección Investigación'>Dirección Investigación</option>
-                            <option value='Dirección Médica'>Dirección Médica</option>
-                            <option value='Laboratorio Biología Celular'>Laboratorio Biología Celular</option>
-                            <option value='Laboratorio Biología Computacional'>Laboratorio Biología Computacional</option>
-                            <option value='Laboratorio Biología Molecular'>Laboratorio Biología Molecular</option>
-                            <option value='Laboratorio Biología Molecular de Enfermedades Emergentes y EPOC'>Laboratorio Biología Molecular de Enfermedades Emergentes y EPOC</option>
-                            <option value='Laboratorio Biopatología Pulmonar INER-Ciencias, UNAM'>Laboratorio Biopatología Pulmonar INER-Ciencias, UNAM</option>
-                            <option value='Laboratorio Cáncer Pulmonar'>Laboratorio Cáncer Pulmonar</option>
-                            <option value='Laboratorio Farmacología Clínica y Experimental'>Laboratorio Farmacología Clínica y Experimental</option>
-                            <option value='Laboratorio Inmunobiología de la Tuberculosis'>Laboratorio Inmunobiología de la Tuberculosis</option>
-                            <option value='Laboratorio Inmunobiología y Genética'>Laboratorio Inmunobiología y Genética</option>
-                            <option value='Laboratorio Inmunofarmacología'>Laboratorio Inmunofarmacología</option>
-                            <option value='Laboratorio Inmunología Integrativa'>Laboratorio Inmunología Integrativa</option>
-                            <option value='Laboratorio Investigación en Enfermedades Reumáticas'>Laboratorio Investigación en Enfermedades Reumáticas</option>
-                            <option value='Laboratorio Investigación en Epidemiología e Infectología ​'>Laboratorio Investigación en Epidemiología e Infectología ​</option>
-                            <option value='Laboratorio LACBio'>Laboratorio LACBio</option>
-                            <option value='Laboratorio Morfología'>Laboratorio Morfología</option>
-                            <option value='Laboratorio Nacional Conahcyt de Investigación y Diagnóstico por Inmunocitofluorometría (LANCIDI) ​'>Laboratorio Nacional Conahcyt de Investigación y Diagnóstico por Inmunocitofluorometría (LANCIDI) ​</option>
-                            <option value='Laboratorio Neumogenómica'>Laboratorio Neumogenómica</option>
-                            <option value='Laboratorio Onco-Inmunobiología'>Laboratorio Onco-Inmunobiología</option>
-                            <option value='Laboratorio Secuenciación y Biología Molecular'>Laboratorio Secuenciación y Biología Molecular</option>
-                            <option value='Laboratorio Transcriptómica e Inmunología Molecular'>Laboratorio Transcriptómica e Inmunología Molecular</option>
-                            <option value='Laboratorio Transducción de Señales'>Laboratorio Transducción de Señales</option>
-                            <option value='Laboratorio Trasplante Pulmonar Experimental'>Laboratorio Trasplante Pulmonar Experimental</option>
-                            <option value='Oficina Apoyo Técnico de la Dirección Médica ​'>Oficina Apoyo Técnico de la Dirección Médica ​</option>
-                            <option value='Oficina Audiovisual'>Oficina Audiovisual</option>
-                            <option value='Oficina Biblioteca y Editorial'>Oficina Biblioteca y Editorial</option>
-                            <option value='Oficina Bioterio'>Oficina Bioterio</option>
-                            <option value='Oficina Capacitación y Desarrollo'>Oficina Capacitación y Desarrollo</option>
-                            <option value='Oficina Coordinación de Protección Civil Institucional y Gestión Ambiental ​'>Oficina Coordinación de Protección Civil Institucional y Gestión Ambiental ​</option>
-                            <option value='Oficina Escuela de Enfermería'>Oficina Escuela de Enfermería</option>
-                            <option value='Oficina Escuela Superior de Terapia Respiratoria'>Oficina Escuela Superior de Terapia Respiratoria</option>
-                            <option value='Oficina Movimientos de Personal'>Oficina Movimientos de Personal</option>
-                            <option value='Oficina Seguridad Radiológica'>Oficina Seguridad Radiológica</option>
-                            <option value='Programa Apoyo a Pacientes y Familiares (PAPyF) ​'>Programa Apoyo a Pacientes y Familiares (PAPyF) ​</option>
-                            <option value='Servicio Anatomía Patológica'>Servicio Anatomía Patológica</option>
-                            <option value='Servicio Anestesia y Clínica del Dolor'>Servicio Anestesia y Clínica del Dolor</option>
-                            <option value='Servicio Banco de Sangre'>Servicio Banco de Sangre</option>
-                            <option value='Servicio Broncoscopía y Endoscopía'>Servicio Broncoscopía y Endoscopía</option>
-                            <option value='Servicio Cardiología'>Servicio Cardiología</option>
-                            <option value='Servicio Cirugía de Tórax'>Servicio Cirugía de Tórax</option>
-                            <option value='Servicio Cirugía Maxilo Facial y Estomatología'>Servicio Cirugía Maxilo Facial y Estomatología</option>
-                            <option value='Servicio Clínico 1'>Servicio Clínico 1</option>
-                            <option value='Servicio Clínico 2'>Servicio Clínico 2</option>
-                            <option value='Servicio Clínico 3'>Servicio Clínico 3</option>
-                            <option value='Servicio Clínico 4'>Servicio Clínico 4</option>
-                            <option value='Servicio Clínico 7'>Servicio Clínico 7</option>
-                            <option value='Servicio Clínico 8'>Servicio Clínico 8</option>
-                            <option value='Servicio Consulta Externa'>Servicio Consulta Externa</option>
-                            <option value='Servicio Cuidados Intensivos Respiratorios'>Servicio Cuidados Intensivos Respiratorios</option>
-                            <option value='Servicio Hospital de Día'>Servicio Hospital de Día</option>
-                            <option value='Servicio Medicina del Sueño'>Servicio Medicina del Sueño</option>
-                            <option value='Servicio Medicina Nuclear e Imagen Molecular'>Servicio Medicina Nuclear e Imagen Molecular</option>
-                            <option value='Servicio Microbiología Clínica'>Servicio Microbiología Clínica</option>
-                            <option value='Servicio Oncología Médica'>Servicio Oncología Médica</option>
-                            <option value='Servicio Terapia Intermedia'>Servicio Terapia Intermedia</option>
-                            <option value='Servicio Terapia Postquirúrgica'>Servicio Terapia Postquirúrgica</option>
-                            <option value='Servicio Terapia Respiratoria'>Servicio Terapia Respiratoria</option>
-                            <option value='Servicio Urgencias Respiratorias'>Servicio Urgencias Respiratorias</option>
-                            <option value='Sindicato Sindicato'>Sindicato Sindicato</option>
-                            <option value='Subdirección Atención Médica de Neumología'>Subdirección Atención Médica de Neumología</option>
-                            <option value='Subdirección Cirugía'>Subdirección Cirugía</option>
-                            <option value='Subdirección Enseñanza'>Subdirección Enseñanza</option>
-                            <option value='Subdirección Investigación Biomédica'>Subdirección Investigación Biomédica</option>
-                            <option value='Subdirección Recursos Humanos y Organización'>Subdirección Recursos Humanos y Organización</option>
-                            <option value='Subdirección Recursos Materiales'>Subdirección Recursos Materiales</option>
-                            <option value='Subdirección Servicios Auxiliares de Diagnóstico y Paramédicos'>Subdirección Servicios Auxiliares de Diagnóstico y Paramédicos</option>
-                            <option value='Transportes'>Transportes</option>
-                            <option value='Trasplante'>Trasplante</option>
-                            <option value='Trasplante Pulmonar Experimental'>Trasplante Pulmonar Experimental</option>
-                            <option value='Tuberculosis'>Tuberculosis</option>
-                            <option value='Unidad de Administración y Finanzas'>Unidad de Administración y Finanzas</option>
-                            <option value='Unidad de Igualdad, Género e Inclusión'>Unidad de Igualdad, Género e Inclusión</option>
-                            <option value='Urgencias Respiratorias'>Urgencias Respiratorias</option>
-                            <option value='Vasculitis Sistémicas Primarias'>Vasculitis Sistémicas Primarias</option>
-                            <option value='Vigilancia Epidemiológica'>Vigilancia Epidemiológica</option>
-                            <option value='OTRO'>OTRO</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Extensión o Teléfono de Contacto</label>
-                        <input type="text" id="phone" name="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 4015">
-                    </div>
-                </div>
-            </div>
+    <form id="workRequestForm" class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-8 max-w-4xl mx-auto">
+    
+    <div>
+    <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">1. Información del Solicitante</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+    <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="nombre.apellido@institucion.com">
+    </div>
+    <div>
+    <label for="requesterName" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo del Solicitante</label>
+    <input type="text" id="requesterName" name="requesterName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. Juan Pérez">
+    </div>
+    <div>
+    <label for="area" class="block text-sm font-medium text-gray-700 mb-1">Área o Departamento</label>
+    <div class="combobox-container">
+    <input type="text" id="area" name="area" required 
+           class="combobox-input w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+           placeholder="Escriba para buscar o haga clic para ver opciones..."
+           autocomplete="off">
+    <div id="areaDropdown" class="combobox-dropdown hidden"></div>
+    </div>
+    </div>
+    <div>
+    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Extensión o Teléfono de Contacto</label>
+    <input type="text" id="phone" name="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 4015">
+    </div>
+    </div>
+    </div>
 
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">2. Servicios</h3>
-                <div class="bg-gray-50 p-4 rounded-lg space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                        <div class="md:col-span-3">
-                            <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Servicios / Trabajos a solicitar</label>
-                            <select id="product" name="product" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                                <option value="" disabled selected>Seleccione un tipo de trabajo...</option>
-                                <option value='AUDIOGRABACIÓN'>AUDIOGRABACIÓN</option>
-                                <option value='DIBUJO E ILUSTRACIÓN'>DIBUJO E ILUSTRACIÓN</option>
-                                <option value='DISEÑO'>DISEÑO</option>
-                                <option value='EDICIÓN DE FOTOGRAFÍA DIGITAL'>EDICIÓN DE FOTOGRAFÍA DIGITAL</option>
-                                <option value='ENGARGOLADO'>ENGARGOLADO</option>
-                                <option value='ESCANEO'>ESCANEO</option>
-                                <option value='IMPRESIÓN DIGITAL'>IMPRESIÓN DIGITAL</option>
-                                <option value='IMPRESIÓN EN PLOTTER'>IMPRESIÓN EN PLOTTER</option>
-                                <option value='INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO'>INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO</option>
-                                <option value='MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC'>MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC</option>
-                                <option value='SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN'>SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN</option>
-                                <option value='MONTAJE EN SOPORTE PROPIO O NUEVO'>MONTAJE EN SOPORTE PROPIO O NUEVO</option>
-                                <option value='SOLICITUD DE TOMA DE FOTOGRAFÍAS'>SOLICITUD DE TOMA DE FOTOGRAFÍAS</option>
-                                <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
-                                <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
-                                <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
-                                <option value='OTRO'>OTRO</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-1">
-                            <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
-                            <input type="number" id="quantity" value="1" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
-                        </div>
-                        <div class="md:col-span-1">
-                            <button type="button" id="addItemBtn" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300">Agregar</button>
-                        </div>
-                    </div>
-                    <div id="digitalPrintContainer" class="conditional-field space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="paperType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Papel</label>
-                                <select id="paperType" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                                    <option value="BOND">BOND</option>
-                                    <option value="OPALINA PAPEL">OPALINA PAPEL</option>
-                                    <option value="OPALINA CARTULINA">OPALINA CARTULINA</option>
-                                    <option value="NACARADO">NACARADO</option>
-                                    <option value="ALBANENE">ALBANENE</option>
-                                    <option value="ADHERIBLE">ADHERIBLE</option>
-                                    <option value="OTROS">OTROS</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="paperSize" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de Papel</label>
-                                <select id="paperSize" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                                    <option value="CARTA">CARTA</option>
-                                    <option value="OFICIO">OFICIO</option>
-                                    <option value="TABLOIDE">TABLOIDE (DOBLE CARTA)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <input id="doubleSided" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
-                            <label for="doubleSided" class="ml-2 block text-sm text-gray-900">Imprimir en ambas caras</label>
-                        </div>
-                    </div>
-                    <div id="plotterContainer" class="conditional-field">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="plotterWidth" class="block text-sm font-medium text-gray-700 mb-1">Ancho (cm)</label>
-                                <input type="number" id="plotterWidth" min="1" max="90" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 90">
-                                <div id="plotterWidthError" class="hidden flex items-center text-red-600 text-sm mt-1">
-                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                                    <span>El ancho no debe exceder los 90 cm.</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="plotterLength" class="block text-sm font-medium text-gray-700 mb-1">Largo (cm)</label>
-                                <input type="number" id="plotterLength" min="1" max="150" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 120">
-                                <div id="plotterLengthError" class="hidden flex items-center text-red-600 text-sm mt-1">
-                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                                    <span>El largo no debe exceder los 150 cm.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div>
+    <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">2. Servicios</h3>
+    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+    <div class="md:col-span-3">
+    <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Servicios / Trabajos a solicitar</label>
+    <select id="product" name="product" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+    <option value="" disabled selected>Seleccione un tipo de trabajo...</option>
+    <option value='AUDIOGRABACIÓN'>AUDIOGRABACIÓN</option>
+    <option value='DIBUJO E ILUSTRACIÓN'>DIBUJO E ILUSTRACIÓN</option>
+    <option value='DISEÑO'>DISEÑO</option>
+    <option value='EDICIÓN DE FOTOGRAFÍA DIGITAL'>EDICIÓN DE FOTOGRAFÍA DIGITAL</option>
+    <option value='ENGARGOLADO'>ENGARGOLADO</option>
+    <option value='ESCANEO'>ESCANEO</option>
+    <option value='IMPRESIÓN DIGITAL'>IMPRESIÓN DIGITAL</option>
+    <option value='IMPRESIÓN EN PLOTTER'>IMPRESIÓN EN PLOTTER</option>
+    <option value='INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO'>INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO</option>
+    <option value='MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC'>MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC</option>
+    <option value='SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN'>SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN</option>
+    <option value='MONTAJE EN SOPORTE PROPIO O NUEVO'>MONTAJE EN SOPORTE PROPIO O NUEVO</option>
+    <option value='SOLICITUD DE TOMA DE FOTOGRAFÍAS'>SOLICITUD DE TOMA DE FOTOGRAFÍAS</option>
+    <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
+    <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
+    <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
+    <option value='OTRO'>OTRO</option>
+    </select>
+    </div>
+    <div class="md:col-span-1">
+    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+    <input type="number" id="quantity" value="1" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
+    </div>
+    <div class="md:col-span-1">
+    <button type="button" id="addItemBtn" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300">Agregar</button>
+    </div>
+    </div>
+    <div id="digitalPrintContainer" class="conditional-field space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+    <label for="paperType" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Papel</label>
+    <select id="paperType" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+    <option value="BOND">BOND</option>
+    <option value="OPALINA PAPEL">OPALINA PAPEL</option>
+    <option value="OPALINA CARTULINA">OPALINA CARTULINA</option>
+    <option value="NACARADO">NACARADO</option>
+    <option value="ALBANENE">ALBANENE</option>
+    <option value="ADHERIBLE">ADHERIBLE</option>
+    <option value="OTROS">OTROS</option>
+    </select>
+    </div>
+    <div>
+    <label for="paperSize" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de Papel</label>
+    <select id="paperSize" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+    <option value="CARTA">CARTA</option>
+    <option value="OFICIO">OFICIO</option>
+    <option value="TABLOIDE">TABLOIDE (DOBLE CARTA)</option>
+    </select>
+    </div>
+    </div>
+    <div class="flex items-center">
+    <input id="doubleSided" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+    <label for="doubleSided" class="ml-2 block text-sm text-gray-900">Imprimir en ambas caras</label>
+    </div>
+    </div>
+    <div id="plotterContainer" class="conditional-field">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+    <label for="plotterWidth" class="block text-sm font-medium text-gray-700 mb-1">Ancho (cm)</label>
+    <input type="number" id="plotterWidth" min="1" max="90" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 90">
+    <div id="plotterWidthError" class="hidden flex items-center text-red-600 text-sm mt-1">
+    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+    <span>El ancho no debe exceder los 90 cm.</span>
+    </div>
+    </div>
+    <div>
+    <label for="plotterLength" class="block text-sm font-medium text-gray-700 mb-1">Largo (cm)</label>
+    <input type="number" id="plotterLength" min="1" max="150" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 120">
+    <div id="plotterLengthError" class="hidden flex items-center text-red-600 text-sm mt-1">
+    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+    <span>El largo no debe exceder los 150 cm.</span>
+    </div>
+    </div>
+    </div>
+    </div>
 
-                    <div id="engarContainer" class="conditional-field">
-                        <label for="enType" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de hoja</label>
-                        <select id="enType" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="CARTA">TAMAÑO CARTA</option>
-                            <option value="OFICIO">TAMAÑO OFICIO</option>
-                            <option value="DOBLE CARTA">TAMAÑO DOBLE CARTA</option>
-                        </select>
-                    </div>
+    <div id="engarContainer" class="conditional-field">
+    <label for="enType" class="block text-sm font-medium text-gray-700 mb-1">Tamaño de hoja</label>
+    <select id="enType" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+    <option value="CARTA">TAMAÑO CARTA</option>
+    <option value="OFICIO">TAMAÑO OFICIO</option>
+    <option value="DOBLE CARTA">TAMAÑO DOBLE CARTA</option>
+    </select>
+    </div>
 
-                    <!-- Orientación Visual -->
-                    <div id="orientacionContainer" class="conditional-field mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Orientación y Posición de la Costilla</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <!-- Vertical - Izquierda -->
-                            <div class="orientation-card">
-                                <input id="vertical-izquierda" name="orientation" type="radio" value="Vertical - Costilla Izquierda" class="sr-only">
-                                <label for="vertical-izquierda" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
-                                    <div class="flex flex-col items-center">
-                                        <div class="page-illustration vertical mb-2">
-                                            <div class="binding-left"></div>
-                                        </div>
-                                        <span class="text-xs text-center font-medium">Vertical<br>Izquierda</span>
-                                    </div>
-                                </label>
-                            </div>
-                            
-                            <!-- Vertical - Arriba -->
-                            <div class="orientation-card">
-                                <input id="vertical-arriba" name="orientation" type="radio" value="Vertical - Costilla Arriba" class="sr-only">
-                                <label for="vertical-arriba" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
-                                    <div class="flex flex-col items-center">
-                                        <div class="page-illustration vertical mb-2">
-                                            <div class="binding-top"></div>
-                                        </div>
-                                        <span class="text-xs text-center font-medium">Vertical<br>Arriba</span>
-                                    </div>
-                                </label>
-                            </div>
-                            
-                            <!-- Horizontal - Izquierda -->
-                            <div class="orientation-card">
-                                <input id="horizontal-izquierda" name="orientation" type="radio" value="Horizontal - Costilla Izquierda" class="sr-only">
-                                <label for="horizontal-izquierda" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
-                                    <div class="flex flex-col items-center">
-                                        <div class="page-illustration horizontal mb-2">
-                                            <div class="binding-left"></div>
-                                        </div>
-                                        <span class="text-xs text-center font-medium">Horizontal<br>Izquierda</span>
-                                    </div>
-                                </label>
-                            </div>
-                            
-                            <!-- Horizontal - Arriba -->
-                            <div class="orientation-card">
-                                <input id="horizontal-arriba" name="orientation" type="radio" value="Horizontal - Costilla Arriba" class="sr-only">
-                                <label for="horizontal-arriba" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
-                                    <div class="flex flex-col items-center">
-                                        <div class="page-illustration horizontal mb-2">
-                                            <div class="binding-top"></div>
-                                        </div>
-                                        <span class="text-xs text-center font-medium">Horizontal<br>Arriba</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <h4 class="text-md font-medium text-gray-600 mb-2">Servicios Agregados:</h4>
-                    <div class="overflow-x-auto"><table class="min-w-full bg-white border border-gray-200"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-4 text-sm font-semibold text-gray-600">Servicio</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Cantidad</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Acción</th></tr></thead><tbody id="itemsTableBody"><tr id="noItemsRow"><td colspan="3" class="text-center py-4 text-gray-500">Aún no se han agregado servicios.</td></tr></tbody></table></div>
-                </div>
-            </div>
+    <!-- Orientación Visual -->
+    <div id="orientacionContainer" class="conditional-field mt-4">
+    <label class="block text-sm font-medium text-gray-700 mb-3">Orientación y Posición de la Costilla</label>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <!-- Vertical - Izquierda -->
+    <div class="orientation-card">
+    <input id="vertical-izquierda" name="orientation" type="radio" value="Vertical - Costilla Izquierda" class="sr-only">
+    <label for="vertical-izquierda" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+    <div class="flex flex-col items-center">
+    <div class="page-illustration vertical mb-2">
+    <div class="binding-left"></div>
+    </div>
+    <span class="text-xs text-center font-medium">Vertical<br>Izquierda</span>
+    </div>
+    </label>
+    </div>
+    
+    <!-- Vertical - Arriba -->
+    <div class="orientation-card">
+    <input id="vertical-arriba" name="orientation" type="radio" value="Vertical - Costilla Arriba" class="sr-only">
+    <label for="vertical-arriba" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+    <div class="flex flex-col items-center">
+    <div class="page-illustration vertical mb-2">
+    <div class="binding-top"></div>
+    </div>
+    <span class="text-xs text-center font-medium">Vertical<br>Arriba</span>
+    </div>
+    </label>
+    </div>
+    
+    <!-- Horizontal - Izquierda -->
+    <div class="orientation-card">
+    <input id="horizontal-izquierda" name="orientation" type="radio" value="Horizontal - Costilla Izquierda" class="sr-only">
+    <label for="horizontal-izquierda" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+    <div class="flex flex-col items-center">
+    <div class="page-illustration horizontal mb-2">
+    <div class="binding-left"></div>
+    </div>
+    <span class="text-xs text-center font-medium">Horizontal<br>Izquierda</span>
+    </div>
+    </label>
+    </div>
+    
+    <!-- Horizontal - Arriba -->
+    <div class="orientation-card">
+    <input id="horizontal-arriba" name="orientation" type="radio" value="Horizontal - Costilla Arriba" class="sr-only">
+    <label for="horizontal-arriba" class="cursor-pointer block p-3 border-2 border-gray-200 rounded-lg hover:border-brand transition-colors">
+    <div class="flex flex-col items-center">
+    <div class="page-illustration horizontal mb-2">
+    <div class="binding-top"></div>
+    </div>
+    <span class="text-xs text-center font-medium">Horizontal<br>Arriba</span>
+    </div>
+    </label>
+    </div>
+    </div>
+    </div>
+    </div>
+    <div class="mt-6">
+    <h4 class="text-md font-medium text-gray-600 mb-2">Servicios Agregados:</h4>
+    <div class="overflow-x-auto"><table class="min-w-full bg-white border border-gray-200"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-4 text-sm font-semibold text-gray-600">Servicio</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Cantidad</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Acción</th></tr></thead><tbody id="itemsTableBody"><tr id="noItemsRow"><td colspan="3" class="text-center py-4 text-gray-500">Aún no se han agregado servicios.</td></tr></tbody></table></div>
+    </div>
+    </div>
 
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">3. Detalles del Servicio</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción Detallada del Servicio y su Justificación</label>
-                        <textarea id="description" name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Por favor, sea lo más específico posible..."></textarea>
-                    </div>
-                </div>
-            </div>
+    <div>
+    <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">3. Detalles del Servicio</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="md:col-span-2">
+    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción Detallada del Servicio y su Justificación</label>
+    <textarea id="description" name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Por favor, sea lo más específico posible..."></textarea>
+    </div>
+    </div>
+    </div>
 
-            <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">4. Archivos Adjuntos (Opcional)</h3>
-                <div class="bg-gray-50 p-4 rounded-lg border-dashed border-2 border-gray-300">
-                    <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-2">Seleccione hasta 3 archivos (máx. 10MB por archivo)</label>
-                    <input type="file" id="fileUpload" name="files" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20">
-                    <div id="fileList" class="mt-3 text-sm text-gray-600"></div>
-                    <div id="fileError" class="mt-2 text-sm text-red-600"></div>
-                </div>
-            </div>
+    <div>
+    <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">4. Archivos Adjuntos (Opcional)</h3>
+    <div class="bg-gray-50 p-4 rounded-lg border-dashed border-2 border-gray-300">
+    <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-2">Seleccione hasta 3 archivos (máx. 10MB por archivo)</label>
+    <input type="file" id="fileUpload" name="files" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20">
+    <div id="fileList" class="mt-3 text-sm text-gray-600"></div>
+    <div id="fileError" class="mt-2 text-sm text-red-600"></div>
+    </div>
+    </div>
 
-            <div class="pt-6 border-t border-gray-200 flex justify-end items-center space-x-4">
-                <div id="loadingSpinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
-                <div id="statusMessage" class="text-sm font-medium"></div>
-                <button type="submit" id="submitBtn" class="bg-brand text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-brand-light transition-colors duration-300">Enviar Formulario</button>
-            </div>
-        </form>
+    <div class="pt-6 border-t border-gray-200 flex justify-end items-center space-x-4">
+    <div id="loadingSpinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
+    <div id="statusMessage" class="text-sm font-medium"></div>
+    <button type="submit" id="submitBtn" class="bg-brand text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-brand-light transition-colors duration-300">Enviar Formulario</button>
+    </div>
+    </form>
     </main>
 
     <footer class="bg-gray-800 text-white text-center p-4 mt-12">
-        <p>&copy; 2025 Instituo Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
+    <p>&copy; 2025 Instituo Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/js/shepherd.min.js"></script>

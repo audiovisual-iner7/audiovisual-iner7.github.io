@@ -241,10 +241,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
   function sendDataToGoogle(data) {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw8I9ZV5R8k3-Td1BnMgO1omTf-hHFs95DUyDPDip_Y_99-uFd09wNE2NeN7r0fZVpHHA/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
+
+    console.log('Sending data:', data); // Para debug
 
     fetch(scriptURL, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data)
         
         // ← Solo esto, nada más

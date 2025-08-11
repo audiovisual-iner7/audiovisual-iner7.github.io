@@ -518,24 +518,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-  function sendDataToGoogle(data) {
+function sendDataToGoogle(data) {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
+    
 
-    console.log('Sending data:', data); // Para debug
+    console.log('Sending data:', data);
+
+    // Crear FormData en lugar de JSON
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(data));
 
     fetch(scriptURL, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-        
-        // ← Solo esto, nada más
+        body: formData  // Sin headers de Content-Type
     })
     .then(response => response.json())
     .then(res => {
         if (res.result === 'success') {
-            var folio = res.folio ;
+            var folio = res.folio;
             statusMessage.textContent = '¡Solicitud enviada con éxito! Tu folio es: ' + folio;
             statusMessage.className = 'text-green-600';
             form.reset();

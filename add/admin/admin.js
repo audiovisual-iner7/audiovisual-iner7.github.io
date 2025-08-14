@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // URL ÚNICA de tu Google Apps Script (CAMBIA por la tuya)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8I9ZV5R8k3-Td1BnMgO1omTf-hHFs95DUyDPDip_Y_99-uFd09wNE2NeN7r0fZVpHHA/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
 
     // Elementos del DOM
     const loginContainer = document.getElementById('loginContainer');

@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // URL ÚNICA de tu Google Apps Script (CAMBIA por la tuya)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8I9ZV5R8k3-Td1BnMgO1omTf-hHFs95DUyDPDip_Y_99-uFd09wNE2NeN7r0fZVpHHA/exec';
+    // URL ÚNICA de tu Google Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
 
-    // Elementos del DOM
-    const loginContainer = document.getElementById('loginContainer');
+    // --- ELEMENTOS DEL DOM ---
+     const loginContainer = document.getElementById('loginContainer');
     const adminPanel = document.getElementById('adminPanel');
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
@@ -18,68 +18,113 @@ document.addEventListener('DOMContentLoaded', function() {
     const pendientesContainer = document.getElementById('pendientesContainer');
     const pendientesTableBody = document.getElementById('pendientesTableBody');
     const noPendientes = document.getElementById('noPendientes');
+    const nuevaSolicitudForm = document.getElementById('nuevaSolicitudForm');
+    const areaInput = document.getElementById('area');
+    const areaDropdown = document.getElementById('areaDropdown');
+    const serviciosBusqueda = document.getElementById('serviciosBusqueda');
+    const serviciosDropdown = document.getElementById('serviciosDropdown');
+    const serviciosSeleccionadosContainer = document.getElementById('serviciosSeleccionados');
+    const serviciosCart = document.getElementById('serviciosCart');
+    const duplicadorDigital = document.getElementById('duplicadorDigital');
+    const numeroMastersContainer = document.getElementById('numeroMasters');
+    const cantidadMastersInput = document.getElementById('cantidadMasters');
+    const claveInput = document.getElementById('clave');
+    const clearFormBtn = document.getElementById('clearForm');
+    const detailsModal = document.getElementById('detailsModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalContent = document.getElementById('modalContent');
 
-    let pendientesList = []; // Para almacenar los pendientes y usarlos en el combo
-    let selectedServices = []; // Para almacenar los servicios seleccionados
-    let selectedServicio = null;
-    let serviciosCart = [];
-
-    // Lista de servicios
-    const serviciosList = [
-        'ANIMACIÓN',
-        'APOYO ADMINISTRATIVO',
-        'APOYO AUDIOVISUAL',
-        'APOYO TÉCNICO INFORMÁTICO',
-        'APOYO TÉCNICO',
-        'AUDIOGRABACIÓN',
-        'CD: GRABADO O EN BLANCO',
-        'CENTÍMETROS PLOTTER',
-        'DIBUJO E ILUSTRACIÓN',
-        'DISEÑO IMPRESIÓN MONTAJE Y CORTE',
-        'DISEÑO',
-        'DVD: GRABADO O EN BLANCO',
-        'EDICIÓN DE FOTOGRAFÍA DIGITAL',
-        'ENGARGOLADOS',
-        'ESCANEOS',
-        'FOTOGRAFÍAS BANCO DE IMÁGEN',
-        'FOTOGRAFÍAS COMPARTIDAS',
-        'HOJAS CARTA',
-        'HOJAS DE REUSO',
-        'HOJAS OFICIO',
-        'HOJAS PAPEL ESPECIAL',
-        'HOJAS TABLOIDE',
-        'IMPRESIÓN PAPEL REUSO',
-        'IMPRESIONES CARTA',
-        'IMPRESIONES OFICIO',
-        'IMPRESIONES PAPEL ESPECIAL',
-        'IMPRESIONES TABLOIDE',
-        'PLACA DE BATERÍA',
-        'PLACA DE FOAMBOARD',
-        'PRESTAMO DE EQUIPO',
-        'PRODUCCIÓN AUDIOVISUAL',
-        'VIDEO BANCO DE IMÁGEN',
-        'VIDEOS COMPARTIDOS',
-        'VIDEOS EDITADOS'
-    ];
-    
-    // Modal elements
-    const assignModal = document.getElementById('assignModal');
-
-
+    // --- ESTADO Y DATOS ---
     let currentUser = null;
+    let pendientesList = [];
+    let serviciosAgregados = [];
 
-
-    // --- 1. MANEJO DE AUTENTICACIÓN ---
+    // --- LISTAS DE DATOS ---
+    const papelOptions = ['BOND', 'OPALINA PAPEL', 'OPALINA CARTULINA', 'NACARADO', 'ALBANENE', 'ADHERIBLE', 'OTROS'];
+    const rolloOptions = ['ROLLO BOND', 'ROLLO ADHERIBLE PAPEL', 'ROLLO ADHERIBLE VINIL', 'ROLLO FOTOGRÁFICO MATE', 'ROLLO FOTOGRÁFICO BRILLANTE'];
     
-    // Verificar si ya hay una sesión activa
+    // NUEVA LISTA: Opciones para el menú de audiograbaciones
+    const comiteOptions = [
+        'COMITÉ DE INER-GESTIÓN HOSPITALARIA', 'CONSEJO TÉCNICO', 'COMITÉ DE MORBIMORTALIDAD', 
+        'JUNTA DE JEFES DE SERVICIO', 'DIRECCIÓN DE PLANEACIÓN ESTRATÉGICA', 'CODECIN', 
+        'COCODI', 'COMERI', 'JUNTA DE GOBIERNO', 'TRANSPLANTE PULMONAR', 'ENTREVISTAS', 'OTROS'
+    ];
+
+    const areasList = [
+        'Clínica Asma e Inmunoalergia', 'Clínica Enfermedad Pulmonar Obstructiva Crónica y Bronquiectasias y Tabaquismo ​',
+        'Clínica Enfermedades Intersticiales del Pulmón ​', 'Clínica Fibrosis Quística ​', 'Clínica Implante Coclear',
+        'Clínica Inmunocompromiso por Enfermedades Infecciosas ​', 'Clínica Intolerancia a la Aspirina, Poliposis y Asma (IAPA) ​',
+        'Clínica Investigación Traslacional en Envejecimiento y Enfermedades Fibrosantes ​', 'Clínica Laringología, Fonocirugía y Cirugía de Cabeza y Cuello ​',
+        'Clínica Pleura', 'Clínica Tuberculosis', 'Clínica Vasculitis Sistémicas Primarias', 'Coordinación Administración Clínica de Enfermería ​',
+        'Coordinación Administración de Recursos Humanos de Enfermería', 'Coordinación Admisión Hospitalaria y Registros Médicos',
+        'Coordinación Ambulancias', 'Coordinación Arte y Cultura', 'Coordinación Atención Médica Ambulatoria',
+        'Coordinación Atención Médica de Hospitalización', 'Coordinación Camillería', 'Coordinación Cardiología y ecocardiografía ​',
+        'Coordinación Centro de Simulación Clínica en Medicina Respiratoria', 'Coordinación Clínicas', 'Coordinación Desarrollo Tecnológico',
+        'Coordinación Donación de Órganos y Tejidos', 'Coordinación Enseñanza de Enfermería ​', 'Coordinación Enseñanza y Capacitación',
+        'Coordinación Epidemiología y Estadística', 'Coordinación Geriatría y Cuidados Paliativos', 'Coordinación Gestión de Tecnología Médica',
+        'Coordinación Gestión del Cuidado y Calidad de Enfermería', 'Coordinación Hemodinamia', 'Coordinación Hipertensión Pulmonar',
+        'Coordinación Infectología', 'Coordinación Ingeniería en Servicio', 'Coordinación Investigación de Enfermería ​',
+        'Coordinación Investigación Educativa en Medicina Basada en Evidencia', 'Coordinación Medicina Interna', 'Coordinación Nefrología',
+        'Coordinación Oncología Torácica', 'Coordinación Salud Mental', 'Coordinación Salud Ocupacional y Preventiva ​',
+        'Coordinación Síndrome metabólico', 'Coordinación Supervisión de Trabajo Social', 'Coordinación Trasplante',
+        'Coordinación Vigilancia Epidemiológica', 'Departamento Adquisiciones', 'Departamento Apoyo Técnico',
+        'Departamento Apoyo Técnico en Administración', 'Departamento Apoyo Técnico en Enseñanza', 'Departamento Áreas Críticas',
+        'Departamento Asuntos Jurídicos y Unidad de Transparencia', 'Departamento Biomedicina Molecular e Investigación Traslacional',
+        'Departamento Calidad', 'Departamento Centro de Investigación en Enfermedades Infecciosas', 'Departamento Control de Bienes',
+        'Departamento Coordinación Técnica', 'Departamento Educación Continua', 'Departamento Empleo y Capacitación',
+        'Departamento Enfermería', 'Departamento Enlace Administrativo', 'Departamento Epidemiología Hospitalaria e Infectología',
+        'Departamento Farmacia Hospitalaria', 'Departamento Fisiología Respiratoria', 'Departamento Formación de Posgrado',
+        'Departamento Formación de Pregrado', 'Departamento Imagenología', 'Departamento Ingeniería Biomédica',
+        'Departamento Investigación en Cirugía Experimental', 'Departamento Investigación en Enfermedades Crónico-Degenerativas',
+        'Departamento Investigación en Fibrosis Pulmonar', 'Departamento Investigación en Hiperreactividad Bronquial',
+        'Departamento Investigación en Inmunogenética y Alergia', 'Departamento Investigación en Microbiología ​',
+        'Departamento Investigación en Tabaquismo y EPOC ​', 'Departamento Investigación en Toxicología y Medicina Ambiental',
+        'Departamento Investigación en Virología y Micología', 'Departamento Laboratorio Clínico', 'Departamento Nutrición Clínica',
+        'Departamento Otorrinolaringología y Cirugía de Cabeza y Cuello', 'Departamento Rehabilitación Pulmonar',
+        'Departamento Relaciones Laborales', 'Departamento Relaciones Públicas y Comunicación', 'Departamento Remuneraciones',
+        'Departamento Tecnologías de la Información y Comunicaciones', 'Departamento Trabajo Social', 'Departamento Unidad de Igualdad, Género e Inclusión',
+        'Dirección Enseñanza', 'Dirección General', 'Dirección Investigación', 'Dirección Médica', 'Laboratorio Biología Celular',
+        'Laboratorio Biología Computacional', 'Laboratorio Biología Molecular', 'Laboratorio Biología Molecular de Enfermedades Emergentes y EPOC',
+        'Laboratorio Biopatología Pulmonar INER-Ciencias, UNAM', 'Laboratorio Cáncer Pulmonar', 'Laboratorio Farmacología Clínica y Experimental',
+        'Laboratorio Inmunobiología de la Tuberculosis', 'Laboratorio Inmunobiología y Genética', 'Laboratorio Inmunofarmacología',
+        'Laboratorio Inmunología Integrativa', 'Laboratorio Investigación en Enfermedades Reumáticas', 'Laboratorio Investigación en Epidemiología e Infectología ​',
+        'Laboratorio LACBio', 'Laboratorio Morfología', 'Laboratorio Nacional Conahcyt de Investigación y Diagnóstico por Inmunocitofluorometría (LANCIDI) ​',
+        'Laboratorio Neumogenómica', 'Laboratorio Onco-Inmunobiología', 'Laboratorio Secuenciación y Biología Molecular',
+        'Laboratorio Transcriptómica e Inmunología Molecular', 'Laboratorio Transducción de Señales', 'Laboratorio Trasplante Pulmonar Experimental',
+        'Oficina Apoyo Técnico de la Dirección Médica ​', 'Oficina Audiovisual', 'Oficina Biblioteca y Editorial', 'Oficina Bioterio',
+        'Oficina Capacitación y Desarrollo', 'Oficina Coordinación de Protección Civil Institucional y Gestión Ambiental ​',
+        'Oficina Escuela de Enfermería', 'Oficina Escuela Superior de Terapia Respiratoria', 'Oficina Movimientos de Personal',
+        'Oficina Seguridad Radiológica', 'Programa Apoyo a Pacientes y Familiares (PAPyF) ​', 'Servicio Anatomía Patológica',
+        'Servicio Anestesia y Clínica del Dolor', 'Servicio Banco de Sangre', 'Servicio Broncoscopía y Endoscopía', 'Servicio Cardiología',
+        'Servicio Cirugía de Tórax', 'Servicio Cirugía Maxilo Facial y Estomatología', 'Servicio Clínico 1', 'Servicio Clínico 2',
+        'Servicio Clínico 3', 'Servicio Clínico 4', 'Servicio Clínico 7', 'Servicio Clínico 8', 'Servicio Consulta Externa',
+        'Servicio Cuidados Intensivos Respiratorios', 'Servicio Hospital de Día', 'Servicio Medicina del Sueño',
+        'Servicio Medicina Nuclear e Imagen Molecular', 'Servicio Microbiología Clínica', 'Servicio Oncología Médica',
+        'Servicio Terapia Intermedia', 'Servicio Terapia Postquirúrgica', 'Servicio Terapia Respiratoria', 'Servicio Urgencias Respiratorias',
+        'Sindicato Sindicato', 'Subdirección Atención Médica de Neumología', 'Subdirección Cirugía', 'Subdirección Enseñanza',
+        'Subdirección Investigación Biomédica', 'Subdirección Recursos Humanos y Organización', 'Subdirección Recursos Materiales',
+        'Subdirección Servicios Auxiliares de Diagnóstico y Paramédicos', 'Transportes', 'Trasplante', 'Trasplante Pulmonar Experimental',
+        'Tuberculosis', 'Unidad de Administración y Finanzas', 'Unidad de Igualdad, Género e Inclusión', 'Urgencias Respiratorias',
+        'Vasculitis Sistémicas Primarias', 'Vigilancia Epidemiológica', 'OTRO'
+    ];
+    const serviciosList = [
+        'ANIMACIÓN', 'APOYO ADMINISTRATIVO', 'APOYO AUDIOVISUAL', 'APOYO TÉCNICO INFORMÁTICO', 'APOYO TÉCNICO', 'AUDIOGRABACIÓN',
+        'CD: GRABADO O EN BLANCO', 'CENTÍMETROS PLOTTER', 'DIBUJO E ILUSTRACIÓN', 'DISEÑO IMPRESIÓN MONTAJE Y CORTE', 'DISEÑO',
+        'DVD: GRABADO O EN BLANCO', 'EDICIÓN DE FOTOGRAFÍA DIGITAL', 'ENGARGOLADOS', 'ESCANEOS', 'FOTOGRAFÍAS BANCO DE IMÁGEN',
+        'FOTOGRAFÍAS COMPARTIDAS', 'HOJAS CARTA', 'HOJAS DE REUSO', 'HOJAS OFICIO', 'HOJAS PAPEL ESPECIAL', 'HOJAS TABLOIDE',
+        'IMPRESIÓN PAPEL REUSO', 'IMPRESIONES CARTA', 'IMPRESIONES OFICIO', 'IMPRESIONES PAPEL ESPECIAL', 'IMPRESIONES TABLOIDE',
+        'PLACA DE BATERÍA', 'PLACA DE FOAMBOARD', 'PRESTAMO DE EQUIPO', 'PRODUCCIÓN AUDIOVISUAL', 'VIDEO BANCO DE IMÁGEN',
+        'VIDEOS COMPARTIDOS', 'VIDEOS EDITADOS'
+    ];
+
+    // --- MANEJO DE SESIÓN Y LÓGICA DE LOGIN ---
+    // (Esta sección no cambia)
     const savedUser = localStorage.getItem('adminUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         showAdminPanel();
         loadPendientes();
     }
-
-    // Login form submission
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -94,15 +139,24 @@ document.addEventListener('DOMContentLoaded', function() {
         setLoginLoading(true);
         hideLoginError();
 
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Empaquetar los datos en un objeto, como siempre.
+        const dataToSend = {
+            action: 'login',
+            username: username,
+            password: password
+        };
+
+        // 2. Crear un objeto FormData y meter nuestro objeto de datos dentro,
+        //    bajo la clave 'data', que es lo que el backend espera.
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(dataToSend));
+        // --- FIN DE LA CORRECCIÓN ---
+
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'login',
-                    username: username,
-                    password: password
-                }),
-                
+                body: formData // Ahora enviamos el FormData, no el texto crudo.
             });
 
             const result = await response.json();
@@ -112,11 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     username: username,
                     name: result.name || username
                 };
-                
-                // Guardar sesión
                 localStorage.setItem('adminUser', JSON.stringify(currentUser));
-                
-                // Mostrar panel
                 showAdminPanel();
                 loadPendientes();
             } else {
@@ -124,77 +174,50 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error en login:', error);
-            showLoginError('Error de conexión. Intente nuevamente.');
+            showLoginError('Error de conexión o en la respuesta del servidor. Revisa la consola.');
         } finally {
             setLoginLoading(false);
         }
     });
-
-    // Logout
-    logoutBtn.addEventListener('click', function() {
+    logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('adminUser');
         currentUser = null;
-        showLoginContainer();
-        loginForm.reset();
-    });
-
-    // --- 2. FUNCIONES DE UI ---
-    
-    function showLoginContainer() {
         loginContainer.style.display = 'block';
         adminPanel.style.display = 'none';
         userInfo.classList.add('hidden');
-    }
+        loginForm.reset();
+    });
 
-    function showAdminPanel() {
-        loginContainer.style.display = 'none';
-        adminPanel.style.display = 'block';
-        adminPanel.classList.add('fade-in');
-        userInfo.classList.remove('hidden');
-        welcomeUser.textContent = `Bienvenido, ${currentUser.name}`;
-    }
-
-    function setLoginLoading(loading) {
-        loginBtn.disabled = loading;
-        if (loading) {
-            loginBtnText.textContent = 'Iniciando sesión...';
-            loginSpinner.classList.remove('hidden');
-        } else {
-            loginBtnText.textContent = 'Iniciar Sesión';
-            loginSpinner.classList.add('hidden');
-        }
-    }
-
-    function showLoginError(message) {
-        loginError.textContent = message;
-        loginError.classList.remove('hidden');
-    }
-
-    function hideLoginError() {
-        loginError.classList.add('hidden');
-    }
-
-    // --- 3. CARGAR PENDIENTES ---
-    
+    // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN ---
+    // (Esta sección no cambia)
     refreshBtn.addEventListener('click', loadPendientes);
-
     async function loadPendientes() {
         showLoadingPendientes();
         
         try {
+            // --- INICIO DE LA CORRECCIÓN ---
+            // 1. Crear el objeto de datos que se enviará.
+            const dataToSend = {
+                action: 'getPendientesUsuario',
+                nombre: currentUser.username
+            };
+
+            // 2. Empaquetarlo en FormData.
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(dataToSend));
+            // --- FIN DE LA CORRECCIÓN ---
+
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'getPendientesUsuario',
-                    nombre: currentUser.username
-                }),
-                
+                body: formData // Ahora se envía el FormData.
             });
 
             const result = await response.json();
 
             if (result.result === 'success') {
-                displayPendientes(result.pendientes);
+                pendientesList = result.pendientes || [];
+                displayPendientes(pendientesList);
+                populateFolioCombo(pendientesList);
             } else {
                 console.error('Error al cargar pendientes:', result.message);
                 showNoPendientes('Error al cargar las solicitudes pendientes.');
@@ -204,593 +227,490 @@ document.addEventListener('DOMContentLoaded', function() {
             showNoPendientes('Error de conexión al cargar las solicitudes.');
         }
     }
-
-    function showLoadingPendientes() {
-        loadingPendientes.classList.remove('hidden');
-        pendientesContainer.classList.add('hidden');
-    }
-
     function displayPendientes(pendientes) {
         loadingPendientes.classList.add('hidden');
-        
         if (!pendientes || pendientes.length === 0) {
             showNoPendientes();
             return;
         }
-
-        // Guardar para usar en el combo - MOVER ESTAS LÍNEAS AQUÍ
-        pendientesList = pendientes;
-        populateFolioCombo(pendientes);
-
         pendientesContainer.classList.remove('hidden');
-        noPendientes.classList.add('hidden');
-        
         pendientesTableBody.innerHTML = '';
-
-        pendientes.forEach((solicitud, index) => {
-            const row = createPendienteRow(solicitud, index);
-            pendientesTableBody.appendChild(row);
+        pendientes.forEach(solicitud => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50';
+            const fecha = new Date(solicitud.fecha).toLocaleDateString('es-MX');
+            const descripcionCorta = solicitud.descripcion?.substring(0, 100) + (solicitud.descripcion?.length > 100 ? '...' : '');
+            row.innerHTML = `
+            <td class="text-sm p-2">${solicitud.folio}</td>
+            <td class="text-sm p-2">${new Date(solicitud.fecha).toLocaleDateString('es-MX')}</td>
+            <td class="font-medium p-2">${solicitud.solicitante}</td>
+            <td class="text-sm p-2">${solicitud.area || ''}</td>
+            <td class="text-sm p-2" title="${solicitud.descripcion}">${solicitud.descripcion.substring(0,50)}...</td>
+            <td class="text-sm p-2">
+                <button data-folio="${solicitud.folio}" class="ver-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs">Ver</button>
+            </td>
+        `;
+        pendientesTableBody.appendChild(row);
         });
     }
 
-    function showNoPendientes(message = null) {
+    function openModal() {
+        detailsModal.classList.remove('hidden');
+        detailsModal.classList.add('flex');
+    }
+
+    function closeModal() {
+        detailsModal.classList.add('hidden');
+        detailsModal.classList.remove('flex');
+    }
+    
+    closeModalBtn.addEventListener('click', closeModal);
+    // Cerrar si se hace clic fuera del contenido del modal
+    detailsModal.addEventListener('click', (e) => {
+        if (e.target === detailsModal) {
+            closeModal();
+        }
+    });
+
+    pendientesTableBody.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('ver-btn')) {
+            const folio = e.target.dataset.folio;
+            openModal();
+            modalContent.innerHTML = '<div class="text-center text-gray-500">Cargando...</div>';
+
+            try {
+                const formData = new FormData();
+                formData.append('data', JSON.stringify({ action: 'getSolicitudDetails', folio: folio }));
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.success) {
+                    populateModal(result.data);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                modalContent.innerHTML = `<div class="text-center text-red-500">Error al cargar los detalles: ${error.message}</div>`;
+            }
+        }
+    });
+
+    function populateModal(data) {
+        const fieldsToShow = ['Folio', 'Timestamp', 'Email', 'Nombre', 'Area', 'Telefono', 'Descripcion', 'Items Adicionales', 'Archivos Adjuntos', 'COMENTARIOS'];
+        let html = '<dl class="space-y-4">';
+        fieldsToShow.forEach(field => {
+            if (data[field]) {
+                html += `
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">${field}</dt>
+                        <dd class="mt-1 text-md text-gray-900 whitespace-pre-wrap">${data[field]}</dd>
+                    </div>
+                `;
+            }
+        });
+        html += '</dl>';
+        modalContent.innerHTML = html;
+    }
+
+    function populateFolioCombo(pendientes) {
+        const folioSelect = document.getElementById('folioSolicitud');
+        folioSelect.innerHTML = '';
+        const nuevaOpcion = document.createElement('option');
+        nuevaOpcion.value = 'NUEVO';
+        nuevaOpcion.textContent = '--- Crear Nueva Solicitud ---';
+        folioSelect.appendChild(nuevaOpcion);
+        pendientes.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.folio;
+            option.textContent = `${p.folio} - ${p.solicitante}`;
+            option.dataset.pendiente = JSON.stringify(p);
+            folioSelect.appendChild(option);
+        });
+    }
+    document.getElementById('folioSolicitud').addEventListener('change', function() {
+        const selectedValue = this.value;
+
+        if (selectedValue === 'NUEVO') {
+            // Si es una nueva solicitud, simplemente limpiar el formulario
+            nuevaSolicitudForm.reset();
+            document.getElementById('folioSolicitud').value = 'NUEVO'; // Mantener la selección
+            serviciosAgregados = [];
+            renderServicesCart();
+            document.getElementById('fechaSolicitud').valueAsDate = new Date(); // Poner fecha actual por defecto
+
+        } else {
+            // Si es un folio existente, solo autocompletar los datos
+            const selectedOption = this.options[this.selectedIndex];
+            const pendiente = JSON.parse(selectedOption.dataset.pendiente);
+            
+            document.getElementById('fechaSolicitud').value = new Date(pendiente.fecha).toISOString().split('T')[0];
+            document.getElementById('nombreSolicitante').value = pendiente.solicitante;
+            document.getElementById('descripcionTrabajo').value = pendiente.descripcion;
+            areaInput.value = pendiente.area || '';
+            
+            // Se eliminó la línea que ponía los campos en "readOnly = true"
+        }
+    });
+
+    // --- LÓGICA DE COMBOBOX (genérica) ---
+    // (Esta sección no cambia)
+    function createDropdown(inputElement, dropdownElement, items, onSelect) {
+        dropdownElement.innerHTML = '';
+        if (items.length === 0) {
+            dropdownElement.classList.add('hidden');
+            return;
+        }
+        items.forEach(item => {
+            const optionEl = document.createElement('div');
+            optionEl.className = 'combobox-option';
+            optionEl.textContent = item;
+            optionEl.addEventListener('click', () => {
+                inputElement.value = item;
+                dropdownElement.classList.add('hidden');
+                if (onSelect) onSelect(item);
+            });
+            dropdownElement.appendChild(optionEl);
+        });
+        dropdownElement.classList.remove('hidden');
+    }
+    areaInput.addEventListener('focus', () => createDropdown(areaInput, areaDropdown, areasList));
+    areaInput.addEventListener('input', () => {
+        const filtered = areasList.filter(a => a.toLowerCase().includes(areaInput.value.toLowerCase()));
+        createDropdown(areaInput, areaDropdown, filtered);
+    });
+
+    // --- LÓGICA DEL CARRITO DE SERVICIOS ---
+     serviciosBusqueda.addEventListener('focus', () => {
+        const currentServiceList = duplicadorDigital.checked ? ['COPIAS'] : serviciosList;
+        createDropdown(serviciosBusqueda, serviciosDropdown, currentServiceList, onServiceSelect);
+    });
+    serviciosBusqueda.addEventListener('input', () => {
+        const searchTerm = serviciosBusqueda.value.toLowerCase();
+        const currentServiceList = duplicadorDigital.checked ? ['COPIAS'] : serviciosList;
+        const filtered = currentServiceList.filter(s => s.toLowerCase().includes(searchTerm));
+        createDropdown(serviciosBusqueda, serviciosDropdown, filtered, onServiceSelect);
+    });
+    function onServiceSelect(serviceName) {
+        addServiceToCart(serviceName);
+        serviciosBusqueda.value = '';
+    }
+
+    // MODIFICADO: addServiceToCart para incluir lógica de 'comite'
+      function addServiceToCart(serviceName) {
+        if (duplicadorDigital.checked && serviceName.toUpperCase() !== 'COPIAS') {
+            alert("Con 'Duplicador Digital' activado, solo puedes agregar servicios de 'COPIAS'.");
+            return;
+        }
+
+        const serviceNameUpper = serviceName.toUpperCase();
+        let newService = { name: serviceName, quantity: 1, specifications: '' };
+
+        if (serviceNameUpper.includes('IMPRESION') || serviceNameUpper.includes('HOJAS')) {
+            newService.tipoPapel = 'BOND';
+            if (serviceNameUpper.includes('IMPRESION')) newService.numHojas = 1;
+        }
+        if (serviceNameUpper.includes('PLOTTER')) newService.tipoRollo = 'ROLLO BOND';
+        if (serviceNameUpper === 'AUDIOGRABACIÓN') newService.comite = comiteOptions[0];
+        if (serviceNameUpper === 'COPIAS') {
+            newService.tamaño = 'CARTA';
+            newService.ambasCaras = false;
+            newService.numHojas = newService.quantity;
+        }
+
+        serviciosAgregados.push(newService);
+        renderServicesCart();
+    }
+
+    // MODIFICADO: renderServicesCart para mostrar el select de comités
+function renderServicesCart() {
+        serviciosCart.innerHTML = '';
+        
+        const hasNonCopiasService = serviciosAgregados.some(s => s.name.toUpperCase() !== 'COPIAS');
+        duplicadorDigital.disabled = hasNonCopiasService;
+
+        if (duplicadorDigital.disabled && duplicadorDigital.checked) {
+            duplicadorDigital.checked = false;
+            duplicadorDigital.dispatchEvent(new Event('change'));
+        }
+        
+        serviciosSeleccionadosContainer.style.display = serviciosAgregados.length > 0 ? 'block' : 'none';
+
+        if (serviciosAgregados.length > 0) {
+            serviciosAgregados.forEach((service, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'cart-item bg-gray-50 border rounded-lg mb-2 p-3 space-y-3';
+                const mainRowHTML = `
+                    <div class="flex items-center justify-between gap-4">
+                        <span class="font-medium text-gray-800 flex-grow">${service.name}</span>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium">${service.name.toUpperCase().includes('PLOTTER') ? 'Cm:' : 'Cant:'}</label>
+                            <input type="number" min="1" value="${service.quantity}" class="w-20 p-1 border rounded text-center" data-index="${index}" data-field="quantity">
+                        </div>
+                        <button type="button" class="text-red-500 hover:text-red-700 font-bold text-xl p-1" data-index="${index}" data-action="delete" title="Eliminar servicio">&times;</button>
+                    </div>`;
+
+                let dynamicFieldsHTML = '';
+                
+                if (service.hasOwnProperty('tipoPapel')) {
+                    const optionsHTML = papelOptions.map(opt => `<option value="${opt}" ${service.tipoPapel === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    dynamicFieldsHTML += `<div class="flex items-center gap-2"><label class="text-sm font-medium w-28">Tipo de Papel:</label><select class="flex-grow p-1 border rounded" data-index="${index}" data-field="tipoPapel">${optionsHTML}</select></div>`;
+                }
+                if (service.hasOwnProperty('tipoRollo')) {
+                    const optionsHTML = rolloOptions.map(opt => `<option value="${opt}" ${service.tipoRollo === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    dynamicFieldsHTML += `<div class="flex items-center gap-2"><label class="text-sm font-medium w-28">Tipo de Rollo:</label><select class="flex-grow p-1 border rounded" data-index="${index}" data-field="tipoRollo">${optionsHTML}</select></div>`;
+                }
+                if (service.hasOwnProperty('numHojas') && service.name.toUpperCase() !== 'COPIAS') {
+                    dynamicFieldsHTML += `<div class="flex items-center gap-2"><label class="text-sm font-medium w-28">Hojas Utilizadas:</label><div class="flex-grow"><input type="number" min="1" value="${service.numHojas}" class="w-24 p-1 border rounded text-center" data-index="${index}" data-field="numHojas"><div id="error-hojas-${index}" class="text-red-600 text-xs mt-1"></div></div></div>`;
+                }
+                if (service.hasOwnProperty('comite')) {
+                    const optionsHTML = comiteOptions.map(opt => `<option value="${opt}" ${service.comite === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    dynamicFieldsHTML += `<div class="flex items-center gap-2"><label class="text-sm font-medium w-28">Comité/Junta:</label><select class="flex-grow p-1 border rounded" data-index="${index}" data-field="comite">${optionsHTML}</select></div>`;
+                }
+                if (service.name.toUpperCase() === 'COPIAS') {
+                    const tamañoOptions = ['CARTA', 'OFICIO', 'TABLOIDE'].map(opt => `<option value="${opt}" ${service.tamaño === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    dynamicFieldsHTML += `
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium w-28">Tamaño:</label>
+                            <select class="flex-grow p-1 border rounded" data-index="${index}" data-field="tamaño">${tamañoOptions}</select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="ambasCaras-${index}" class="h-4 w-4 rounded" data-index="${index}" data-field="ambasCaras" ${service.ambasCaras ? 'checked' : ''}>
+                            <label for="ambasCaras-${index}" class="text-sm font-medium">Ambas Caras</label>
+                        </div>`;
+                }
+                
+                const specificationsHTML = `<div><input type="text" placeholder="Especificaciones adicionales..." value="${service.specifications}" class="w-full p-1 border rounded text-sm" data-index="${index}" data-field="specifications"></div>`;
+                itemEl.innerHTML = mainRowHTML + (dynamicFieldsHTML ? `<div class="pl-4 border-l-2 border-gray-200 space-y-2">${dynamicFieldsHTML}</div>` : '') + specificationsHTML;
+                serviciosCart.appendChild(itemEl);
+            });
+        }
+        validateAllCartItems();
+    }
+
+    serviciosCart.addEventListener('click', (e) => {
+        const deleteButton = e.target.closest('button[data-action="delete"]');
+        if (deleteButton) {
+            const index = deleteButton.dataset.index;
+            serviciosAgregados.splice(index, 1);
+            renderServicesCart(); // Re-renderizar el carrito para actualizar la vista
+        }
+    });
+
+    // --- LÓGICA DE VALIDACIÓN Y EVENTOS ---
+    // (Esta sección no cambia)
+    function validateImpresionItem(service, index) {
+        const quantityInput = document.querySelector(`input[data-index="${index}"][data-field="quantity"]`);
+        const numHojasInput = document.querySelector(`input[data-index="${index}"][data-field="numHojas"]`);
+        const errorContainer = document.getElementById(`error-hojas-${index}`);
+        if (!errorContainer || !numHojasInput || !quantityInput) return true;
+        const quantity = parseInt(service.quantity, 10);
+        const numHojas = parseInt(service.numHojas, 10);
+        let isValid = true;
+        if (quantity < numHojas || quantity > (numHojas * 2)) {
+            errorContainer.textContent = `Con ${numHojas} hoja(s), la Cantidad debe estar entre ${numHojas} y ${numHojas * 2}.`;
+            quantityInput.classList.add('border-red-500', 'focus:border-red-500');
+            numHojasInput.classList.add('border-red-500', 'focus:border-red-500');
+            isValid = false;
+        } else {
+            errorContainer.textContent = '';
+            quantityInput.classList.remove('border-red-500', 'focus:border-red-500');
+            numHojasInput.classList.remove('border-red-500', 'focus:border-red-500');
+        }
+        return isValid;
+    }
+    function validateAllCartItems() {
+        let allItemsAreValid = true;
+        serviciosAgregados.forEach((service, index) => {
+            if (service.name.toUpperCase().includes('IMPRESION')) {
+                if (!validateImpresionItem(service, index)) {
+                    allItemsAreValid = false;
+                }
+            }
+        });
+        return allItemsAreValid;
+    }
+    serviciosCart.addEventListener('change', (e) => {
+        if (e.target.matches('input, select')) {
+            
+            const index = e.target.dataset.index;
+            const field = e.target.dataset.field;
+            if (index === undefined || field === undefined) return;
+
+            const service = serviciosAgregados[index];
+            const value = e.target.type === 'checkbox' ? e.target.checked : (e.target.type === 'number' ? parseInt(e.target.value) || 1 : e.target.value);
+            service[field] = value;
+
+            // --- NUEVA LÓGICA DE CÁLCULO ---
+            if (service.name.toUpperCase() === 'COPIAS' && (field === 'quantity' || field === 'ambasCaras')) {
+                if (service.ambasCaras) {
+                    service.numHojas = Math.ceil(service.quantity / 2);
+                } else {
+                    service.numHojas = service.quantity;
+                }
+            }
+            // --- FIN DE NUEVA LÓGICA ---
+
+            if (service.name.toUpperCase().includes('IMPRESION') && (field === 'quantity' || field === 'numHojas')) {
+                validateImpresionItem(service, index);
+            }
+        }
+    });
+
+
+    serviciosCart.addEventListener('change', (e) => {
+        if (!e.target.matches('input, select')) return;
+        const index = e.target.dataset.index;
+        const field = e.target.dataset.field;
+        if (index === undefined || field === undefined) return;
+        
+        const service = serviciosAgregados[index];
+        service[field] = e.target.type === 'checkbox' ? e.target.checked : (e.target.type === 'number' ? parseInt(e.target.value) || 1 : e.target.value);
+
+        if (service.name.toUpperCase() === 'COPIAS' && (field === 'quantity' || field === 'ambasCaras')) {
+            service.numHojas = service.ambasCaras ? Math.ceil(service.quantity / 2) : service.quantity;
+        }
+        if (service.name.toUpperCase().includes('IMPRESION')) {
+            validateImpresionItem(service, index);
+        }
+    });
+
+    nuevaSolicitudForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!validateAllCartItems()) {
+            alert('Por favor, corrija los errores en el carrito de servicios antes de continuar.');
+            return;
+        }
+
+        const submitButton = e.submitter || nuevaSolicitudForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Registrando...';
+
+        // --- INICIO DE LA CORRECCIÓN: Recolección manual de datos ---
+        // Construimos el objeto de datos manualmente para asegurar su estructura.
+        const dataToSend = {
+            folio: document.getElementById('folioSolicitud').value,
+            fechaSolicitud: document.getElementById('fechaSolicitud').value,
+            fechaEntrega: document.getElementById('fechaEntrega').value,
+            nombreSolicitante: document.getElementById('nombreSolicitante').value,
+            area: document.getElementById('area').value,
+            vale: document.getElementById('vale').value,
+            elaboro: document.getElementById('elaboro').value,
+            tipoTrabajo: document.getElementById('tipoTrabajo').value,
+            clave: document.getElementById('clave').value,
+            duplicadorDigital: document.getElementById('duplicadorDigital').checked, // Usamos .checked para booleano
+            cantidadMasters: document.getElementById('cantidadMasters').value,
+            descripcion: document.getElementById('descripcionTrabajo').value,
+            servicios: serviciosAgregados, // Añadimos el carrito de servicios
+            asignadoPor: currentUser.name,
+            action: "crearSolicitudAdmin"
+        };
+        // --- FIN DE LA CORRECCIÓN ---
+        
+        console.log("Datos listos para REGISTRAR (método manual):", dataToSend);
+
+        const formDataForPost = new FormData();
+        formDataForPost.append('data', JSON.stringify(dataToSend));
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formDataForPost
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert(result.message + (result.folio ? ` Folio procesado: ${result.folio}` : ''));
+                nuevaSolicitudForm.reset();
+                serviciosAgregados = [];
+                renderServicesCart();
+                
+                // Ocultar y resetear manualmente los campos del duplicador
+                numeroMastersContainer.classList.add('hidden');
+                cantidadMastersInput.required = false;
+                claveInput.required = false;
+                
+                loadPendientes();  
+            } else {
+                throw new Error(result.message || 'Error desconocido del servidor.');
+            }
+        })
+        .catch(error => {
+            console.error('Error en el envío:', error);
+            alert('Hubo un error al registrar la solicitud: ' + error.message);
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Registrar Solicitud';
+        });
+    });
+
+    if (duplicadorDigital) {
+      duplicadorDigital.addEventListener('change', function() {
+        const isChecked = this.checked;
+
+        numeroMastersContainer.classList.toggle('hidden', !isChecked);
+        cantidadMastersInput.required = isChecked;
+        claveInput.required = isChecked;
+
+        if (isChecked) {
+          if (serviciosAgregados.some(s => s.name.toUpperCase() !== 'COPIAS')) {
+            alert("Para usar 'Duplicador Digital', primero elimina del carrito los servicios que no sean 'COPIAS'.");
+            this.checked = false;
+            numeroMastersContainer.classList.add('hidden');
+            cantidadMastersInput.required = false;
+            claveInput.required = false;
+            return;
+          }
+        } else {
+          cantidadMastersInput.value = '';
+        }
+        
+        // Actualizar la búsqueda de servicios
+        serviciosBusqueda.value = '';
+        const currentServiceList = isChecked ? ['COPIAS'] : serviciosList;
+        createDropdown(serviciosBusqueda, serviciosDropdown, currentServiceList, onServiceSelect);
+      });
+    }
+
+
+
+
+    if (clearFormBtn) {
+        clearFormBtn.addEventListener('click', function() {
+            nuevaSolicitudForm.reset(); // Limpia los valores de los campos
+            
+            // Forzamos el estado visual correcto después de limpiar
+            duplicadorDigital.checked = false;
+            numeroMastersContainer.classList.add('hidden');
+            cantidadMastersInput.required = false;
+            cantidadMastersInput.value = '';
+            claveInput.required = false;
+
+            // También limpiar el carrito de servicios
+            serviciosAgregados = [];
+            renderServicesCart();
+        });
+    }
+
+    // --- FUNCIONES AUXILIARES DE UI Y EVENTOS GLOBALES ---
+    // (Esta sección no cambia)
+    function showLoginError(message) { loginError.textContent = message; loginError.classList.remove('hidden'); }
+    function hideLoginError() { loginError.classList.add('hidden'); }
+    function setLoginLoading(loading) { loginBtn.disabled = loading; loginBtnText.textContent = loading ? 'Iniciando...' : 'Iniciar Sesión'; loginSpinner.classList.toggle('hidden', !loading); }
+    function showAdminPanel() { loginContainer.style.display = 'none'; adminPanel.style.display = 'block'; userInfo.classList.remove('hidden'); welcomeUser.textContent = `Bienvenido, ${currentUser.name}`; }
+    function showNoPendientes(message = "No hay solicitudes pendientes por asignar.") { loadingPendientes.classList.add('hidden'); pendientesContainer.classList.add('hidden'); noPendientes.classList.remove('hidden'); noPendientes.querySelector('p:last-child').textContent = message; }
+    document.addEventListener('click', (e) => { if (!e.target.closest('.combobox-container')) { areaDropdown.classList.add('hidden'); serviciosDropdown.classList.add('hidden'); } });
+     
+    function showLoadingPendientes() {
+        loadingPendientes.classList.remove('hidden');
+        pendientesContainer.classList.add('hidden');
+        noPendientes.classList.add('hidden');
+    }
+
+    function showNoPendientes(message = "No hay solicitudes pendientes por asignar.") {
         loadingPendientes.classList.add('hidden');
         pendientesContainer.classList.add('hidden');
         noPendientes.classList.remove('hidden');
-        
-        if (message) {
-            noPendientes.querySelector('p:last-child').textContent = message;
-        }
+        noPendientes.querySelector('p:last-child').textContent = message;
     }
-
-    function createPendienteRow(solicitud, index) {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-50';
-        const folio = solicitud.folio ;
-        // Formatear fecha
-        const fecha = new Date(solicitud.fecha).toLocaleDateString('es-MX');
-        
-        // Truncar textos largos
-        const descripcionCorta = truncateText(solicitud.descripcion, 100);
-        const articulosCortos = truncateText(solicitud.articulos, 80);
-        
-        // Determinar color del badge de estatus
-        const statusClass = getStatusClass(solicitud.estatus);
-        
-        row.innerHTML = `
-            <td class="text-sm">${folio}</td>
-            <td class="text-sm">${fecha}</td>
-            <td class="font-medium">${solicitud.solicitante}</td>
-            <td class="text-sm" title="${solicitud.descripcion}">${descripcionCorta}</td>
-            <td class="text-sm" ">${solicitud.comentarios}</td>
-
-        `;
-
-        // Agregar event listener al botón de asignar
-       
-
-        return row;
-    }
-
-    function truncateText(text, maxLength) {
-        if (!text) return '';
-        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-    }
-
-    function getStatusClass(estatus) {
-        switch (estatus?.toLowerCase()) {
-            case 'pendiente':
-                return 'status-pendiente';
-            case 'en proceso':
-                return 'status-proceso';
-            case 'en revisión':
-                return 'status-revision';
-            default:
-                return 'status-pendiente';
-        }
-    }
-
-
-    // --- 5. MANEJO DE TECLADO ---
-    
-    // Cerrar modal con Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !assignModal.classList.contains('hidden')) {
-            closeAssignModal();
-        }
-    });
-
-
-    // --- NUEVAS FUNCIONES PARA EL FORMULARIO ---
-
-        // Elementos del DOM para el formulario (agregar al inicio con los otros elementos)
-        const folioSolicitud = document.getElementById('folioSolicitud');
-        const duplicadorDigital = document.getElementById('duplicadorDigital');
-        const numeroMasters = document.getElementById('numeroMasters');
-        const serviciosBusqueda = document.getElementById('serviciosBusqueda');
-        const serviciosDropdown = document.getElementById('serviciosDropdown');
-        const serviciosSeleccionados = document.getElementById('serviciosSeleccionados');
-        const serviciosCartContainer = document.getElementById('serviciosCart');
-        const nuevaSolicitudForm = document.getElementById('nuevaSolicitudForm');
-
-        function populateFolioCombo(pendientes) {
-            if (!folioSolicitud) return; // Si no existe el elemento, no hacer nada
-            
-            // Limpiar opciones existentes excepto la primera
-            folioSolicitud.innerHTML = '<option value="">Seleccionar folio...</option>';
-            
-            // Agregar folios de pendientes
-            pendientes.forEach(pendiente => {
-                const option = document.createElement('option');
-                option.value = pendiente.folio;
-                option.textContent = `${pendiente.folio} - ${pendiente.solicitante}`;
-                option.dataset.pendiente = JSON.stringify(pendiente);
-                folioSolicitud.appendChild(option);
-            });
-        }
-
-        function autoFillFormData(pendiente) {
-            // Llenar campos que coincidan
-            if (pendiente.fecha) {
-                const fechaInput = document.getElementById('fechaSolicitud');
-                if (fechaInput) fechaInput.value = formatDateForInput(pendiente.fecha);
-            }
-            if (pendiente.solicitante) {
-                const solicitanteInput = document.getElementById('nombreSolicitante');
-                if (solicitanteInput) solicitanteInput.value = pendiente.solicitante;
-            }
-            if (pendiente.descripcion) {
-                const descripcionInput = document.getElementById('descripcionTrabajo');
-                if (descripcionInput) descripcionInput.value = pendiente.descripcion;
-            }
-        }
-
-        function clearFormData() {
-            // Limpiar campos autocompletables
-            const fechaInput = document.getElementById('fechaSolicitud');
-            const solicitanteInput = document.getElementById('nombreSolicitante');
-            const descripcionInput = document.getElementById('descripcionTrabajo');
-            
-            if (fechaInput) fechaInput.value = '';
-            if (solicitanteInput) solicitanteInput.value = '';
-            if (descripcionInput) descripcionInput.value = '';
-        }
-
-        function formatDateForInput(dateString) {
-            const date = new Date(dateString);
-            return date.toISOString().split('T')[0];
-        }
-
-        function displayServiceDropdown(services) {
-            if (!serviciosDropdown) return;
-            
-            serviciosDropdown.innerHTML = '';
-            
-            if (services.length === 0) {
-                serviciosDropdown.classList.add('hidden');
-                return;
-            }
-
-            services.forEach(service => {
-                const item = document.createElement('div');
-                item.className = 'service-dropdown-item';
-                item.textContent = service;
-                item.addEventListener('click', () => addServiceToCart(service));
-                serviciosDropdown.appendChild(item);
-            });
-
-            serviciosDropdown.classList.remove('hidden');
-        }
-
-        function addServiceToCart(serviceName) {
-            // Verificar si el servicio ya está en el carrito
-            if (selectedServices.find(s => s.name === serviceName)) {
-                alert('Este servicio ya está agregado');
-                return;
-            }
-
-            const service = {
-                name: serviceName,
-                quantity: 1,
-                specifications: ''
-            };
-
-            selectedServices.push(service);
-            updateServicesCart();
-            
-            // Limpiar búsqueda
-            if (serviciosBusqueda) serviciosBusqueda.value = '';
-            if (serviciosDropdown) serviciosDropdown.classList.add('hidden');
-        }
-
-        function updateServicesCart() {
-            if (!serviciosSeleccionados || !serviciosCartContainer) return; // ← Cambiar aquí
-            
-            if (selectedServices.length === 0) {
-                serviciosSeleccionados.classList.add('hidden');
-                return;
-            }
-
-            serviciosSeleccionados.classList.remove('hidden');
-            serviciosCartContainer.innerHTML = ''; // ← Cambiar aquí
-
-            selectedServices.forEach((service, index) => {
-                const cartItem = createCartItem(service, index);
-                serviciosCartContainer.appendChild(cartItem); // ← Cambiar aquí
-            });
-        }
-
-        function createCartItem(service, index) {
-            const div = document.createElement('div');
-            div.className = 'cart-item';
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-medium text-gray-900">${service.name}</h4>
-                    <button type="button" onclick="removeService(${index})" class="text-red-600 hover:text-red-800">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Cantidad</label>
-                        <input type="number" min="1" value="${service.quantity}" 
-                            onchange="updateServiceQuantity(${index}, this.value)"
-                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Especificaciones</label>
-                        <input type="text" value="${service.specifications}" 
-                            onchange="updateServiceSpecifications(${index}, this.value)"
-                            placeholder="Detalles adicionales..."
-                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    </div>
-                </div>
-            `;
-            return div;
-        }
-
-        // Funciones globales para el manejo del carrito
-        window.removeService = function(index) {
-            selectedServices.splice(index, 1);
-            updateServicesCart();
-        };
-
-        window.updateServiceQuantity = function(index, quantity) {
-            selectedServices[index].quantity = parseInt(quantity) || 1;
-        };
-
-        window.updateServiceSpecifications = function(index, specifications) {
-            selectedServices[index].specifications = specifications;
-        };
-
-        // Event listeners para el formulario
-        if (folioSolicitud) {
-            folioSolicitud.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption.dataset.pendiente) {
-                    const pendiente = JSON.parse(selectedOption.dataset.pendiente);
-                    autoFillFormData(pendiente);
-                } else {
-                    clearFormData();
-                }
-            });
-        }
-
-        if (duplicadorDigital) {
-            duplicadorDigital.addEventListener('change', function() {
-                if (this.checked) {
-                    if (numeroMasters) numeroMasters.classList.remove('hidden');
-                    const cantidadInput = document.getElementById('cantidadMasters');
-                    if (cantidadInput) cantidadInput.required = true;
-                } else {
-                    if (numeroMasters) numeroMasters.classList.add('hidden');
-                    const cantidadInput = document.getElementById('cantidadMasters');
-                    if (cantidadInput) {
-                        cantidadInput.required = false;
-                        cantidadInput.value = '';
-                    }
-                }
-            });
-        }
-
-        if (serviciosBusqueda) {
-            serviciosBusqueda.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                
-                if (query.length === 0) {
-                    if (serviciosDropdown) serviciosDropdown.classList.add('hidden');
-                    return;
-                }
-
-                const filteredServices = serviciosList.filter(service => 
-                    service.toLowerCase().includes(query)
-                );
-
-                displayServiceDropdown(filteredServices);
-            });
-        }
-
-        if (nuevaSolicitudForm) {
-            nuevaSolicitudForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Recopilar datos del formulario
-                const formData = new FormData(this);
-                const solicitudData = Object.fromEntries(formData.entries());
-                
-                // Agregar servicios seleccionados
-                solicitudData.servicios = selectedServices;
-                
-                console.log('Datos de la solicitud:', solicitudData);
-                
-                // Aquí puedes enviar los datos a tu Google Apps Script
-                // submitNuevaSolicitud(solicitudData);
-                
-                alert('Funcionalidad de envío pendiente de implementar');
-            });
-        }
-
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', function(e) {
-            if (serviciosBusqueda && serviciosDropdown) {
-                if (!serviciosBusqueda.contains(e.target) && !serviciosDropdown.contains(e.target)) {
-                    serviciosDropdown.classList.add('hidden');
-                }
-            }
-        });
-
-
-        // Función para filtrar servicios
-        function filterServicios(searchTerm) {
-            if (!searchTerm || searchTerm.length < 2) {
-                return [];
-            }
-            
-            return serviciosList.filter(servicio => 
-                servicio.toLowerCase().includes(searchTerm.toLowerCase())
-            ).slice(0, 10); // Limitar a 10 resultados
-        }
-
-        // Función para mostrar dropdown de servicios
-        function showServiciosDropdown(servicios) {
-            const dropdown = document.getElementById('serviciosDropdown');
-            
-            if (servicios.length === 0) {
-                dropdown.classList.add('hidden');
-                selectedServicio = null;
-                document.getElementById('agregarServicioBtn').disabled = true;
-                return;
-            }
-            
-            dropdown.innerHTML = '';
-            servicios.forEach(servicio => {
-                const item = document.createElement('div');
-                item.className = 'service-dropdown-item';
-                item.textContent = servicio;
-                item.addEventListener('click', () => {
-                    selectServicio(servicio);
-                });
-                dropdown.appendChild(item);
-            });
-            
-            dropdown.classList.remove('hidden');
-        }
-
-        // NUEVA función para seleccionar servicio
-        function selectServicio(servicio) {
-            selectedServicio = servicio;
-            document.getElementById('serviciosBusqueda').value = servicio;
-            document.getElementById('serviciosDropdown').classList.add('hidden');
-            document.getElementById('agregarServicioBtn').disabled = false;
-        }
-
-
-        // Función para agregar servicio al carrito
-        // Función para agregar servicio al carrito (ACTUALIZADA)
-        function addServicioToCart(servicio = null) {
-            const servicioToAdd = servicio || selectedServicio;
-            
-            if (!servicioToAdd) {
-                alert('Seleccione un servicio primero');
-                return;
-            }
-            
-            if (serviciosCart.some(item => item.nombre === servicioToAdd)) {
-                alert('Este servicio ya está agregado');
-                return;
-            }
-            
-            serviciosCart.push({
-                nombre: servicioToAdd,
-                cantidad: 1
-            });
-            
-            renderServiciosCart();
-            
-            // Limpiar búsqueda
-            const busquedaInput = document.getElementById('serviciosBusqueda');
-            const agregarBtn = document.getElementById('agregarServicioBtn');
-            
-            if (busquedaInput) busquedaInput.value = '';
-            if (agregarBtn) agregarBtn.disabled = true;
-            selectedServicio = null;
-        }
-
-
-        // Función para renderizar el carrito de servicios (ACTUALIZADA)
-        function renderServiciosCart() {
-            const cartContainer = document.getElementById('serviciosCart');
-            
-            // VERIFICAR que el elemento existe
-            if (!cartContainer) {
-                console.error('Elemento serviciosCart no encontrado en el HTML');
-                return;
-            }
-            
-            cartContainer.innerHTML = '';
-            
-            serviciosCart.forEach((servicio, index) => {
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item flex justify-between items-center p-3 bg-gray-50 border rounded-lg mb-2';
-                cartItem.innerHTML = `
-                    <div class="flex-1">
-                        <span class="font-medium text-gray-800">${servicio.nombre}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-1">
-                            <label class="text-sm text-gray-600">Cant:</label>
-                            <input type="number" min="1" value="${servicio.cantidad}" 
-                                class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center"
-                                onchange="updateServicioCantidad(${index}, this.value)">
-                        </div>
-                        <button type="button" onclick="editServicio(${index})" 
-                                class="px-2 py-1 text-blue-600 hover:text-blue-800 text-sm border border-blue-300 rounded hover:bg-blue-50 transition-colors">
-                            Editar
-                        </button>
-                        <button type="button" onclick="removeServicioFromCart(${index})" 
-                                class="px-2 py-1 text-red-600 hover:text-red-800 text-sm border border-red-300 rounded hover:bg-red-50 transition-colors">
-                            Eliminar
-                        </button>
-                    </div>
-                `;
-                cartContainer.appendChild(cartItem);
-            });
-            
-            const serviciosSeleccionados = document.getElementById('serviciosSeleccionados');
-            if (serviciosSeleccionados) {
-                if (serviciosCart.length === 0) {
-                    serviciosSeleccionados.classList.add('hidden');
-                } else {
-                    serviciosSeleccionados.classList.remove('hidden');
-                }
-            }
-        }
-
-        // NUEVA función para editar servicio
-        function editServicio(index) {
-            const servicio = serviciosCart[index];
-            const nuevaCantidad = prompt(`Editar cantidad para "${servicio.nombre}":`, servicio.cantidad);
-            
-            if (nuevaCantidad !== null && nuevaCantidad > 0) {
-                serviciosCart[index].cantidad = parseInt(nuevaCantidad);
-                renderServiciosCart();
-            }
-        }
-
-        // Función para eliminar servicio del carrito (SIN CAMBIOS)
-        function removeServicioFromCart(index) {
-            if (confirm('¿Está seguro de eliminar este servicio?')) {
-                serviciosCart.splice(index, 1);
-                renderServiciosCart();
-            }
-        }
-
-        // Event listener para el buscador de servicios
-    document.getElementById('serviciosBusqueda').addEventListener('input', function(e) {
-        const searchTerm = e.target.value;
-        const filteredServicios = filterServicios(searchTerm);
-        showServiciosDropdown(filteredServicios);
-        
-        // Resetear selección si el usuario está escribiendo
-        if (selectedServicio && !searchTerm.includes(selectedServicio)) {
-            selectedServicio = null;
-            document.getElementById('agregarServicioBtn').disabled = true;
-        }
-    });
-
-            // Event listener para el botón agregar
-            document.getElementById('agregarServicioBtn').addEventListener('click', function() {
-                addServicioToCart();
-            });
-
-            // Ocultar dropdown al hacer click fuera
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.service-search-container')) {
-                    document.getElementById('serviciosDropdown').classList.add('hidden');
-                }
-            });
-            
-
-        function showServiceSpecificFields(servicio) {
-            // Ocultar todos los campos específicos primero
-            hideAllSpecificFields();
-            
-            const servicioUpper = servicio.toUpperCase();
-            
-            // Campos para impresiones
-            if (servicioUpper.includes('IMPRESIONES')) {
-                showImpresionFields();
-            }
-            
-            // Campos para hojas (pero no impresiones)
-            else if (servicioUpper.includes('HOJAS')) {
-                showHojasFields();
-            }
-            
-            // Campos para plotter
-            else if (servicioUpper.includes('CENTÍMETROS PLOTTER')) {
-                showPlotterFields();
-            }
-            
-            // Campos para diseño
-            else if (servicioUpper.includes('DISEÑO')) {
-                showDisenoFields();
-            }
-            
-            // Campos para fotografía
-            else if (servicioUpper.includes('FOTOGRAFÍAS') || servicioUpper.includes('EDICIÓN DE FOTOGRAFÍA')) {
-                showFotografiaFields();
-            }
-            
-            // Campos para video
-            else if (servicioUpper.includes('VIDEO') || servicioUpper.includes('PRODUCCIÓN AUDIOVISUAL')) {
-                showVideoFields();
-            }
-            
-            // Campos para CD/DVD
-            else if (servicioUpper.includes('CD:') || servicioUpper.includes('DVD:')) {
-                showDiscFields();
-            }
-        }
-
-        function hideAllSpecificFields() {
-            const containers = [
-                'impresionFields',
-                'hojasFields',
-                'plotterFields',
-                'disenoFields', 
-                'fotografiaFields',
-                'videoFields',
-                'discFields'
-            ];
-            
-            containers.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.classList.add('hidden');
-            });
-        }
-
-        function showImpresionFields() {
-            const container = document.getElementById('impresionFields');
-            if (container) container.classList.remove('hidden');
-        }
-
-        function showHojasFields() {
-            const container = document.getElementById('hojasFields');
-            if (container) container.classList.remove('hidden');
-        }
-
-        function showPlotterFields() {
-            const container = document.getElementById('plotterFields');
-            if (container) container.classList.remove('hidden');
-        }
-
-        console.log('=== DEBUG ELEMENTOS ===');
-        console.log('serviciosBusqueda:', document.getElementById('serviciosBusqueda'));
-        console.log('agregarServicioBtn:', document.getElementById('agregarServicioBtn'));
-        console.log('serviciosDropdown:', document.getElementById('serviciosDropdown'));
-        console.log('serviciosCart:', document.getElementById('serviciosCart'));
-        console.log('serviciosSeleccionados:', document.getElementById('serviciosSeleccionados'));
-        console.log('folioSolicitud:', document.getElementById('folioSolicitud'));
-
 });

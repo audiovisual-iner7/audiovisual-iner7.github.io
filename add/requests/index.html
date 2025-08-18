@@ -292,30 +292,28 @@
     <div class="bg-gray-50 p-4 rounded-lg space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
     <div class="md:col-span-3">
-        <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Servicios / Trabajos a solicitar</label>
-        <select id="product" name="product" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-        <option value="" disabled selected>Seleccione un tipo de trabajo...</option>
-        <option value='AUDIOGRABACIÓN'>AUDIOGRABACIÓN</option>
-        <option value='CARTEL CONGRESO'>CARTEL CONGRESO</option>
-        <option value='DIBUJO E ILUSTRACIÓN'>DIBUJO E ILUSTRACIÓN</option>
-        <option value='DISEÑO'>DISEÑO</option>
-        <option value='EDICIÓN DE FOTOGRAFÍA DIGITAL'>EDICIÓN DE FOTOGRAFÍA DIGITAL</option>
-        <option value='ENGARGOLADO'>ENGARGOLADO</option>
-        <option value='ESCANEO'>ESCANEO</option>
-        <option value='IMPRESIÓN DIGITAL'>IMPRESIÓN DIGITAL</option>
-        <option value='IMPRESIÓN EN PLOTTER'>IMPRESIÓN EN PLOTTER</option>
-        <option value='INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO'>INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO</option>
-        <option value='MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC'>MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC</option>
-        <option value='SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN'>SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN</option>
-        <option value='MONTAJE EN SOPORTE PROPIO O NUEVO'>MONTAJE EN SOPORTE PROPIO O NUEVO</option>
-        <option value='SOLICITUD DE TOMA DE FOTOGRAFÍAS'>SOLICITUD DE TOMA DE FOTOGRAFÍAS</option>
-        <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
-        <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
-        <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
-        <option value='OTRO'>OTRO</option>
-        </select>
+    <label for="product" class="block text-sm font-medium text-gray-700 mb-1">Servicios / Trabajos a solicitar</label>
+    <select id="product" name="product" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+    <option value="" disabled selected>Seleccione un tipo de trabajo...</option>
+    <option value='AUDIOGRABACIÓN'>AUDIOGRABACIÓN</option>
+    <option value='DIBUJO E ILUSTRACIÓN'>DIBUJO E ILUSTRACIÓN</option>
+    <option value='DISEÑO'>DISEÑO</option>
+    <option value='EDICIÓN DE FOTOGRAFÍA DIGITAL'>EDICIÓN DE FOTOGRAFÍA DIGITAL</option>
+    <option value='ENGARGOLADO'>ENGARGOLADO</option>
+    <option value='ESCANEO'>ESCANEO</option>
+    <option value='IMPRESIÓN DIGITAL'>IMPRESIÓN DIGITAL</option>
+    <option value='IMPRESIÓN EN PLOTTER'>IMPRESIÓN EN PLOTTER</option>
+    <option value='INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO'>INSTALACIÓN DE BOCINAS Y MICRÓFONO ALÁMBRICO</option>
+    <option value='MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC'>MONTAJE EN SOPORTE RÍGIDO Y FORRO DE PVC</option>
+    <option value='SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN'>SOLICITAR LA CREACIÓN DE UNA ANIMACIÓN</option>
+    <option value='MONTAJE EN SOPORTE PROPIO O NUEVO'>MONTAJE EN SOPORTE PROPIO O NUEVO</option>
+    <option value='SOLICITUD DE TOMA DE FOTOGRAFÍAS'>SOLICITUD DE TOMA DE FOTOGRAFÍAS</option>
+    <option value='SOLICITUD DE REALIZACIÓN DE VIDEO'>SOLICITUD DE REALIZACIÓN DE VIDEO</option>
+    <option value='SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL'>SOLICITUD DE VIDEOS DEL ACERVO INSTITUCIONAL</option>
+    <option value='SOLICITUD DE VECTORIZADO'>SOLICITUD DE VECTORIZADO</option>
+    <option value='OTRO'>OTRO</option>
+    </select>
     </div>
-
     <div class="md:col-span-1">
     <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
     <input type="number" id="quantity" value="1" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
@@ -440,19 +438,6 @@
     </div>
     </div>
     </div>
-
-    <div id="cartelCongresoContainer" class="conditional-field space-y-2 mt-4">
-        <div>
-            <label for="matricula" class="block text-sm font-medium text-gray-700 mb-1">Número de Matrícula</label>
-            <input type="text" id="matricula" name="matricula" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" placeholder="Ej. 123456" required>
-        </div>
-        <div class="flex items-start text-sm text-yellow-800 bg-yellow-50 p-3 rounded-md">
-            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.636-1.026 2.072-1.218 3.125-.476l.32.253a.5.5 0 01.12.63l-3.235 5.4a.5.5 0 01-.84-.475l.192-.673a.5.5 0 00-.317-.552L4.6 6.354a.5.5 0 01.12-.931l3.537-1.326zM12 10a2 2 0 11-4 0 2 2 0 014 0zM4.155 8.162a.5.5 0 01.84.475l-1.63 5.705a.5.5 0 01-.84-.475l1.63-5.705z" clip-rule="evenodd"></path><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z"></path></svg>
-            <p><b>Importante:</b> Solo está autorizado un cartel al año por persona. Favor de enviar el diseño final y la carta de invitación al congreso en la sección de "Archivos Adjuntos". Se debe solicitar la autorización correspondiente en la Subdirección de Enseñanza.</p>
-        </div>
-    </div>
-
-
     <div class="mt-6">
     <h4 class="text-md font-medium text-gray-600 mb-2">Servicios Agregados:</h4>
     <div class="overflow-x-auto"><table class="min-w-full bg-white border border-gray-200"><thead class="bg-gray-50"><tr><th class="text-left py-2 px-4 text-sm font-semibold text-gray-600">Servicio</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Cantidad</th><th class="text-center py-2 px-4 text-sm font-semibold text-gray-600">Acción</th></tr></thead><tbody id="itemsTableBody"><tr id="noItemsRow"><td colspan="3" class="text-center py-4 text-gray-500">Aún no se han agregado servicios.</td></tr></tbody></table></div>

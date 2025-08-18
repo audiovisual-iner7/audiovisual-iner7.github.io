@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const plotterContainer = document.getElementById('plotterContainer');
     const engarContainer = document.getElementById('engarContainer');
     const orientacionContainer = document.getElementById('orientacionContainer');
-    const cartelCongresoContainer = document.getElementById('cartelCongresoContainer'); // <-- NUEVO
     
     // --- NUEVO: Elementos para validación de plotter ---
     const plotterWidthInput = document.getElementById('plotterWidth');
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const digitalPrintOption = "IMPRESIÓN DIGITAL";
     const plotterOption = "IMPRESIÓN EN PLOTTER";
     const engargoladosOption = "ENGARGOLADO";
-    const cartelCongresoOption = "CARTEL CONGRESO";
 
     // Lista de todas las áreas/departamentos
     const areas = [
@@ -326,11 +324,9 @@ document.addEventListener('DOMContentLoaded', function() {
         plotterContainer.style.display = 'none';
         engarContainer.style.display = 'none';
         orientacionContainer.style.display = 'none';
-        cartelCongresoContainer.style.display = 'none';
 
         if (selectedValue === digitalPrintOption) digitalPrintContainer.style.display = 'block';
         if (selectedValue === plotterOption) plotterContainer.style.display = 'block';
-        if (selectedValue === cartelCongresoOption) cartelCongresoContainer.style.display = 'block';
         if (selectedValue === engargoladosOption) {
             engarContainer.style.display = 'block';
             orientacionContainer.style.display = 'block';
@@ -361,6 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const quantity = parseInt(quantityInput.value, 10);
 
         if (productName === "") {
+            // Reemplazado alert por un foco en el campo para mejor UX
             productSelect.focus();
             return;
         }
@@ -376,34 +373,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (plotterContainer.style.display === 'block') {
             const width = parseInt(plotterWidthInput.value, 10);
             const length = parseInt(plotterLengthInput.value, 10);
+
+            // Validación final antes de agregar
             if (width > 90 || length > 150 || !width || !length) {
+                // Si hay un error, nos aseguramos que los mensajes sean visibles y detenemos
                 if (width > 90) plotterWidthError.classList.remove('hidden');
                 if (length > 150) plotterLengthError.classList.remove('hidden');
                 return; 
             }
             productName += ` - Medidas: ${width}cm (ancho) x ${length}cm (largo)`;
         }
-
-        // <-- BLOQUE NUEVO PARA CARTEL CONGRESO -->
-        if (cartelCongresoContainer.style.display === 'block') {
-            const matriculaInput = document.getElementById('matricula');
-            const matricula = matriculaInput.value.trim();
-
-            // Validación de que la matrícula no esté vacía
-            if (!matricula) {
-                matriculaInput.focus(); // Pone el foco en el campo de matrícula
-                matriculaInput.classList.add('border-red-500'); // Resalta el campo en rojo
-                setTimeout(() => matriculaInput.classList.remove('border-red-500'), 3000); // Quita el resaltado después de 3 segundos
-                return; // Detiene la ejecución
-            }
-            productName += ` - Matrícula: ${matricula}`;
-        }
-        // <-- FIN DEL BLOQUE NUEVO -->
         
         if (engarContainer.style.display === 'block') {
             const engargoladoSize = document.getElementById('enType').value;
             const selectedOrientation = document.querySelector('input[name="orientation"]:checked');
+
             if (!selectedOrientation) {
+                // Podemos añadir un feedback visual aquí también si queremos
                 return;
             }
             productName += ` - Tamaño: ${engargoladoSize} - Orientación: ${selectedOrientation.value}`;
@@ -423,10 +409,6 @@ document.addEventListener('DOMContentLoaded', function() {
             plotterContainer.style.display = 'none';
             engarContainer.style.display = 'none';
             orientacionContainer.style.display = 'none';
-            cartelCongresoContainer.style.display = 'none'; // <-- NUEVO
-            if (document.getElementById('matricula')) {
-                document.getElementById('matricula').value = ''; // <-- NUEVO
-            }
             plotterWidthInput.value = '';
             plotterLengthInput.value = '';
             plotterWidthError.classList.add('hidden');

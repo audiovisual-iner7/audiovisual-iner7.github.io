@@ -148,12 +148,18 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoadingPendientes();
         
         try {
+            // --- INICIO DE LA CORRECCIÓN ---
+            // Se empaqueta la acción en el formato FormData que el backend espera.
+            const dataToSend = {
+                action: 'getPendientes'
+            };
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(dataToSend));
+            // --- FIN DE LA CORRECCIÓN ---
+
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'getPendientes'
-                }),
-                
+                body: formData // Ahora se envía el FormData correcto
             });
 
             const result = await response.json();
@@ -161,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.result === 'success') {
                 displayPendientes(result.data);
             } else {
-                console.error('Error al cargar pendientes:', result.message);
+                console.error('Error al cargar pendientes:', result.message || result.error);
                 showNoPendientes('Error al cargar las solicitudes pendientes.');
             }
         } catch (error) {

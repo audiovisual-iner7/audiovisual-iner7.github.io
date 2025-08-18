@@ -189,7 +189,7 @@
         <div id="adminPanel">
             <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Solicitudes Pendientes</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Entrega Servicios</h2>
                     <button id="refreshBtn" class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
                         <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -239,11 +239,11 @@
     </main>
 
     <!-- Modal de Asignación -->
-    <div id="assignModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+    <div id="deliverModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">Asignar Tarea</h3>
+                    <h3 class="text-lg font-bold text-gray-800">Confirmar Entrega</h3>
                     <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -251,40 +251,17 @@
                     </button>
                 </div>
                 
-                <div id="assignTaskDetails" class="mb-4 p-4 bg-gray-50 rounded-lg">
-                    <!-- Los detalles de la tarea se mostrarán aquí -->
-                </div>
-                
-                <div class="mb-4">
-                    <label for="assignTo" class="block text-sm font-medium text-gray-700 mb-2">Asignar a:</label>
-                    <select id="assignTo" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                        <option value="">Seleccione un miembro del equipo...</option>
-                        <option value="CARLOS">CARLOS</option>
-                        <option value="DANIEL">DANIEL</option>
-                        <option value="DIANA">DIANA</option>
-                        <option value="GIOVANNY">GIOVANNY</option>
-                        <option value="HILDING">HILDING</option>
-                        <option value="MARICELA">MARICELA</option>
-                        <option value="MIGUEL">MIGUEL</option>
-                        <option value="SAM">SAM</option>
-                        <option value="SCARLET">SCARLET</option>
-                    </select>
-                </div>
-                
-                <div class="mb-6">
-                    <label for="assignComments" class="block text-sm font-medium text-gray-700 mb-2">Comentarios (opcional):</label>
-                    <textarea id="assignComments" rows="3" 
-                              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
-                              placeholder="Agregue comentarios adicionales..."></textarea>
+                <div id="deliverTaskDetails" class="mb-6 text-center">
+                    <p>¿Estás seguro de que deseas marcar esta solicitud como <strong>entregada</strong>?</p>
                 </div>
                 
                 <div class="flex space-x-3">
-                    <button id="confirmAssignBtn" 
+                    <button id="confirmDeliverBtn" 
                             class="flex-1 bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
-                        <span id="assignBtnText">Asignar Tarea</span>
-                        <div id="assignSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                        <span id="deliverBtnText">Sí, confirmar entrega</span>
+                        <div id="deliverSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
                     </button>
-                    <button id="cancelAssignBtn" 
+                    <button id="cancelDeliverBtn" 
                             class="flex-1 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
                         Cancelar
                     </button>
@@ -297,6 +274,6 @@
         <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="./admin.js"></script>
+    <script src="./entrega.js"></script>
 </body>
 </html>

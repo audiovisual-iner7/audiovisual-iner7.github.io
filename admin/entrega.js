@@ -19,19 +19,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const pendientesTableBody = document.getElementById('pendientesTableBody');
     const noPendientes = document.getElementById('noPendientes');
     
-    // Modal elements
-    const assignModal = document.getElementById('assignModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const assignTaskDetails = document.getElementById('assignTaskDetails');
-    const assignTo = document.getElementById('assignTo');
-    const assignComments = document.getElementById('assignComments');
-    const confirmAssignBtn = document.getElementById('confirmAssignBtn');
-    const cancelAssignBtn = document.getElementById('cancelAssignBtn');
-    const assignBtnText = document.getElementById('assignBtnText');
-    const assignSpinner = document.getElementById('assignSpinner');
+// Referencias a los nuevos elementos del modal
+    const deliverModal = document.getElementById('deliverModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const deliverTaskDetails = document.getElementById('deliverTaskDetails');
+    const confirmDeliverBtn = document.getElementById('confirmDeliverBtn');
+    const cancelDeliverBtn = document.getElementById('cancelDeliverBtn');
+    const deliverBtnText = document.getElementById('deliverBtnText');
+    const deliverSpinner = document.getElementById('deliverSpinner');
+
+    let currentPendientes = []; 
+
+    let currentTaskToDeliver = null;
 
     let currentUser = null;
-    let currentTaskToAssign = null;
+
 
     // --- 1. MANEJO DE AUTENTICACIÓN ---
     
@@ -58,30 +60,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         setLoginLoading(true);
         hideLoginError();
+        
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'login',
-                    username: username,
-                    password: password
-                }),
-                
+            // USA LA NUEVA FUNCIÓN AUXILIAR
+            const result = await postData({
+                action: 'login',
+                username: username,
+                password: password
             });
-
-            const result = await response.json();
 
             if (result.success) {
                 currentUser = {
                     username: username,
                     name: result.name || username
                 };
-                
-                // Guardar sesión
                 localStorage.setItem('adminUser', JSON.stringify(currentUser));
-                
-                // Mostrar panel
                 showAdminPanel();
                 loadPendientes();
                 setupDynamicMenu();
@@ -141,6 +135,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- 3. CARGAR PENDIENTES ---
+
+     /**
+     * Función auxiliar para enviar datos al backend en el formato que espera (e.parameter.data).
+     * @param {object} payload El objeto de JavaScript que se enviará.
+     * @returns {Promise<object>} La respuesta JSON del servidor.
+     */
+    async function postData(payload) {
+        // 1. Prepara los datos en formato de formulario.
+        const formData = new URLSearchParams();
+        // 2. Empaqueta todo nuestro objeto JSON como un string dentro del campo 'data'.
+        formData.append('data', JSON.stringify(payload));
+
+        // 3. Realiza la petición fetch usando el nuevo formato en el body.
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error en la red: ${response.statusText}`);
+        }
+
+        return response.json();
+    }
     
     refreshBtn.addEventListener('click', loadPendientes);
 
@@ -148,15 +166,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoadingPendientes();
         
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'getPendientes'
-                }),
-                
+            // USA LA NUEVA FUNCIÓN AUXILIAR
+            const result = await postData({
+                action: 'getRegPendientes'
             });
-
-            const result = await response.json();
 
             if (result.result === 'success') {
                 displayPendientes(result.data);
@@ -180,11 +193,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!pendientes || pendientes.length === 0) {
             showNoPendientes();
+            currentPendientes = []; // <-- Asegúrate de vaciarla si no hay datos
             return;
         }
 
         pendientesContainer.classList.remove('hidden');
         noPendientes.classList.add('hidden');
+        
+        currentPendientes = pendientes; // <-- GUARDA LOS DATOS AQUÍ
         
         pendientesTableBody.innerHTML = '';
 
@@ -207,20 +223,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function createPendienteRow(solicitud, index) {
         const row = document.createElement('tr');
         row.className = 'hover:bg-gray-50';
-        const folio = solicitud.folio ;
-        // Formatear fecha
-        const fecha = new Date(solicitud.fecha).toLocaleDateString('es-MX');
         
-        // Truncar textos largos
+        const fechaValida = solicitud.fecha ? new Date(solicitud.fecha) : null;
+        const fechaFormateada = fechaValida ? fechaValida.toLocaleDateString('es-MX') : 'Fecha inválida';
+        
+        // El resto de la función es igual...
         const descripcionCorta = truncateText(solicitud.descripcion, 100);
         const articulosCortos = truncateText(solicitud.articulos, 80);
-        
-        // Determinar color del badge de estatus
         const statusClass = getStatusClass(solicitud.estatus);
         
         row.innerHTML = `
-            <td class="text-sm">${folio}</td>
-            <td class="text-sm">${fecha}</td>
+            <td class="text-sm">${solicitud.folio}</td>
+            <td class="text-sm">${fechaFormateada}</td>
             <td class="font-medium">${solicitud.nombre}</td>
             <td class="text-sm">${solicitud.area}</td>
             <td class="text-sm">${solicitud.telefono}</td>
@@ -230,17 +244,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="status-badge ${statusClass}">${solicitud.estatus}</span>
             </td>
             <td>
-                <button class="assign-btn bg-brand text-white px-3 py-1 rounded text-sm hover:bg-brand-light transition-colors" 
+                <button class="deliver-btn bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors" 
                         data-index="${index}">
-                    Asignar
+                    Entregar
                 </button>
             </td>
         `;
 
-        // Agregar event listener al botón de asignar
-        const assignBtn = row.querySelector('.assign-btn');
-        assignBtn.addEventListener('click', () => openAssignModal(solicitud, index));
-
+        // YA NO HAY addEventListener AQUÍ. LO HEMOS QUITADO.
+        
         return row;
     }
 
@@ -262,124 +274,144 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- 4. MODAL DE ASIGNACIÓN ---
+    // --- 4. MODAL DE ENTREGA ---
     
-    function openAssignModal(solicitud, index) {
-        currentTaskToAssign = { ...solicitud, index };
+    
+
+    // Cambiamos la función que crea la fila para que el botón diga "Entregar"
+   
+    
+    function openDeliverModal(solicitud, index) {
+    // Punto de Control 1: Verificamos qué datos llegan aquí.
+        console.log('Paso 1: Abriendo modal para la solicitud:', solicitud);
         
-        // Mostrar detalles de la tarea
-        assignTaskDetails.innerHTML = `
-            <div class="space-y-2">
-                <div><strong>Solicitante:</strong> ${solicitud.nombre}</div>
-                <div><strong>Área:</strong> ${solicitud.area}</div>
-                <div><strong>Fecha:</strong> ${new Date(solicitud.fecha).toLocaleDateString('es-MX')}</div>
-                <div><strong>Descripción:</strong> ${solicitud.descripcion}</div>
-                <div><strong>Artículos:</strong> ${solicitud.articulos}</div>
-            </div>
+        currentTaskToDeliver = { ...solicitud, index };
+        
+        deliverTaskDetails.innerHTML = `
+            <p class="mb-2">Vas a marcar la solicitud con</p>
+            <p class="font-bold text-xl text-brand">${solicitud.folio}</p>
+            <p class="mt-2">como <strong>entregada</strong>. ¿Deseas continuar?</p>
         `;
         
-        // Limpiar campos
-        assignTo.value = '';
-        assignComments.value = '';
-        
-        // Mostrar modal
-        assignModal.classList.remove('hidden');
+        deliverModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
 
-    function closeAssignModal() {
-        assignModal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        currentTaskToAssign = null;
-    }
+    function closeDeliverModal() {
+        deliverModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        currentTaskToDeliver = null;
+    }
 
-    // Event listeners del modal
-    closeModalBtn.addEventListener('click', closeAssignModal);
-    cancelAssignBtn.addEventListener('click', closeAssignModal);
-    
-    // Cerrar modal al hacer click fuera
-    assignModal.addEventListener('click', function(e) {
-        if (e.target === assignModal) {
-            closeAssignModal();
+    pendientesTableBody.addEventListener('click', function(e) {
+        // Si el elemento clickeado tiene la clase 'deliver-btn'
+        if (e.target && e.target.classList.contains('deliver-btn')) {
+            // Obtenemos el índice guardado en el atributo 'data-index'
+            const index = e.target.dataset.index;
+            
+            // Buscamos la solicitud correspondiente en nuestro almacén de datos
+            const solicitud = currentPendientes[index];
+            
+            if (solicitud) {
+                // Si la encontramos, abrimos el modal con los datos correctos
+                openDeliverModal(solicitud, index);
+            } else {
+                console.error('No se pudo encontrar la solicitud para el índice:', index);
+                alert('Error: No se pudieron cargar los datos de la fila. Por favor, recargue la página.');
+            }
         }
     });
 
-    // Confirmar asignación
-    confirmAssignBtn.addEventListener('click', async function() {
-        const assignedTo = assignTo.value.trim();
-        const comments = assignComments.value.trim();
-        
-        if (!assignedTo) {
-            alert('Por favor, seleccione a quién asignar la tarea.');
+
+    // Event listeners del modal
+    closeModalBtn.addEventListener('click', closeDeliverModal);
+    cancelDeliverBtn.addEventListener('click', closeDeliverModal);
+    
+    deliverModal.addEventListener('click', function(e) {
+        if (e.target === deliverModal) {
+            closeDeliverModal();
+        }
+    });
+
+    // Confirmar entrega
+    confirmDeliverBtn.onclick = async function() {
+        console.log('--- Iniciando confirmación (método onclick) ---');
+        console.log('1. Valor de currentTaskToDeliver al entrar:', currentTaskToDeliver);
+        console.log('2. Valor de currentUser al entrar:', currentUser);
+
+        // Verificación robusta al inicio.
+        if (!currentTaskToDeliver || !currentUser) {
+            console.error('Error crítico: La información de la tarea o del usuario es nula. Abortando.');
+            alert('Error: No se pudo obtener la información. Por favor, recargue la página e intente de nuevo.');
             return;
         }
 
-        setAssignLoading(true);
+        // "Aislamos" los valores en variables locales inmediatamente.
+        const folioParaEnviar = currentTaskToDeliver.folio;
+        const usuarioParaEnviar = currentUser.username;
+
+        console.log('3. Datos aislados listos para enviar:', { folio: folioParaEnviar, usuario: usuarioParaEnviar });
+
+        setDeliverLoading(true);
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'assignTask',
-                    taskData: currentTaskToAssign,
-                    assignedTo: assignedTo,
-                    comments: comments,
-                    assignedBy: currentUser.username
-                }),
-                
+            const result = await postData({
+                action: 'deliverTask',
+                folio: folioParaEnviar,
+                deliveredBy: usuarioParaEnviar
             });
 
-            const result = await response.json();
-
             if (result.success) {
-                closeAssignModal();
-                loadPendientes(); // Recargar la lista
-                
-                // Mostrar mensaje de éxito
-                showSuccessMessage(`Tarea asignada exitosamente a ${assignedTo}`);
+                // Guardamos el folio antes de que la variable global se anule
+                const folioExitoso = currentTaskToDeliver.folio;
+                closeDeliverModal();
+                loadPendientes();
+
+                showSuccessMessage(`Solicitud ${folioExitoso} marcada como entregada.`);
             } else {
-                alert(result.message || 'Error al asignar la tarea.');
+                alert(result.message || 'Error al confirmar la entrega.');
             }
         } catch (error) {
-            console.error('Error al asignar tarea:', error);
-            alert('Error de conexión al asignar la tarea.');
+            // En caso de un error de red, la variable global no se ha anulado
+            const folioFallido = currentTaskToDeliver ? currentTaskToDeliver.folio : "desconocido";
+            console.error(`Error al entregar tarea para el folio ${folioFallido}:`, error);
+            alert('Error de conexión al confirmar la entrega.');
         } finally {
-            setAssignLoading(false);
+            setDeliverLoading(false);
         }
+    };
+
+    function setDeliverLoading(loading) {
+        confirmDeliverBtn.disabled = loading;
+        if (loading) {
+            deliverBtnText.textContent = 'Confirmando...';
+            deliverSpinner.classList.remove('hidden');
+        } else {
+            deliverBtnText.textContent = 'Sí, confirmar entrega';
+            deliverSpinner.classList.add('hidden');
+        }
+    }
+
+    function showSuccessMessage(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        successDiv.textContent = message;
+        
+        document.body.appendChild(successDiv);
+        
+        setTimeout(() => {
+            successDiv.remove();
+        }, 3000);
+    }
+
+    // --- 5. MANEJO DE TECLADO ---
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !deliverModal.classList.contains('hidden')) {
+            closeDeliverModal();
+        }
     });
 
-    function setAssignLoading(loading) {
-        confirmAssignBtn.disabled = loading;
-        if (loading) {
-            assignBtnText.textContent = 'Asignando...';
-            assignSpinner.classList.remove('hidden');
-        } else {
-            assignBtnText.textContent = 'Asignar Tarea';
-            assignSpinner.classList.add('hidden');
-        }
-    }
-
-    function showSuccessMessage(message) {
-        // Crear y mostrar mensaje de éxito temporal
-        const successDiv = document.createElement('div');
-        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        successDiv.textContent = message;
-        
-        document.body.appendChild(successDiv);
-        
-        setTimeout(() => {
-            successDiv.remove();
-        }, 3000);
-    }
-
-    // --- 5. MANEJO DE TECLADO ---
-    
-    // Cerrar modal con Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !assignModal.classList.contains('hidden')) {
-            closeAssignModal();
-        }
-    });
 
     // --- 6. MANEJO DEL MENÚ DE NAVEGACIÓN ---
     

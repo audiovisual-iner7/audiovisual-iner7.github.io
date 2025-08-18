@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentUser = JSON.parse(savedUser);
         showAdminPanel();
         loadPendientes();
+        setupDynamicMenu()
     }
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -169,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('adminUser', JSON.stringify(currentUser));
                 showAdminPanel();
                 loadPendientes();
+                setupDynamicMenu()
             } else {
                 showLoginError(result.message || 'Credenciales incorrectas.');
             }
@@ -296,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function populateModal(data) {
-        const fieldsToShow = ['Folio', 'Timestamp', 'Email', 'Nombre', 'Area', 'Telefono', 'Descripcion', 'Items Adicionales', 'Archivos Adjuntos', 'COMENTARIOS'];
+        const fieldsToShow = ['Folio', 'Timestamp', 'Email', 'Nombre', 'Area', 'Telefono', 'Descripcion', 'Items', 'Archivos Adjuntos', 'COMENTARIOS'];
         let html = '<dl class="space-y-4">';
         fieldsToShow.forEach(field => {
             if (data[field]) {
@@ -712,5 +714,75 @@ function renderServicesCart() {
         pendientesContainer.classList.add('hidden');
         noPendientes.classList.remove('hidden');
         noPendientes.querySelector('p:last-child').textContent = message;
+    }
+
+
+    // --- 6. MANEJO DEL MENÚ DE NAVEGACIÓN ---
+    
+    const menuBtn = document.getElementById('menuBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    // Abre o cierra el menú al hacer clic en el botón
+    menuBtn.addEventListener('click', function(event) {
+        dropdownMenu.classList.toggle('hidden');
+        // Detiene la propagación para que el listener de 'window' no lo cierre inmediatamente
+        event.stopPropagation(); 
+    });
+
+    // Cierra el menú si se hace clic en cualquier otro lugar de la página
+    window.addEventListener('click', function(event) {
+        if (!dropdownMenu.classList.contains('hidden')) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+
+    /**
+     * Configura el menú de navegación dinámicamente basado en el usuario actual.
+     * Es segura de llamar en cualquier página, ya que primero comprueba si el menú existe.
+     */
+    function setupDynamicMenu() {
+        const menuItemsContainer = document.querySelector('#dropdownMenu .py-1');
+
+        if (!menuItemsContainer) {
+            return;
+        }
+
+        const adminUsers = ['DIANA', 'HILDING', 'GIOVANNY'];
+        const existingAssignOption = document.getElementById('menu-item-assign');
+
+        // Verificamos si hay un usuario logueado
+        if (!currentUser) {
+            // Si no hay usuario, nos aseguramos de que la opción de admin no esté
+            if (existingAssignOption) {
+                existingAssignOption.remove();
+            }
+            return;
+        }
+        
+        // Comprobamos si el usuario actual es un administrador.
+        const isAdmin = adminUsers.includes(currentUser.username.toUpperCase());
+
+        // --- LÍNEA DE DEPURACIÓN ---
+        // Imprimimos en la consola el resultado de la comprobación.
+        console.log(`Comprobando permisos para '${currentUser.username}'. ¿Es admin? ${isAdmin}`);
+        // --- FIN DE LÍNEA DE DEPURACIÓN ---
+
+        if (isAdmin) {
+            if (!existingAssignOption) {
+                const assignOption = document.createElement('a');
+                assignOption.href = '../admin/';
+                assignOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                assignOption.role = 'menuitem';
+                assignOption.tabindex = '-1';
+                assignOption.id = 'menu-item-assign';
+                assignOption.textContent = 'Asignar';
+                menuItemsContainer.appendChild(assignOption);
+            }
+        } else {
+            if (existingAssignOption) {
+                existingAssignOption.remove();
+            }
+        }
     }
 });

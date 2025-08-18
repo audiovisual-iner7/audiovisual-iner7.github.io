@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const engarContainer = document.getElementById('engarContainer');
     const orientacionContainer = document.getElementById('orientacionContainer');
     const cartelCongresoContainer = document.getElementById('cartelCongresoContainer'); // <-- NUEVO
+    const matriculaInput = document.getElementById('matricula');
     
     // --- NUEVO: Elementos para validación de plotter ---
     const plotterWidthInput = document.getElementById('plotterWidth');
@@ -328,9 +329,15 @@ document.addEventListener('DOMContentLoaded', function() {
         orientacionContainer.style.display = 'none';
         cartelCongresoContainer.style.display = 'none';
 
+        matriculaInput.required = false;
+
         if (selectedValue === digitalPrintOption) digitalPrintContainer.style.display = 'block';
         if (selectedValue === plotterOption) plotterContainer.style.display = 'block';
-        if (selectedValue === cartelCongresoOption) cartelCongresoContainer.style.display = 'block';
+        if (selectedValue === cartelCongresoOption) {
+        cartelCongresoContainer.style.display = 'block';
+        // Solo cuando el campo es VISIBLE, lo hacemos requerido.
+        matriculaInput.required = true;
+    }
         if (selectedValue === engargoladosOption) {
             engarContainer.style.display = 'block';
             orientacionContainer.style.display = 'block';

@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const plotterContainer = document.getElementById('plotterContainer');
     const engarContainer = document.getElementById('engarContainer');
     const orientacionContainer = document.getElementById('orientacionContainer');
+    const cartelCongresoContainer = document.getElementById('cartelCongresoContainer'); // <-- NUEVO
+    const matriculaInput = document.getElementById('matricula');
     
     // --- NUEVO: Elementos para validación de plotter ---
     const plotterWidthInput = document.getElementById('plotterWidth');
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const digitalPrintOption = "IMPRESIÓN DIGITAL";
     const plotterOption = "IMPRESIÓN EN PLOTTER";
     const engargoladosOption = "ENGARGOLADO";
+    const cartelCongresoOption = "CARTEL CONGRESO";
 
     // Lista de todas las áreas/departamentos
     const areas = [
@@ -324,9 +327,17 @@ document.addEventListener('DOMContentLoaded', function() {
         plotterContainer.style.display = 'none';
         engarContainer.style.display = 'none';
         orientacionContainer.style.display = 'none';
+        cartelCongresoContainer.style.display = 'none';
+
+        matriculaInput.required = false;
 
         if (selectedValue === digitalPrintOption) digitalPrintContainer.style.display = 'block';
         if (selectedValue === plotterOption) plotterContainer.style.display = 'block';
+        if (selectedValue === cartelCongresoOption) {
+        cartelCongresoContainer.style.display = 'block';
+        // Solo cuando el campo es VISIBLE, lo hacemos requerido.
+        matriculaInput.required = true;
+    }
         if (selectedValue === engargoladosOption) {
             engarContainer.style.display = 'block';
             orientacionContainer.style.display = 'block';
@@ -357,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const quantity = parseInt(quantityInput.value, 10);
 
         if (productName === "") {
-            // Reemplazado alert por un foco en el campo para mejor UX
             productSelect.focus();
             return;
         }
@@ -373,23 +383,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (plotterContainer.style.display === 'block') {
             const width = parseInt(plotterWidthInput.value, 10);
             const length = parseInt(plotterLengthInput.value, 10);
-
-            // Validación final antes de agregar
             if (width > 90 || length > 150 || !width || !length) {
-                // Si hay un error, nos aseguramos que los mensajes sean visibles y detenemos
                 if (width > 90) plotterWidthError.classList.remove('hidden');
                 if (length > 150) plotterLengthError.classList.remove('hidden');
                 return; 
             }
             productName += ` - Medidas: ${width}cm (ancho) x ${length}cm (largo)`;
         }
+
+        // <-- BLOQUE NUEVO PARA CARTEL CONGRESO -->
+        if (cartelCongresoContainer.style.display === 'block') {
+            const matriculaInput = document.getElementById('matricula');
+            const matricula = matriculaInput.value.trim();
+
+            // Validación de que la matrícula no esté vacía
+            if (!matricula) {
+                matriculaInput.focus(); // Pone el foco en el campo de matrícula
+                matriculaInput.classList.add('border-red-500'); // Resalta el campo en rojo
+                setTimeout(() => matriculaInput.classList.remove('border-red-500'), 3000); // Quita el resaltado después de 3 segundos
+                return; // Detiene la ejecución
+            }
+            productName += ` - Matrícula: ${matricula}`;
+        }
+        // <-- FIN DEL BLOQUE NUEVO -->
         
         if (engarContainer.style.display === 'block') {
             const engargoladoSize = document.getElementById('enType').value;
             const selectedOrientation = document.querySelector('input[name="orientation"]:checked');
-
             if (!selectedOrientation) {
-                // Podemos añadir un feedback visual aquí también si queremos
                 return;
             }
             productName += ` - Tamaño: ${engargoladoSize} - Orientación: ${selectedOrientation.value}`;
@@ -409,6 +430,10 @@ document.addEventListener('DOMContentLoaded', function() {
             plotterContainer.style.display = 'none';
             engarContainer.style.display = 'none';
             orientacionContainer.style.display = 'none';
+            cartelCongresoContainer.style.display = 'none'; // <-- NUEVO
+            if (document.getElementById('matricula')) {
+                document.getElementById('matricula').value = ''; // <-- NUEVO
+            }
             plotterWidthInput.value = '';
             plotterLengthInput.value = '';
             plotterWidthError.classList.add('hidden');
@@ -731,6 +756,76 @@ function sendDataToGoogle(data) {
         tour.start();
         localStorage.setItem('tutorialSolicitudVisto', 'true');
         }
+
+
+        // --- 6. MANEJO DEL MENÚ DE NAVEGACIÓN ---
+    
+    const menuBtn = document.getElementById('menuBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    // Abre o cierra el menú al hacer clic en el botón
+    menuBtn.addEventListener('click', function(event) {
+        dropdownMenu.classList.toggle('hidden');
+        // Detiene la propagación para que el listener de 'window' no lo cierre inmediatamente
+        event.stopPropagation(); 
+    });
+
+    // Cierra el menú si se hace clic en cualquier otro lugar de la página
+    window.addEventListener('click', function(event) {
+        if (!dropdownMenu.classList.contains('hidden')) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+
+    /**
+     * Configura el menú de navegación dinámicamente basado en el usuario actual.
+     * Es segura de llamar en cualquier página, ya que primero comprueba si el menú existe.
+     */
+    function setupDynamicMenu() {
+        const menuItemsContainer = document.querySelector('#dropdownMenu .py-1');
+
+        if (!menuItemsContainer) {
+            return;
+        }
+
+        const adminUsers = ['DIANA', 'HILDING', 'GIOVANNY'];
+        const existingAssignOption = document.getElementById('menu-item-assign');
+
+        // Verificamos si hay un usuario logueado
+        if (!currentUser) {
+            // Si no hay usuario, nos aseguramos de que la opción de admin no esté
+            if (existingAssignOption) {
+                existingAssignOption.remove();
+            }
+            return;
+        }
+        
+        // Comprobamos si el usuario actual es un administrador.
+        const isAdmin = adminUsers.includes(currentUser.username.toUpperCase());
+
+        // --- LÍNEA DE DEPURACIÓN ---
+        // Imprimimos en la consola el resultado de la comprobación.
+        console.log(`Comprobando permisos para '${currentUser.username}'. ¿Es admin? ${isAdmin}`);
+        // --- FIN DE LÍNEA DE DEPURACIÓN ---
+
+        if (isAdmin) {
+            if (!existingAssignOption) {
+                const assignOption = document.createElement('a');
+                assignOption.href = '../admin/';
+                assignOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                assignOption.role = 'menuitem';
+                assignOption.tabindex = '-1';
+                assignOption.id = 'menu-item-assign';
+                assignOption.textContent = 'Asignar';
+                menuItemsContainer.appendChild(assignOption);
+            }
+        } else {
+            if (existingAssignOption) {
+                existingAssignOption.remove();
+            }
+        }
+    }
 });
 
 

@@ -453,8 +453,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- 6. Lógica para enviar el formulario a Google Sheets ---
+// --- 6. Lógica para enviar el formulario a Google Sheets ---
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // <-- NUEVA VALIDACIÓN INICIA AQUÍ -->
+        const servicesRowsCount = itemsTableBody.querySelectorAll('tr:not(#noItemsRow)').length;
+        
+        if (servicesRowsCount === 0) {
+            statusMessage.textContent = 'Error: Debe agregar al menos un servicio a la lista.';
+            statusMessage.className = 'text-sm font-medium text-red-600';
+            
+            // Hacemos scroll y ponemos el foco en el selector de productos para guiar al usuario
+            productSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            productSelect.focus();
+
+            // Limpiamos el mensaje después de 5 segundos
+            setTimeout(() => { statusMessage.textContent = ''; }, 5000);
+            
+            return; // Detenemos el envío del formulario aquí mismo
+        }
+        // <-- NUEVA VALIDACIÓN TERMINA AQUÍ -->
 
         if (fileUpload.files.length > 3) {
             fileError.textContent = 'Por favor, seleccione 3 archivos como máximo.';
@@ -464,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         loadingSpinner.classList.remove('hidden');
         statusMessage.textContent = 'Enviando...';
-        statusMessage.className = 'text-blue-600';
+        statusMessage.className = 'text-sm font-medium text-blue-600';
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
@@ -479,7 +498,6 @@ document.addEventListener('DOMContentLoaded', function() {
         data.timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
         
         delete data.product;
-        
 
         const files = fileUpload.files;
         if (files.length > 0) {

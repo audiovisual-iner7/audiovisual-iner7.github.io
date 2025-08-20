@@ -310,29 +310,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Confirmar asignación
+// Confirmar asignación
     confirmAssignBtn.addEventListener('click', async function() {
-        const assignedTo = assignTo.value.trim();
+        const assignedToUser = assignTo.value.trim();
         const comments = assignComments.value.trim();
         
-        if (!assignedTo) {
+        if (!assignedToUser) {
             alert('Por favor, seleccione a quién asignar la tarea.');
             return;
         }
 
         setAssignLoading(true);
 
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Crear el objeto de datos. Usamos 'elaboro' para que coincida con lo que espera el backend.
+        const dataToSend = {
+            action: 'assignTask',
+            taskData: currentTaskToAssign,
+            elaboro: assignedToUser, 
+            comentarios: comments,
+            assignedBy: currentUser.name
+        };
+
+        // 2. Empaquetar en FormData.
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(dataToSend));
+        // --- FIN DE LA CORRECCIÓN ---
+
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'assignTask',
-                    taskData: currentTaskToAssign,
-                    assignedTo: assignedTo,
-                    comments: comments,
-                    assignedBy: currentUser.username
-                }),
-                
+                body: formData // Ahora se envía el FormData
             });
 
             const result = await response.json();
@@ -340,9 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 closeAssignModal();
                 loadPendientes(); // Recargar la lista
-                
-                // Mostrar mensaje de éxito
-                showSuccessMessage(`Tarea asignada exitosamente a ${assignedTo}`);
+                showSuccessMessage(result.message || `Tarea asignada exitosamente a ${assignedToUser}`);
             } else {
                 alert(result.message || 'Error al asignar la tarea.');
             }

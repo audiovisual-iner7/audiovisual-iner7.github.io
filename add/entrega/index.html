@@ -214,7 +214,6 @@
                                     <th class="w-24">Fecha</th>
                                     <th class="w-32">Solicitante</th>
                                     <th class="w-40">Área</th>
-                                    <th class="w-20">Teléfono</th>
                                     <th class="w-32">Descripción</th>
                                     <th class="w-32">Artículos</th>
                                     <th class="w-24">Estatus</th>
@@ -246,33 +245,35 @@
             <form id="deliverForm" onsubmit="return false;">
                 <div class="flex justify-between items-center p-4 border-b">
                     <h3 class="text-lg font-bold text-gray-800">Confirmar Entrega</h3>
-                    <button type="button" id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
+                    <button type="button" id="closeModalBtn" class="text-gray-400 hover:text-gray-600">&times;</button>
                 </div>
                 
                 <div class="p-6 space-y-4">
                     <div>
                         <label for="deliveryDate" class="block text-sm font-medium text-gray-700">Fecha de Entrega</label>
-                        <input type="date" id="deliveryDate" name="fechaEntrega" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand">
+                        <input type="date" id="deliveryDate" name="fechaEntrega" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
                     </div>
                     <div>
                         <label for="deliveredTo" class="block text-sm font-medium text-gray-700">Entregado a (Nombre Completo)</label>
-                        <input type="text" id="deliveredTo" name="recibe" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand" placeholder="Nombre de la persona que recibe...">
+                        <input type="text" id="deliveredTo" name="recibe" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Nombre de la persona que recibe...">
+                    </div>
+                    <div>
+                        <label for="deliveryObservations" class="block text-sm font-medium text-gray-700">Observaciones (Opcional)</label>
+                        <textarea id="deliveryObservations" name="observaciones" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Cualquier detalle adicional sobre la entrega..."></textarea>
                     </div>
                     <div id="deliverError" class="text-red-600 text-sm hidden"></div>
                 </div>
                 
                 <div class="flex justify-end p-4 bg-gray-50 border-t space-x-2">
                     <button type="button" id="cancelDeliverBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
-                    <button type="submit" id="confirmDeliverBtn" class="bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
+                    <button type="submit" id="confirmDeliverBtn" class="bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light">
                         <span id="deliverBtnText">Confirmar Entrega</span>
                         <div id="deliverSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
                     </button>
                 </div>
             </form>
         </div>
-    </div>
+</div>
 
     <footer class="bg-gray-800 text-white text-center p-4 mt-12">
         <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>

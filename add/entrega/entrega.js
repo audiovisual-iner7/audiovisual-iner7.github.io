@@ -19,14 +19,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const pendientesTableBody = document.getElementById('pendientesTableBody');
     const noPendientes = document.getElementById('noPendientes');
     
-// Referencias a los nuevos elementos del modal
-    const deliverModal = document.getElementById('deliverModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const deliverTaskDetails = document.getElementById('deliverTaskDetails');
-    const confirmDeliverBtn = document.getElementById('confirmDeliverBtn');
-    const cancelDeliverBtn = document.getElementById('cancelDeliverBtn');
-    const deliverBtnText = document.getElementById('deliverBtnText');
-    const deliverSpinner = document.getElementById('deliverSpinner');
+  const deliverModal = document.getElementById('deliverModal');
+    const deliverForm = document.querySelector('#deliverModal form'); // Busca el form dentro del modal
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelDeliverBtn = document.getElementById('cancelDeliverBtn');
+    const confirmDeliverBtn = document.getElementById('confirmDeliverBtn');
+    const deliverBtnText = document.getElementById('deliverBtnText');
+    const deliverSpinner = document.getElementById('deliverSpinner');
+    
+    // Estos elementos están DENTRO del modal en tu HTML
+    const deliveryDateInput = document.getElementById('deliveryDate');
+    const deliveredToInput = document.getElementById('deliveredTo');
+    const deliverError = document.getElementById('deliverError');
+    const deliveryObservationsInput = document.getElementById('deliveryObservations');
 
     let currentPendientes = []; 
 
@@ -134,213 +139,126 @@ document.addEventListener('DOMContentLoaded', function() {
         loginError.classList.add('hidden');
     }
 
-    // --- 3. CARGAR PENDIENTES ---
-
-     /**
-     * Función auxiliar para enviar datos al backend en el formato que espera (e.parameter.data).
-     * @param {object} payload El objeto de JavaScript que se enviará.
-     * @returns {Promise<object>} La respuesta JSON del servidor.
-     */
-    async function postData(payload) {
-        // 1. Prepara los datos en formato de formulario.
-        const formData = new URLSearchParams();
-        // 2. Empaqueta todo nuestro objeto JSON como un string dentro del campo 'data'.
-        formData.append('data', JSON.stringify(payload));
-
-        // 3. Realiza la petición fetch usando el nuevo formato en el body.
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error en la red: ${response.statusText}`);
-        }
-
-        return response.json();
-    }
-    
+    // --- LÓGICA DE CARGA DE PENDIENTES ---
     refreshBtn.addEventListener('click', loadPendientes);
 
     async function loadPendientes() {
         showLoadingPendientes();
-        
         try {
-            // USA LA NUEVA FUNCIÓN AUXILIAR
-            const result = await postData({
-                action: 'getRegPendientes'
-            });
+            const formData = new FormData();
+            formData.append('data', JSON.stringify({ action: 'getRegPendientes' }));
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+            const result = await response.json();
 
             if (result.result === 'success') {
                 displayPendientes(result.data);
             } else {
-                console.error('Error al cargar pendientes:', result.message);
-                showNoPendientes('Error al cargar las solicitudes pendientes.');
+                throw new Error(result.error || 'Error al cargar los pendientes.');
             }
         } catch (error) {
             console.error('Error en loadPendientes:', error);
-            showNoPendientes('Error de conexión al cargar las solicitudes.');
+            showNoPendientes('Error de conexión o al cargar datos.');
         }
     }
-
-    function showLoadingPendientes() {
-        loadingPendientes.classList.remove('hidden');
-        pendientesContainer.classList.add('hidden');
-    }
-
+    
     function displayPendientes(pendientes) {
+        pendientesTableBody.innerHTML = '';
         loadingPendientes.classList.add('hidden');
         
         if (!pendientes || pendientes.length === 0) {
-            showNoPendientes();
-            currentPendientes = []; // <-- Asegúrate de vaciarla si no hay datos
+            noPendientes.classList.remove('hidden');
+            pendientesContainer.classList.add('hidden');
             return;
         }
-
-        pendientesContainer.classList.remove('hidden');
+        
         noPendientes.classList.add('hidden');
+        pendientesContainer.classList.remove('hidden');
         
-        currentPendientes = pendientes; // <-- GUARDA LOS DATOS AQUÍ
-        
-        pendientesTableBody.innerHTML = '';
+        pendientes.forEach(solicitud => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50';
+            
+            // Lógica para darle estilo al badge de estatus
+            const statusClass = getStatusClass(solicitud.estatus);
 
-        pendientes.forEach((solicitud, index) => {
-            const row = createPendienteRow(solicitud, index);
+            row.innerHTML = `
+                <td class="px-4 py-2 text-sm">${solicitud.folio}</td>
+                <td class="px-4 py-2 text-sm">${new Date(solicitud.fecha).toLocaleDateString('es-MX')}</td>
+                <td class="px-4 py-2 font-medium">${solicitud.nombre}</td>
+                <td class="px-4 py-2 text-sm">${solicitud.area}</td>
+                <td class="px-4 py-2 text-sm" title="${solicitud.descripcion}">${(solicitud.descripcion || '').substring(0, 30)}...</td>
+                <td class="px-4 py-2 text-sm" title="${solicitud.articulos}">${(solicitud.articulos || '').substring(0, 40)}...</td>
+                <td class="px-4 py-2 text-sm">
+                    <span class="status-badge ${statusClass}">${solicitud.estatus}</span>
+                </td>
+                <td class="px-4 py-2 text-center">
+                    <button data-folio="${solicitud.folio}" class="entregar-btn bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs font-semibold">Entregar</button>
+                </td>
+            `;
             pendientesTableBody.appendChild(row);
         });
     }
 
-    function showNoPendientes(message = null) {
-        loadingPendientes.classList.add('hidden');
-        pendientesContainer.classList.add('hidden');
-        noPendientes.classList.remove('hidden');
-        
-        if (message) {
-            noPendientes.querySelector('p:last-child').textContent = message;
-        }
-    }
-
-    function createPendienteRow(solicitud, index) {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-50';
-        
-        const fechaValida = solicitud.fecha ? new Date(solicitud.fecha) : null;
-        const fechaFormateada = fechaValida ? fechaValida.toLocaleDateString('es-MX') : 'Fecha inválida';
-        
-        // El resto de la función es igual...
-        const descripcionCorta = truncateText(solicitud.descripcion, 100);
-        const articulosCortos = truncateText(solicitud.articulos, 80);
-        const statusClass = getStatusClass(solicitud.estatus);
-        
-        row.innerHTML = `
-            <td class="text-sm">${solicitud.folio}</td>
-            <td class="text-sm">${fechaFormateada}</td>
-            <td class="font-medium">${solicitud.nombre}</td>
-            <td class="text-sm">${solicitud.area}</td>
-            <td class="text-sm">${solicitud.telefono}</td>
-            <td class="text-sm" title="${solicitud.descripcion}">${descripcionCorta}</td>
-            <td class="text-sm" title="${solicitud.articulos}">${articulosCortos}</td>
-            <td>
-                <span class="status-badge ${statusClass}">${solicitud.estatus}</span>
-            </td>
-            <td>
-                <button class="deliver-btn bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors" 
-                        data-index="${index}">
-                    Entregar
-                </button>
-            </td>
-        `;
-
-        // YA NO HAY addEventListener AQUÍ. LO HEMOS QUITADO.
-        
-        return row;
-    }
-
-    function truncateText(text, maxLength) {
-        if (!text) return '';
-        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-    }
-
     function getStatusClass(estatus) {
-        switch (estatus?.toLowerCase()) {
-            case 'pendiente':
-                return 'status-pendiente';
-            case 'en proceso':
-                return 'status-proceso';
-            case 'en revisión':
-                return 'status-revision';
-            default:
-                return 'status-pendiente';
-        }
+    switch (estatus?.toLowerCase()) {
+        case 'pendiente':
+            return 'status-pendiente';
+        case 'en proceso':
+            return 'status-proceso';
+        case 'en revisión':
+            return 'status-revision';
+        default:
+            return 'bg-gray-200 text-gray-800'; // Un color por defecto
     }
+}
 
-    // --- 4. MODAL DE ENTREGA ---
-    
-    let folioToDeliver = null;
-    
-    // Crear y configurar los nuevos campos del formulario
-    deliveryDateInput.type = 'date';
-    deliveryDateInput.required = true;
-    deliveryDateInput.className = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md';
-    const dateLabel = document.createElement('label');
-    dateLabel.textContent = 'Fecha de Entrega';
-    dateLabel.className = 'block text-sm font-medium text-gray-700';
-    
-    deliveredToInput.type = 'text';
-    deliveredToInput.placeholder = 'Nombre de la persona que recibe...';
-    deliveredToInput.required = true;
-    deliveredToInput.className = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md';
-    const nameLabel = document.createElement('label');
-    nameLabel.textContent = 'Entregado a (Nombre Completo)';
-    nameLabel.className = 'block text-sm font-medium text-gray-700 mt-4';
-
-    // Limpiar el contenido estático y añadir los nuevos campos
-    deliverTaskDetails.innerHTML = '';
-    deliverTaskDetails.appendChild(dateLabel);
-    deliverTaskDetails.appendChild(deliveryDateInput);
-    deliverTaskDetails.appendChild(nameLabel);
-    deliverTaskDetails.appendChild(deliveredToInput);
-   
-    
-    function openDeliverModal(folio) {
+    // --- LÓGICA PARA EL MODAL DE ENTREGA ---
+    function openDeliverModal(folio) {
         folioToDeliver = folio;
-        deliveryDateInput.value = new Date().toISOString().split('T')[0]; // Fecha de hoy
+        deliveryDateInput.value = new Date().toISOString().split('T')[0];
         deliveredToInput.value = '';
+        deliveryObservationsInput.value = '';
+        deliverError.classList.add('hidden');
         deliverModal.classList.remove('hidden');
+        deliverModal.classList.add('flex');
     }
 
-    function closeDeliverModal() {
+    function closeDeliverModal() {
         deliverModal.classList.add('hidden');
+        deliverModal.classList.remove('flex');
     }
 
     closeModalBtn.addEventListener('click', closeDeliverModal);
     cancelDeliverBtn.addEventListener('click', closeDeliverModal);
-
 
     pendientesTableBody.addEventListener('click', (e) => {
         if (e.target.classList.contains('entregar-btn')) {
             openDeliverModal(e.target.dataset.folio);
         }
     });
+    
+    deliverForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const recibe = deliveredToInput.value.trim();
+        const fechaEntrega = deliveryDateInput.value;
+        const observaciones = deliveryObservationsInput.value.trim();
 
-
-    // Event listeners del modal
-    confirmDeliverBtn.addEventListener('click', async () => {
-        if (!deliveredToInput.value.trim() || !deliveryDateInput.value) {
-            alert("Ambos campos, fecha y nombre, son obligatorios.");
+        if (!recibe || !fechaEntrega) {
+            deliverError.textContent = "Ambos campos son obligatorios.";
+            deliverError.classList.remove('hidden');
             return;
         }
-
-        confirmDeliverBtn.disabled = true;
-        confirmDeliverBtn.textContent = 'Registrando...';
+        
+        setDeliverLoading(true);
         
         try {
             const dataToSend = {
                 action: 'deliverTask',
                 folio: folioToDeliver,
-                recibe: deliveredToInput.value.trim(),
-                fechaEntrega: deliveryDateInput.value,
-                deliveredBy: currentUser.name // Quién está realizando la acción
+                recibe: recibe,
+                fechaEntrega: fechaEntrega,
+                deliveredBy: currentUser.username,
+                observaciones: observaciones
             };
             const formData = new FormData();
             formData.append('data', JSON.stringify(dataToSend));
@@ -356,83 +274,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(result.message);
             }
         } catch (error) {
-            alert(`Error: ${error.message}`);
-        } finally {
-            confirmDeliverBtn.disabled = false;
-            confirmDeliverBtn.textContent = 'Sí, confirmar entrega';
-        }
-    });
-
-    // Confirmar entrega
-    confirmDeliverBtn.onclick = async function() {
-        console.log('--- Iniciando confirmación (método onclick) ---');
-        console.log('1. Valor de currentTaskToDeliver al entrar:', currentTaskToDeliver);
-        console.log('2. Valor de currentUser al entrar:', currentUser);
-
-        // Verificación robusta al inicio.
-        if (!currentTaskToDeliver || !currentUser) {
-            console.error('Error crítico: La información de la tarea o del usuario es nula. Abortando.');
-            alert('Error: No se pudo obtener la información. Por favor, recargue la página e intente de nuevo.');
-            return;
-        }
-
-        // "Aislamos" los valores en variables locales inmediatamente.
-        const folioParaEnviar = currentTaskToDeliver.folio;
-        const usuarioParaEnviar = currentUser.username;
-
-        console.log('3. Datos aislados listos para enviar:', { folio: folioParaEnviar, usuario: usuarioParaEnviar });
-
-        setDeliverLoading(true);
-
-        try {
-            const result = await postData({
-                action: 'deliverTask',
-                folio: folioParaEnviar,
-                deliveredBy: usuarioParaEnviar
-            });
-
-            if (result.success) {
-                // Guardamos el folio antes de que la variable global se anule
-                const folioExitoso = currentTaskToDeliver.folio;
-                closeDeliverModal();
-                loadPendientes();
-
-                showSuccessMessage(`Solicitud ${folioExitoso} marcada como entregada.`);
-            } else {
-                alert(result.message || 'Error al confirmar la entrega.');
-            }
-        } catch (error) {
-            // En caso de un error de red, la variable global no se ha anulado
-            const folioFallido = currentTaskToDeliver ? currentTaskToDeliver.folio : "desconocido";
-            console.error(`Error al entregar tarea para el folio ${folioFallido}:`, error);
-            alert('Error de conexión al confirmar la entrega.');
+            deliverError.textContent = `Error: ${error.message}`;
+            deliverError.classList.remove('hidden');
         } finally {
             setDeliverLoading(false);
         }
-    };
+    });
+    
+    function setDeliverLoading(loading) {
+        confirmDeliverBtn.disabled = loading;
+        if (loading) {
+            deliverBtnText.textContent = 'Confirmando...';
+            deliverSpinner.classList.remove('hidden');
+        } else {
+            deliverBtnText.textContent = 'Confirmar Entrega';
+            deliverSpinner.classList.add('hidden');
+        }
+    }
 
-    function setDeliverLoading(loading) {
-        confirmDeliverBtn.disabled = loading;
-        if (loading) {
-            deliverBtnText.textContent = 'Confirmando...';
-            deliverSpinner.classList.remove('hidden');
-        } else {
-            deliverBtnText.textContent = 'Sí, confirmar entrega';
-            deliverSpinner.classList.add('hidden');
-        }
-    }
+    function showLoadingPendientes() {
+        loadingPendientes.classList.remove('hidden');
+        pendientesContainer.classList.add('hidden');
+        noPendientes.classList.add('hidden');
+    }
 
-    function showSuccessMessage(message) {
-        const successDiv = document.createElement('div');
-        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        successDiv.textContent = message;
-        
-        document.body.appendChild(successDiv);
-        
-        setTimeout(() => {
-            successDiv.remove();
-        }, 3000);
-    }
+    function showNoPendientes(message = "No hay trabajos pendientes por entregar.") {
+        loadingPendientes.classList.add('hidden');
+        pendientesContainer.classList.add('hidden');
+        noPendientes.classList.remove('hidden');
+        noPendientes.querySelector('p:last-child').textContent = message;
+    }
 
     // --- 5. MANEJO DE TECLADO ---
     

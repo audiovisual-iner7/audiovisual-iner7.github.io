@@ -276,62 +276,92 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- 4. MODAL DE ENTREGA ---
     
+    let folioToDeliver = null;
     
+    // Crear y configurar los nuevos campos del formulario
+    deliveryDateInput.type = 'date';
+    deliveryDateInput.required = true;
+    deliveryDateInput.className = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md';
+    const dateLabel = document.createElement('label');
+    dateLabel.textContent = 'Fecha de Entrega';
+    dateLabel.className = 'block text-sm font-medium text-gray-700';
+    
+    deliveredToInput.type = 'text';
+    deliveredToInput.placeholder = 'Nombre de la persona que recibe...';
+    deliveredToInput.required = true;
+    deliveredToInput.className = 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md';
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Entregado a (Nombre Completo)';
+    nameLabel.className = 'block text-sm font-medium text-gray-700 mt-4';
 
-    // Cambiamos la función que crea la fila para que el botón diga "Entregar"
+    // Limpiar el contenido estático y añadir los nuevos campos
+    deliverTaskDetails.innerHTML = '';
+    deliverTaskDetails.appendChild(dateLabel);
+    deliverTaskDetails.appendChild(deliveryDateInput);
+    deliverTaskDetails.appendChild(nameLabel);
+    deliverTaskDetails.appendChild(deliveredToInput);
    
     
-    function openDeliverModal(solicitud, index) {
-    // Punto de Control 1: Verificamos qué datos llegan aquí.
-        console.log('Paso 1: Abriendo modal para la solicitud:', solicitud);
-        
-        currentTaskToDeliver = { ...solicitud, index };
-        
-        deliverTaskDetails.innerHTML = `
-            <p class="mb-2">Vas a marcar la solicitud con</p>
-            <p class="font-bold text-xl text-brand">${solicitud.folio}</p>
-            <p class="mt-2">como <strong>entregada</strong>. ¿Deseas continuar?</p>
-        `;
-        
+    function openDeliverModal(folio) {
+        folioToDeliver = folio;
+        deliveryDateInput.value = new Date().toISOString().split('T')[0]; // Fecha de hoy
+        deliveredToInput.value = '';
         deliverModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
     }
 
     function closeDeliverModal() {
-        deliverModal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        currentTaskToDeliver = null;
-    }
+        deliverModal.classList.add('hidden');
+    }
 
-    pendientesTableBody.addEventListener('click', function(e) {
-        // Si el elemento clickeado tiene la clase 'deliver-btn'
-        if (e.target && e.target.classList.contains('deliver-btn')) {
-            // Obtenemos el índice guardado en el atributo 'data-index'
-            const index = e.target.dataset.index;
-            
-            // Buscamos la solicitud correspondiente en nuestro almacén de datos
-            const solicitud = currentPendientes[index];
-            
-            if (solicitud) {
-                // Si la encontramos, abrimos el modal con los datos correctos
-                openDeliverModal(solicitud, index);
-            } else {
-                console.error('No se pudo encontrar la solicitud para el índice:', index);
-                alert('Error: No se pudieron cargar los datos de la fila. Por favor, recargue la página.');
-            }
+    closeModalBtn.addEventListener('click', closeDeliverModal);
+    cancelDeliverBtn.addEventListener('click', closeDeliverModal);
+
+
+    pendientesTableBody.addEventListener('click', (e) => {
+        if (e.target.classList.contains('entregar-btn')) {
+            openDeliverModal(e.target.dataset.folio);
         }
     });
 
 
     // Event listeners del modal
-    closeModalBtn.addEventListener('click', closeDeliverModal);
-    cancelDeliverBtn.addEventListener('click', closeDeliverModal);
-    
-    deliverModal.addEventListener('click', function(e) {
-        if (e.target === deliverModal) {
-            closeDeliverModal();
-        }
-    });
+    confirmDeliverBtn.addEventListener('click', async () => {
+        if (!deliveredToInput.value.trim() || !deliveryDateInput.value) {
+            alert("Ambos campos, fecha y nombre, son obligatorios.");
+            return;
+        }
+
+        confirmDeliverBtn.disabled = true;
+        confirmDeliverBtn.textContent = 'Registrando...';
+        
+        try {
+            const dataToSend = {
+                action: 'deliverTask',
+                folio: folioToDeliver,
+                recibe: deliveredToInput.value.trim(),
+                fechaEntrega: deliveryDateInput.value,
+                deliveredBy: currentUser.name // Quién está realizando la acción
+            };
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(dataToSend));
+
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.success) {
+                closeDeliverModal();
+                alert('Entrega registrada con éxito.');
+                loadPendientes();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        } finally {
+            confirmDeliverBtn.disabled = false;
+            confirmDeliverBtn.textContent = 'Sí, confirmar entrega';
+        }
+    });
 
     // Confirmar entrega
     confirmDeliverBtn.onclick = async function() {

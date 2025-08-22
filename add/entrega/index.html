@@ -240,35 +240,37 @@
 
     </main>
 
-    <!-- Modal de Asignación -->
+    <!-- Modal de Entrega -->
     <div id="deliverModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
+            <form id="deliverForm" onsubmit="return false;">
+                <div class="flex justify-between items-center p-4 border-b">
                     <h3 class="text-lg font-bold text-gray-800">Confirmar Entrega</h3>
-                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                    <button type="button" id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
                 
-                <div id="deliverTaskDetails" class="mb-6 text-center">
-                    <p>¿Estás seguro de que deseas marcar esta solicitud como <strong>entregada</strong>?</p>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="deliveryDate" class="block text-sm font-medium text-gray-700">Fecha de Entrega</label>
+                        <input type="date" id="deliveryDate" name="fechaEntrega" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand">
+                    </div>
+                    <div>
+                        <label for="deliveredTo" class="block text-sm font-medium text-gray-700">Entregado a (Nombre Completo)</label>
+                        <input type="text" id="deliveredTo" name="recibe" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand" placeholder="Nombre de la persona que recibe...">
+                    </div>
+                    <div id="deliverError" class="text-red-600 text-sm hidden"></div>
                 </div>
                 
-                <div class="flex space-x-3">
-                    <button id="confirmDeliverBtn" 
-                            class="flex-1 bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
-                        <span id="deliverBtnText">Sí, confirmar entrega</span>
+                <div class="flex justify-end p-4 bg-gray-50 border-t space-x-2">
+                    <button type="button" id="cancelDeliverBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="confirmDeliverBtn" class="bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
+                        <span id="deliverBtnText">Confirmar Entrega</span>
                         <div id="deliverSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
                     </button>
-                    <button id="cancelDeliverBtn" 
-                            class="flex-1 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
-                        Cancelar
-                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 

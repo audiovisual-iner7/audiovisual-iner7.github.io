@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'CD: GRABADO O EN BLANCO', 'CENTÍMETROS PLOTTER', 'DIBUJO E ILUSTRACIÓN', 'DISEÑO IMPRESIÓN MONTAJE Y CORTE', 'DISEÑO',
         'DVD: GRABADO O EN BLANCO', 'EDICIÓN DE FOTOGRAFÍA DIGITAL', 'ENGARGOLADOS', 'ESCANEOS', 'FOTOGRAFÍAS BANCO DE IMÁGEN',
         'FOTOGRAFÍAS COMPARTIDAS', 'HOJAS CARTA', 'HOJAS DE REUSO', 'HOJAS OFICIO', 'HOJAS PAPEL ESPECIAL', 'HOJAS TABLOIDE',
-        'IMPRESIÓN PAPEL REUSO', 'IMPRESIONES CARTA', 'IMPRESIONES OFICIO', 'IMPRESIONES PAPEL ESPECIAL', 'IMPRESIONES TABLOIDE',
+        'IMPRESIÓN PAPEL REUSO', 'IMPRESIONES CARTA', 'IMPRESIONES OFICIO', 'IMPRESIONES PAPEL ESPECIAL', 'IMPRESIONES TABLOIDE', 'IMPRESIONES SIN HOJAS',
         'PLACA DE BATERÍA', 'PLACA DE FOAMBOARD', 'PRESTAMO DE EQUIPO', 'PRODUCCIÓN AUDIOVISUAL', 'VIDEO BANCO DE IMÁGEN',
         'VIDEOS COMPARTIDOS', 'VIDEOS EDITADOS'
     ];
@@ -407,10 +407,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const serviceNameUpper = serviceName.toUpperCase();
         let newService = { name: serviceName, quantity: 1, specifications: '' };
 
-        if (serviceNameUpper.includes('IMPRESION') || serviceNameUpper.includes('HOJAS')) {
+        if (serviceNameUpper === 'IMPRESIONES SIN HOJAS') {
+            newService.tamaño = 'CARTA'; // Se añade la propiedad de tamaño
+        } 
+        // El caso más general ('IMPRESION') va después.
+        else if (serviceNameUpper.includes('IMPRESION') || serviceNameUpper.includes('HOJAS')) {
             newService.tipoPapel = 'BOND';
-            if (serviceNameUpper.includes('IMPRESION')) newService.numHojas = 1;
-        }
+            if (serviceNameUpper.includes('IMPRESION')) {
+                newService.numHojas = 1;
+            }
+        } 
         if (serviceNameUpper.includes('PLOTTER')) newService.tipoRollo = 'ROLLO BOND';
         if (serviceNameUpper === 'AUDIOGRABACIÓN') newService.comite = comiteOptions[0];
         if (serviceNameUpper === 'COPIAS') {
@@ -479,6 +485,17 @@ function renderServicesCart() {
                             <input type="checkbox" id="ambasCaras-${index}" class="h-4 w-4 rounded" data-index="${index}" data-field="ambasCaras" ${service.ambasCaras ? 'checked' : ''}>
                             <label for="ambasCaras-${index}" class="text-sm font-medium">Ambas Caras</label>
                         </div>`;
+                }
+                if (service.name.toUpperCase() === 'IMPRESIONES SIN HOJAS') {
+                    const tamañoOptions = ['CARTA', 'OFICIO', 'TABLOIDE']
+                        .map(opt => `<option value="${opt}" ${service.tamaño === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    
+                    dynamicFieldsHTML += `
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium w-28">Tamaño:</label>
+                            <select class="flex-grow p-1 border rounded" data-index="${index}" data-field="tamaño">${tamañoOptions}</select>
+                        </div>
+                    `;
                 }
                 
                 const specificationsHTML = `<div><input type="text" placeholder="Especificaciones adicionales..." value="${service.specifications}" class="w-full p-1 border rounded text-sm" data-index="${index}" data-field="specifications"></div>`;

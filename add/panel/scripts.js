@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // URL ÚNICA de tu Google Apps Script
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
 
+
     // --- ELEMENTOS DEL DOM ---
      const loginContainer = document.getElementById('loginContainer');
     const adminPanel = document.getElementById('adminPanel');
@@ -349,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('nombreSolicitante').value = pendiente.solicitante;
             document.getElementById('descripcionTrabajo').value = pendiente.descripcion;
             areaInput.value = pendiente.area || '';
+            document.getElementById('emailSolicitante').value = pendiente.email || ''; 
             
             // Se eliminó la línea que ponía los campos en "readOnly = true"
         }
@@ -612,6 +614,7 @@ function renderServicesCart() {
             fechaSolicitud: document.getElementById('fechaSolicitud').value,
             fechaEntrega: document.getElementById('fechaEntrega').value,
             nombreSolicitante: document.getElementById('nombreSolicitante').value,
+            email: document.getElementById('emailSolicitante').value,
             area: document.getElementById('area').value,
             vale: document.getElementById('vale').value,
             elaboro: document.getElementById('elaboro').value,

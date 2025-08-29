@@ -598,6 +598,11 @@ function renderServicesCart() {
     nuevaSolicitudForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
+        if (serviciosAgregados.length === 0) {
+            alert('🛑 Debe agregar al menos un servicio para poder registrar la solicitud.');
+            return; // Detiene la ejecución y evita el envío del formulario.
+        }
+
         if (!validateAllCartItems()) {
             alert('Por favor, corrija los errores en el carrito de servicios antes de continuar.');
             return;

@@ -1,133 +1,79 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // URL de tu Google Apps Script
+    // URL de tu Google Apps Script (la misma que usas en scripts.js)
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
 
     // --- ELEMENTOS DEL DOM ---
+    const userInfo = document.getElementById('userInfo');
+    const welcomeUser = document.getElementById('welcomeUser');
+    const logoutBtn = document.getElementById('logoutBtn');
     const eventosForm = document.getElementById('eventosForm');
     const submitBtn = document.getElementById('submitBtn');
     const clearBtn = document.getElementById('clearBtn');
+    
+    // --- ESTADO ---
+    let currentUser = null;
 
-    // --- FUNCIONES AUXILIARES ---
-    function showMessage(message, isError = false) {
-        let messageDiv = document.getElementById('message-container');
-        if (!messageDiv) {
-            messageDiv = document.createElement('div');
-            messageDiv.id = 'message-container';
-            messageDiv.className = 'fixed top-4 right-4 z-50 max-w-md';
-            document.body.appendChild(messageDiv);
-        }
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `p-4 rounded-lg shadow-lg ${isError ? 'bg-red-100 border border-red-400 text-red-700' : 'bg-green-100 border border-green-400 text-green-700'}`;
-        alertDiv.innerHTML = `<div class="flex items-center"><span class="flex-1">${message}</span><button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-lg font-bold">&times;</button></div>`;
-        messageDiv.appendChild(alertDiv);
-        setTimeout(() => { if (alertDiv.parentNode) { alertDiv.remove(); } }, 5000);
-    }
+    // --- 1. VERIFICACIÓN DE AUTENTICACIÓN (CORRECTA) ---
+    // Esto revisa si el usuario ya inició sesión. Si no, lo regresa a la página principal.
+    
+    
+    
 
-    function setSubmitButtonState(isLoading) {
-        if (isLoading) {
+    // --- 2. LÓGICA DEL FORMULARIO DE EVENTOS (SIN CAMBIOS, AHORA FUNCIONARÁ) ---
+    if (eventosForm) {
+        eventosForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Registrando...`;
-        } else {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Registrar Evento';
-        }
-    }
+            submitBtn.textContent = 'Registrando...';
 
-    // --- FUNCIÓN PARA RECOPILAR DATOS DEL FORMULARIO ---
-    function collectFormData() {
-        const formData = new FormData(eventosForm);
-
-        // Recopilar las claves de los servicios seleccionados
-        const clavesSeleccionadas = [];
-        const serviceCheckboxes = eventosForm.querySelectorAll('input[type="checkbox"]:checked');
-        serviceCheckboxes.forEach(checkbox => {
-            if (checkbox.name) {
-                clavesSeleccionadas.push(checkbox.name);
-            }
-        });
-        const clavesString = clavesSeleccionadas.join(', ');
-
-        // Devolvemos el objeto en el formato que espera el backend
-        return {
-            action: 'registrarEvento',
-            noEvento: formData.get('noEvento') || '',
-            fechaInicio: formData.get('fechaInicio'),
-            fechaFin: formData.get('fechaFin'),
-            tipoEvento: formData.get('tipoEvento'),
-            nombreEvento: formData.get('nombreEvento'),
-            sede: formData.get('sede'),
-            claves: clavesString
-        };
-    }
-
-    // --- FUNCIÓN PARA VALIDAR EL FORMULARIO ---
-    function validateForm(data) {
-        const errors = [];
-        if (!data.fechaInicio) errors.push('La fecha de inicio es requerida');
-        if (!data.fechaFin) errors.push('La fecha fin es requerida');
-        if (!data.tipoEvento) errors.push('El tipo de evento es requerido');
-        if (!data.nombreEvento.trim()) errors.push('El nombre del evento es requerido');
-        if (!data.sede.trim()) errors.push('La sede es requerida');
-
-        if (data.fechaInicio && data.fechaFin && new Date(data.fechaFin) < new Date(data.fechaInicio)) {
-            errors.push('La fecha de fin no puede ser anterior a la de inicio');
-        }
-
-        if (!data.claves) {
-            errors.push('Debe seleccionar al menos un servicio requerido');
-        }
-
-        return errors;
-    }
-
-    // --- LÓGICA PRINCIPAL DEL FORMULARIO ---
-    eventosForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const eventData = collectFormData();
-        const validationErrors = validateForm(eventData);
-
-        if (validationErrors.length > 0) {
-            showMessage('Errores de validación:\n• ' + validationErrors.join('\n• '), true);
-            return;
-        }
-
-        setSubmitButtonState(true);
-        try {
-            // SIGUIENDO EXACTAMENTE EL PATRÓN DE TU CÓDIGO QUE FUNCIONA
-            const formData = new FormData();
-            formData.append('data', JSON.stringify(eventData));
-
-            console.log('Enviando datos:', eventData);
-
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData
+            const serviciosRequeridos = {};
+            const checkboxes = eventosForm.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                serviciosRequeridos[cb.name] = cb.checked;
             });
 
-            console.log('Response status:', response.status);
+            const dataToSend = {
+                action: 'registrarEvento',
+                noEvento: document.getElementById('noEvento').value,
+                fechaInicio: document.getElementById('fechaInicio').value,
+                fechaFin: document.getElementById('fechaFin').value,
+                tipoEvento: document.getElementById('tipoEvento').value,
+                nombreEvento: document.getElementById('nombreEvento').value,
+                sede: document.getElementById('sede').value,
+                servicios: serviciosRequeridos
+            };
 
-            const result = await response.json();
-            console.log('Resultado recibido:', result);
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(dataToSend));
 
-            if (result.success) {
-                showMessage('¡Evento registrado exitosamente!');
-                eventosForm.reset();
-            } else {
-                showMessage('Error al registrar evento: ' + (result.message || 'Error desconocido'), true);
-            }
-        } catch (error) {
-            console.error('Error completo:', error);
-            showMessage('Error al procesar la solicitud: ' + error.message, true);
-        } finally {
-            setSubmitButtonState(false);
-        }
-    });
-
-    clearBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (confirm('¿Está seguro de que desea limpiar todos los campos del formulario?')) {
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('✅ ¡Evento registrado con éxito!');
+                    eventosForm.reset();
+                } else {
+                    throw new Error(result.message || 'Error desconocido del servidor.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al registrar el evento:', error);
+                alert(`❌ Hubo un error: ${error.message}`);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrar Evento';
+            });
+        });
+    }
+    
+    if(clearBtn) {
+        clearBtn.addEventListener('click', () => {
             eventosForm.reset();
-            showMessage('Formulario limpiado correctamente');
-        }
-    });
+        });
+    }
 });

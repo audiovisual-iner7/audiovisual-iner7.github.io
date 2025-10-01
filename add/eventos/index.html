@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Eventos - Oficina de Audiovisual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --brand-color: #003C7D;
+            --brand-color-light: #0056b3;
+        }
+        .bg-brand { background-color: var(--brand-color); }
+        .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
+        .border-brand { border-color: var(--brand-color); }
+        .text-brand { color: var(--brand-color); }
+        .header-logo { height: 50px; width: auto; max-width: 137px; object-fit: contain; }
+        .header-content { display: flex; align-items: center; gap: 1rem; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-brand shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="header-content">
+                <a href="index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
+                <div class="flex-1">
+                    <a href="index.html"><h1 class="text-2xl font-bold text-white">Panel de Administración - Oficina de Audiovisual</h1></a>
+                </div>
+                <div id="userInfo" class="text-white text-sm">
+                    <span id="welcomeUser"></span>
+                    <button id="logoutBtn" class="ml-4 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Registrar Nuevo Evento</h2>
+                
+                <form id="eventosForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="noEvento" class="block text-sm font-medium text-gray-700">No. Evento (Opcional)</label>
+                            <input type="text" id="noEvento" name="noEvento" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="fechaInicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio <span class="text-red-500">*</span></label>
+                            <input type="date" id="fechaInicio" name="fechaInicio" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="fechaFin" class="block text-sm font-medium text-gray-700">Fecha Fin <span class="text-red-500">*</span></label>
+                            <input type="date" id="fechaFin" name="fechaFin" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="tipoEvento" class="block text-sm font-medium text-gray-700">Tipo de Evento <span class="text-red-500">*</span></label>
+                            <select id="tipoEvento" name="tipoEvento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Seleccione una opción</option>
+                                <option value="CEREMONIAS">CEREMONIAS</option>
+                                <option value="CIENI">CIENI</option>
+                                <option value="CONGRESO">CONGRESO</option>
+                                <option value="CURSO MONOGRAFICO">CURSO MONOGRAFICO</option>
+                                <option value="JORNADAS DE ENFERMERIA">JORNADAS DE ENFERMERIA</option>
+                                <option value="JORNADAS DE QUIMICOS">JORNADAS DE QUÍMICOS</option>
+                                <option value="JORNADAS DE TRABAJO SOCIAL">JORNADAS DE TRABAJO SOCIAL</option>
+                                <option value="JORNADAS MEDICAS">JORNADAS MÉDICAS</option>
+                                <option value="OTROS">OTROS</option>
+                                <option value="SEMINARIO INER">SEMINARIO INER</option>
+                                <option value="SESION DE ENFERMERIA">SESIÓN DE ENFERMERÍA</option>
+                                <option value="SESION GENERAL">SESIÓN GENERAL</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="sede" class="block text-sm font-medium text-gray-700">Sede <span class="text-red-500">*</span></label>
+                            <input type="text" id="sede" name="sede" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="nombreEvento" class="block text-sm font-medium text-gray-700">Nombre del Evento <span class="text-red-500">*</span></label>
+                        <input type="text" id="nombreEvento" name="nombreEvento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Servicios Requeridos (Claves)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 p-4 border rounded-md bg-gray-50 max-h-64 overflow-y-auto">
+                            <div class="flex items-center"><input type="checkbox" name="S1" class="h-4 w-4"><label class="ml-2 text-sm">S1 - CARTEL IMPRESIÓN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S2" class="h-4 w-4"><label class="ml-2 text-sm">S2 - CARTEL REVISTA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S3" class="h-4 w-4"><label class="ml-2 text-sm">S3 - POSTAL DE DIFUSIÓN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S4" class="h-4 w-4"><label class="ml-2 text-sm">S4 - REEL DE VIDEO DEL EVENTO</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S5" class="h-4 w-4"><label class="ml-2 text-sm">S5 - ENCABEZADO FORMULARIOS</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S6" class="h-4 w-4"><label class="ml-2 text-sm">S6 - PROGRAMA: PORTADA E INTERIOR</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S7" class="h-4 w-4"><label class="ml-2 text-sm">S7 - BANNER VERTICAL PODIUM</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S8" class="h-4 w-4"><label class="ml-2 text-sm">S8 - PROGRAMA PANTALLA LOBBY</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S9" class="h-4 w-4"><label class="ml-2 text-sm">S9 - CORTINILLA GENERAL</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S10" class="h-4 w-4"><label class="ml-2 text-sm">S10 - COORTINILLA ANIMADA GENERAL</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S11" class="h-4 w-4"><label class="ml-2 text-sm">S11 - CORTINILLA ASISTENCIA SESIÓN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S12" class="h-4 w-4"><label class="ml-2 text-sm">S12 - CORTINILLA INSCRIPCIÓN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S13" class="h-4 w-4"><label class="ml-2 text-sm">S13 - CORTINILLA ASISTENCIA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S14" class="h-4 w-4"><label class="ml-2 text-sm">S14 - CORTINILLA EVALUACIÓN DE CALIDAD</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S15" class="h-4 w-4"><label class="ml-2 text-sm">S15 - CORTINILLA GRADUADOS</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S16" class="h-4 w-4"><label class="ml-2 text-sm">S16 - SUPERS SESIÓN GENERAL Y ENF.</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S17" class="h-4 w-4"><label class="ml-2 text-sm">S17 - SUPERS ORDEN DEL DIA INAUG. Y CLAUSURA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S18" class="h-4 w-4"><label class="ml-2 text-sm">S18 - SUPERS PROGRAMA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S19" class="h-4 w-4"><label class="ml-2 text-sm">S19 - QR BANDERÍN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S20" class="h-4 w-4"><label class="ml-2 text-sm">S20 - QR ASISTENCIA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S21" class="h-4 w-4"><label class="ml-2 text-sm">S21 - QR SESIÓN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S22" class="h-4 w-4"><label class="ml-2 text-sm">S22 - QR INSCRIPCIÓN</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S23" class="h-4 w-4"><label class="ml-2 text-sm">S23 - QR EVALUACION DE CALIDAD</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S24" class="h-4 w-4"><label class="ml-2 text-sm">S24 - DOC. DE PREGUNTAS Y COMENTARIOS</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S25" class="h-4 w-4"><label class="ml-2 text-sm">S25 - FLECHAS</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S26" class="h-4 w-4"><label class="ml-2 text-sm">S26 - SEÑALETICA Y QR PARA TALLERES</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S27" class="h-4 w-4"><label class="ml-2 text-sm">S27 - FORMATO TRABAJO LIBRES</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S28" class="h-4 w-4"><label class="ml-2 text-sm">S28 - VIDEO INTRO DE PROTECCIÓN CIVIL</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S29" class="h-4 w-4"><label class="ml-2 text-sm">S29 - TRANSMISION EN YOUTUBE</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S30" class="h-4 w-4"><label class="ml-2 text-sm">S30 - TRANSMISION ZOOM</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S31" class="h-4 w-4"><label class="ml-2 text-sm">S31 - TRAMSMITIR INSTAGRAM Y FACEBOOK</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S32" class="h-4 w-4"><label class="ml-2 text-sm">S32 - APOYO TÉCNICO</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S33" class="h-4 w-4"><label class="ml-2 text-sm">S33 - MANUAL DE EXPOSITORES</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S34" class="h-4 w-4"><label class="ml-2 text-sm">S34 - MAPA DE DISTRIBUCION DE TALLERES</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S35" class="h-4 w-4"><label class="ml-2 text-sm">S35 - PLANTILLA DE PRESENTACIONES</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S36" class="h-4 w-4"><label class="ml-2 text-sm">S36 - GAFETES</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S37" class="h-4 w-4"><label class="ml-2 text-sm">S37 - MOSCA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S38" class="h-4 w-4"><label class="ml-2 text-sm">S38 - VIDEOS SALA DE ESPERA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S39" class="h-4 w-4"><label class="ml-2 text-sm">S39 - VIDEO CUENTA REGRESIVA</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S40" class="h-4 w-4"><label class="ml-2 text-sm">S40 - PROGRAMACIÓN ZOOM</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S41" class="h-4 w-4"><label class="ml-2 text-sm">S41 - ENCABEZADO DE ZOOM</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S42" class="h-4 w-4"><label class="ml-2 text-sm">S42 - FONDOS DE PANTALLA, VIRTUAL Y OBS</label></div>
+                            <div class="flex items-center"><input type="checkbox" name="S43" class="h-4 w-4"><label class="ml-2 text-sm">S43 - CORTINILLA RECESOS</label></div>
+                        </div>
+                    </div>
+
+
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" id="submitBtn" class="flex-1 bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
+                            Registrar Evento
+                        </button>
+                        <button type="button" id="clearBtn" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 mt-12">
+        <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="./eventos.js"></script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,36 +10,61 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    body { font-family: 'Inter', sans-serif; }
-    :root {
-    --brand-color: #003C7D;
-    --brand-color-light: #0056b3;
-    }
-    .bg-brand { background-color: var(--brand-color); }
-    .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
-    .text-brand { color: var(--brand-color); }
-    .header-logo { height: 50px; width: auto; max-width: 137px; object-fit: contain; }
-    .task-card {
-    border-left-width: 4px;
-    transition: all 0.2s ease-in-out;
-    }
-    .task-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --brand-color: #003C7D;
+            --brand-color-light: #0056b3;
+        }
+
+        .bg-brand {
+            background-color: var(--brand-color);
+        }
+
+        .hover\:bg-brand-light:hover {
+            background-color: var(--brand-color-light);
+        }
+
+        .text-brand {
+            color: var(--brand-color);
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            max-width: 137px;
+            object-fit: contain;
+        }
+
+        .task-card {
+            border-left-width: 4px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
     <header class="bg-brand shadow-md sticky top-0 z-10">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <a href="index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
-                <a href="dashboard.html"><h1 class="text-xl md:text-2xl font-bold text-white">Dashboard de Pendientes</h1></a>
+                <a href="index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional"
+                        class="header-logo"></a>
+                <a href="dashboard.html">
+                    <h1 class="text-xl md:text-2xl font-bold text-white">Dashboard de Pendientes</h1>
+                </a>
             </div>
             <div class="relative" id="navMenu">
-                <a href="index.html" class="inline-flex items-center gap-x-1.5 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-light">
-                Volver al Panel
+                <a href="index.html"
+                    class="inline-flex items-center gap-x-1.5 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-light">
+                    Volver al Panel
                 </a>
             </div>
         </div>
@@ -46,126 +72,257 @@
 
     <main class="container mx-auto p-4 md:p-8">
 
-        
-       
 
-    <div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Registrar Nuevo Evento</h2>
-    
-    <form id="eventosForm" class="space-y-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div>
-    <label for="noEvento" class="block text-sm font-medium text-gray-700">No. Evento (Opcional)</label>
-    <input type="text" id="noEvento" name="noEvento" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
-    </div>
-    <div>
-    <label for="fechaInicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio <span class="text-red-500">*</span></label>
-    <input type="date" id="fechaInicio" name="fechaInicio" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
-    </div>
-    <div>
-    <label for="fechaFin" class="block text-sm font-medium text-gray-700">Fecha Fin <span class="text-red-500">*</span></label>
-    <input type="date" id="fechaFin" name="fechaFin" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
-    </div>
-    </div>
 
-    <div>
-    <label for="tipoEvento" class="block text-sm font-medium text-gray-700">Tipo de Evento <span class="text-red-500">*</span></label>
-    <select id="tipoEvento" name="tipoEvento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
-    <option value="">Seleccione una opción</option>
-    <option value="SESION_GENERAL">SESIÓN GENERAL</option>
-    <option value="SESION_ENFERMERIA">SESIÓN DE ENFERMERÍA</option>
-    <option value="CIENI">CIENI</option>
-    <option value="EDUCACION">EDUCACIÓN PARA LA SALUD</option>
-    <option value="SEMINARIO_INER">SEMINARIO INER</option>
-    <option value="CEREMONIAS">CEREMONIAS</option>
-    <option value="OTROS">OTROS</option>
-    </select>
-    </div>
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">Registrar Nuevo Evento</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-    <label for="nombreEvento" class="block text-sm font-medium text-gray-700">Nombre del Evento <span class="text-red-500">*</span></label>
-    <input type="text" id="nombreEvento" name="nombreEvento" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
-    </div>
-    <div>
-    <label for="sede" class="block text-sm font-medium text-gray-700">Sede <span class="text-red-500">*</span></label>
-    <select id="sede" name="sede" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
-    <option value="">Seleccione una sede</option>
-    <option value="AUD.RÉBORA">AUD.RÉBORA</option>
-    <option value="AUD. DONATO">AUD. DONATO</option>
-    <option value="AUD. JIMENEZ">AUD. JIMENEZ</option>
-    <option value="EXPLANADA">EXPLANADA</option>
-    <option value="SALA DE PROFESORES 1">SALA DE PROFESORES 1</option>
-    <option value="SALA DE PROFESORES 2">SALA DE PROFESORES 2</option>
-    <option value="SALA DE PROFESORES 3">SALA DE PROFESORES 3</option>
-    <option value="ONLINE">ONLINE</option>
-    <option value="OTRO">OTRO</option>
-    </select>
-    </div>
-    </div>
-    </div>
+                <form id="eventosForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="noEvento" class="block text-sm font-medium text-gray-700">No. Evento
+                                (Opcional)</label>
+                            <input type="text" id="noEvento" name="noEvento"
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="fechaInicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio
+                                <span class="text-red-500">*</span></label>
+                            <input type="date" id="fechaInicio" name="fechaInicio" required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="fechaFin" class="block text-sm font-medium text-gray-700">Fecha Fin <span
+                                    class="text-red-500">*</span></label>
+                            <input type="date" id="fechaFin" name="fechaFin" required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                    </div>
 
-    <div>
-    <div class="flex items-center justify-between mb-3">
-        <label class="block text-sm font-medium text-gray-700">Servicios Requeridos</label>
-        <div class="flex items-center gap-4">
-            <div class="flex items-center">
-                <input type="checkbox" id="selectAllServices" class="h-4 w-4 text-brand focus:ring-brand border-gray-300 rounded">
-                <label for="selectAllServices" class="ml-2 text-sm font-medium text-gray-700">Seleccionar todos</label>
+                    <div>
+                        <label for="tipoEvento" class="block text-sm font-medium text-gray-700">Tipo de Evento <span
+                                class="text-red-500">*</span></label>
+                        <select id="tipoEvento" name="tipoEvento" required
+                            class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Seleccione una opción</option>
+                            <option value="SESION_GENERAL">SESIÓN GENERAL</option>
+                            <option value="SESION_ENFERMERIA">SESIÓN DE ENFERMERÍA</option>
+                            <option value="CIENI">CIENI</option>
+                            <option value="EDUCACION">EDUCACIÓN PARA LA SALUD</option>
+                            <option value="SEMINARIO_INER">SEMINARIO INER</option>
+                            <option value="CEREMONIAS">CEREMONIAS</option>
+                            <option value="OTROS">OTROS</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="nombreEvento" class="block text-sm font-medium text-gray-700">Nombre del Evento
+                                <span class="text-red-500">*</span></label>
+                            <input type="text" id="nombreEvento" name="nombreEvento" required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label for="sede" class="block text-sm font-medium text-gray-700">Sede <span
+                                    class="text-red-500">*</span></label>
+                            <select id="sede" name="sede" required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Seleccione una sede</option>
+                                <option value="AUD.RÉBORA">AUD.RÉBORA</option>
+                                <option value="AUD. DONATO">AUD. DONATO</option>
+                                <option value="AUD. JIMENEZ">AUD. JIMENEZ</option>
+                                <option value="EXPLANADA">EXPLANADA</option>
+                                <option value="SALA DE PROFESORES 1">SALA DE PROFESORES 1</option>
+                                <option value="SALA DE PROFESORES 2">SALA DE PROFESORES 2</option>
+                                <option value="SALA DE PROFESORES 3">SALA DE PROFESORES 3</option>
+                                <option value="ONLINE">ONLINE</option>
+                                <option value="OTRO">OTRO</option>
+                            </select>
+                        </div>
+                    </div>
             </div>
-            <div id="service-counter" class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                0 servicios seleccionados
+
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Servicios Requeridos</label>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="selectAllServices"
+                                class="h-4 w-4 text-brand focus:ring-brand border-gray-300 rounded">
+                            <label for="selectAllServices" class="ml-2 text-sm font-medium text-gray-700">Seleccionar
+                                todos</label>
+                        </div>
+                        <div id="service-counter" class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                            0 servicios seleccionados
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 p-4 border rounded-md bg-gray-50"
+                    id="servicesContainer">
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S1"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CARTEL IMPRESIÓN</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S2"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">POSTAL DE DIFUSIÓN</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S3"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">REEL DE VIDEO DEL
+                            EVENTO</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S4"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">ENCABEZADO FORMULARIOS</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S5"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">PROGRAMA: PORTADA E
+                            INTERIOR</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S6"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">BANNER VERTICAL PODIUM</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S7"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">PROGRAMA PANTALLA LOBBY</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S8"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA GENERAL</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S9"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA ANIMADA
+                            GENERAL</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S10"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA ASISTENCIA</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S11"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA INSCRIPCIÓN Y EVAL.
+                            INICIAL</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S12"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA EVAL. CALIDAD Y
+                            CONOCIMIENTOS</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S13"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">SUPERS SESIÓN GENERAL Y
+                            ENF.</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S14"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">SUPERS ORDEN DEL DIA INAUG. Y
+                            CLAUSURA</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S15"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">SUPERS PROGRAMA</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S16"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR BANDERÍN</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S17"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR SESIÓN</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S18"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR INSCRIPCIÓN Y EVAL.
+                            INICIAL</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S19"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR EVAL. CALIDAD Y
+                            CONOCIMIENTOS</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S20"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DOC. PREGUNTAS
+                            (SESIONES)</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S21"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DOC. PREGUNTAS (EVENTO)</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S22"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">VIDEO INTRO DE PROTECCIÓN
+                            CIVIL</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S23"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA DE PRÓXIMOS
+                            EVENTOS</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S24"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">TRANSMISIÓN EN YOUTUBE</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S25"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">TRANSMISIÓN ZOOM</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S26"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">APOYO TÉCNICO</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S27"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">GRABACIÓN DE AUDIO</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S28"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">GRABACIÓN DE VIDEO</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S29"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">EDICIÓN DE VIDEO</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S30"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">FOTOGRAFÍA DEL EVENTO</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S31"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">EDICIÓN DE FOTOGRAFÍAS</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S32"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DISEÑO DE GAFETES</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S33"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">IMPRESIÓN DE GAFETES</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S34"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DISEÑO DE DIPLOMAS</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S35"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">IMPRESIÓN DE DIPLOMAS</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S36"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DISEÑO DE CONSTANCIAS</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S37"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">IMPRESIÓN DE
+                            CONSTANCIAS</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S38"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DISEÑO DE INVITACIONES</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S39"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">IMPRESIÓN DE
+                            INVITACIONES</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S40"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DISEÑO DE BANNERS</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S41"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">IMPRESIÓN DE BANNERS</label>
+                    </div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S42"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA INICIO</label></div>
+                    <div class="flex items-center"><input type="checkbox" name="servicios" value="S43"
+                            class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA RECESOS</label>
+                    </div>
+                </div>
             </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" id="submitBtn"
+                    class="flex-1 bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
+                    Registrar Evento
+                </button>
+                <button type="button" id="clearBtn"
+                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    Limpiar
+                </button>
+            </div>
+            </form>
         </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 p-4 border rounded-md bg-gray-50" id="servicesContainer">
-    <div class="flex items-center"><input type="checkbox" name="CARTEL" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CARTEL</label></div>
-    <div class="flex items-center"><input type="checkbox" name="POSTAL_DIFUSION" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">POSTAL DE DIFUSIÓN</label></div>
-    <div class="flex items-center"><input type="checkbox" name="REEL_VIDEO" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">REEL DE VIDEO DEL EVENTO</label></div>
-    <div class="flex items-center"><input type="checkbox" name="ENCABEZADO_FORMULARIOS" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">ENCABEZADO FORMULARIOS</label></div>
-    <div class="flex items-center"><input type="checkbox" name="PROGRAMA_PORTADA_INTERIOR" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">PROGRAMA: PORTADA E INTERIOR</label></div>
-    <div class="flex items-center"><input type="checkbox" name="BANNER_VERTICAL_PODIUM" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">BANNER VERTICAL PODIUM</label></div>
-    <div class="flex items-center"><input type="checkbox" name="PROGRAMA_PANTALLA_LOBBY" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">PROGRAMA PANTALLA LOBBY</label></div>
-    <div class="flex items-center"><input type="checkbox" name="CORTINILLA_GENERAL" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA GENERAL</label></div>
-    <div class="flex items-center"><input type="checkbox" name="CORTINILLA_ANIMADA_GENERAL" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA ANIMADA GENERAL</label></div>
-    <div class="flex items-center"><input type="checkbox" name="CORTINILLA_ASISTENCIA" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA ASISTENCIA</label></div>
-    <div class="flex items-center"><input type="checkbox" name="CORTINILLA_INSCRIPCION_EVAL_INICIAL" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA INSCRIPCIÓN Y EVAL. INICIAL</label></div>
-    <div class="flex items-center"><input type="checkbox" name="CORTINILLA_EVAL_CALIDAD_CONOCIMIENTOS" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA EVAL. CALIDAD Y CONOCIMIENTOS</label></div>
-    <div class="flex items-center"><input type="checkbox" name="SUPERS_SESION_GENERAL" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">SUPERS SESIÓN GENERAL Y ENF.</label></div>
-    <div class="flex items-center"><input type="checkbox" name="SUPERS_ORDEN_DIA" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">SUPERS ORDEN DEL DIA INAUG. Y CLAUSURA</label></div>
-    <div class="flex items-center"><input type="checkbox" name="SUPERS_PROGRAMA" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">SUPERS PROGRAMA</label></div>
-    <div class="flex items-center"><input type="checkbox" name="QR_BANDERIN" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR BANDERÍN</label></div>
-    <div class="flex items-center"><input type="checkbox" name="QR_SESION" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR SESIÓN</label></div>
-    <div class="flex items-center"><input type="checkbox" name="QR_INSCRIPCION_EVAL_INICIAL" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR INSCRIPCIÓN Y EVAL. INICIAL</label></div>
-    <div class="flex items-center"><input type="checkbox" name="QR_EVAL_CALIDAD_CONOCIMIENTOS" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">QR EVAL. CALIDAD Y CONOCIMIENTOS</label></div>
-    <div class="flex items-center"><input type="checkbox" name="DOC_PREGUNTAS_SESIONES" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DOC. PREGUNTAS (SESIONES)</label></div>
-    <div class="flex items-center"><input type="checkbox" name="DOC_PREGUNTAS_EVENTO" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">DOC. PREGUNTAS (EVENTO)</label></div>
-    <div class="flex items-center"><input type="checkbox" name="VIDEO_INTRO_PC" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">VIDEO INTRO DE PROTECCIÓN CIVIL</label></div>
-    <div class="flex items-center"><input type="checkbox" name="CORTINILLA_PROX_EVENTOS" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">CORTINILLA DE PRÓXIMOS EVENTOS</label></div>
-    <div class="flex items-center"><input type="checkbox" name="TRANSMISION_YOUTUBE" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">TRANSMISIÓN EN YOUTUBE</label></div>
-    <div class="flex items-center"><input type="checkbox" name="TRANSMISION_ZOOM" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">TRANSMISIÓN ZOOM</label></div>
-    <div class="flex items-center"><input type="checkbox" name="APOYO_TECNICO" class="h-4 w-4 service-checkbox"><label class="ml-2 text-sm">APOYO TÉCNICO</label></div>
-    </div>
-    </div>
-
-    <div class="flex gap-4 pt-4">
-    <button type="submit" id="submitBtn" class="flex-1 bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light transition-colors">
-    Registrar Evento
-    </button>
-    <button type="button" id="clearBtn" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-    Limpiar
-    </button>
-    </div>
-    </form>
-    </div>
-    </div>
+        </div>
     </main>
 
     <footer class="bg-gray-800 text-white text-center p-4 mt-12">
-    <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
     </footer>
 
     <script src="./eventos.js"></script>
+    <script>
+        // Script para contar servicios seleccionados
+        document.addEventListener('DOMContentLoaded', function () {
+            const serviceCounter = document.getElementById('service-counter');
+            const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+
+            function updateCounter() {
+                const selectedCount = document.querySelectorAll('.service-checkbox:checked').length;
+                serviceCounter.textContent = `${selectedCount} servicios seleccionados`;
+                console.log('📊 Servicios seleccionados:', selectedCount);
+            }
+
+            // Agregar event listener a cada checkbox
+            serviceCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateCounter);
+            });
+
+            // Actualizar contador inicial
+            updateCounter();
+        });
+    </script>
 </body>
+
 </html>

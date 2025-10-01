@@ -21,59 +21,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- 2. LÓGICA DEL FORMULARIO DE EVENTOS (SIN CAMBIOS, AHORA FUNCIONARÁ) ---
     if (eventosForm) {
-        eventosForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Registrando...';
+    eventosForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Registrando...';
 
-            const serviciosRequeridos = {};
-            const checkboxes = eventosForm.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                serviciosRequeridos[cb.name] = cb.checked;
-            });
+    // Obtener solo los checkboxes seleccionados usando el selector que funciona
+    const checkboxesSeleccionados = document.querySelectorAll('.service-checkbox:checked');
+    const serviciosSeleccionados = [];
+    
+    checkboxesSeleccionados.forEach(cb => {
+        if (cb.value) {
+            serviciosSeleccionados.push(cb.value);
+        }
+    });
+    
+    // Crear string con las claves separadas por espacios
+    const serviciosString = serviciosSeleccionados.join(' ');
 
-            const dataToSend = {
-                action: 'registrarEvento',
-                noEvento: document.getElementById('noEvento').value,
-                fechaInicio: document.getElementById('fechaInicio').value,
-                fechaFin: document.getElementById('fechaFin').value,
-                tipoEvento: document.getElementById('tipoEvento').value,
-                nombreEvento: document.getElementById('nombreEvento').value,
-                sede: document.getElementById('sede').value,
-                servicios: serviciosRequeridos
-            };
+    const dataToSend = {
+    action: 'registrarEvento',
+    noEvento: document.getElementById('noEvento').value,
+    fechaInicio: document.getElementById('fechaInicio').value,
+    fechaFin: document.getElementById('fechaFin').value,
+    tipoEvento: document.getElementById('tipoEvento').value,
+    nombreEvento: document.getElementById('nombreEvento').value,
+    sede: document.getElementById('sede').value,
+    servicios: serviciosString
+    };
+    
+    // Log para debugging
+    console.log('Servicios seleccionados:', serviciosSeleccionados);
+    console.log('String de servicios:', serviciosString);
 
-            const formData = new FormData();
-            formData.append('data', JSON.stringify(dataToSend));
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(dataToSend));
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    alert('✅ ¡Evento registrado con éxito!');
-                    eventosForm.reset();
-                } else {
-                    throw new Error(result.message || 'Error desconocido del servidor.');
-                }
-            })
-            .catch(error => {
-                console.error('Error al registrar el evento:', error);
-                alert(`❌ Hubo un error: ${error.message}`);
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Registrar Evento';
-            });
-        });
+    fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+    if (result.success) {
+    alert('✅ ¡Evento registrado con éxito!');
+    eventosForm.reset();
+    } else {
+    throw new Error(result.message || 'Error desconocido del servidor.');
+    }
+    })
+    .catch(error => {
+    console.error('Error al registrar el evento:', error);
+    alert(`❌ Hubo un error: ${error.message}`);
+    })
+    .finally(() => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Registrar Evento';
+    });
+    });
     }
     
     if(clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            eventosForm.reset();
-        });
+    clearBtn.addEventListener('click', () => {
+    eventosForm.reset();
+    });
     }
 });

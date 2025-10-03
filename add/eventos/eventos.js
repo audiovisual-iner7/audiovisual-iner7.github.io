@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 tipoEvento: document.getElementById('tipoEvento').value,
                 nombreEvento: document.getElementById('nombreEvento').value,
                 sede: document.getElementById('sede').value,
-                servicios: serviciosString
+                servicios: serviciosString,
+                comentarios: document.getElementById('comentarios').value 
             };
             
             // Log para debugging

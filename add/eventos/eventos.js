@@ -13,10 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- ESTADO ---
     let currentUser = null;
 
-    // --- 1. VERIFICACIÓN DE AUTENTICACIÓN (CORRECTA) ---
-    // Esto revisa si el usuario ya inició sesión. Si no, lo regresa a la página principal.
-
-
 
 
     // --- 2. LÓGICA DEL FORMULARIO DE EVENTOS (SIN CAMBIOS, AHORA FUNCIONARÁ) ---

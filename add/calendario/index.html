@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Eventos - Oficina de Audiovisual</title>
+    <title>Dashboard de Eventos - Audiovisual</title> 
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,108 +14,190 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-
         :root {
             --brand-color: #003C7D;
             --brand-color-light: #0056b3;
+            --brand-color-dark: #002a59;
+        }
+        .bg-brand { background-color: var(--brand-color); }
+        .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
+        .border-brand { border-color: var(--brand-color); }
+        .text-brand { color: var(--brand-color); }
+
+        /* Ocultar elementos inicialmente (Copiado del Panel de Admin) */
+        #adminPanel {
+            display: none;
+        }
+        
+        /* Animación suave para mostrar el panel (Copiado del Panel de Admin) */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .bg-brand {
-            background-color: var(--brand-color);
-        }
-
-        .hover\:bg-brand-light:hover {
-            background-color: var(--brand-color-light);
-        }
-
-        .text-brand {
-            color: var(--brand-color);
-        }
-
+        /* Estilos del logo (Copiado del Panel de Admin) */
         .header-logo {
             height: 50px;
             width: auto;
             max-width: 137px;
             object-fit: contain;
         }
+        @media (max-width: 768px) {
+            .header-logo {
+                height: 40px;
+                max-width: 110px;
+            }
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
+        /* --- Estilos propios del Dashboard de Eventos --- */
+        
+        /* Estilos de la barra de progreso */
         .progress-bar-bg {
-            background-color: #e9ecef;
+            background-color: #e0e7ff; /* Azul muy claro */
         }
-
         .progress-bar-fill {
-            background-color: #28a745;
+            background-color: var(--brand-color); /* Color de marca */
+            transition: width 0.3s ease-in-out;
         }
 
+        /* Estilos para el acordeón de tarjetas */
         .card-details {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
+            transition: max-height 0.3s ease-out;
         }
     </style>
 </head>
+<body class="bg-gray-100">
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
-
-    <header class="bg-brand shadow-md sticky top-0 z-10">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <a href="../panel/index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional"
-                        class="header-logo"></a>
-                <h1 class="text-xl md:text-2xl font-bold text-white">Dashboard de Eventos</h1>
+    <header class="bg-brand shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="header-content">
+                <a href="index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a> 
+                <div class="flex-1">
+                    <a href="index.html"><h1 class="text-2xl font-bold text-white">Dashboard de Eventos</h1></a>
+                </div>
+                
+                <div class="relative" id="navMenu">
+                    <button id="menuBtn" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand focus:ring-white">
+                        <span>Menú</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    <div id="dropdownMenu" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-out duration-100"
+                        role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                        <div class="py-1" role="none">
+                            <a href="../panel/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">Inicio</a>
+                            <a href="../entrega/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">Entregar</a>
+                            <a href="../calendario/index.html" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-2">Eventos</a>
+                            <a href="../request/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-3">Solicitudes</a>
+                            <a href="../../sqr/index.html" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-4">QR's</a>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="userInfo" class="text-white text-sm hidden">
+                    <span id="welcomeUser"></span>
+                    <button id="logoutBtn" class="ml-4 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors">
+                        Cerrar Sesión
+                    </button>
+                </div>
             </div>
-            <a href="../eventos/index.html"
-                class="inline-flex items-center gap-x-1.5 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-light">
-                Registrar Evento
-            </a>
         </div>
     </header>
+    <!-- <main class="container max-w-full mx-auto p-4 md:p-8"> -->
+    <main class="container mx-auto p-4 md:p-8">
+        <div id="loginContainer" class="max-w-md mx-auto mt-20">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Dashboard de Eventos</h2>
+                    <p class="text-gray-600">Ingrese sus credenciales para continuar</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                        <input type="text" id="username" name="username" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+                               placeholder="Ingrese su usuario">
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                        <input type="password" id="password" name="password" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+                               placeholder="Ingrese su contraseña">
+                    </div>
+                    
+                    <div id="loginError" class="hidden text-red-600 text-sm text-center"></div>
+                    
+                    <button type="submit" id="loginBtn" 
+                            class="w-full bg-brand text-white font-bold py-3 px-4 rounded-lg hover:bg-brand-light transition-colors duration-300">
+                        <span id="loginBtnText">Iniciar Sesión</span>
+                        <div id="loginSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div id="adminPanel">
+            
+            <div class="bg-white rounded-xl shadow-lg p-4 mb-8 flex flex-wrap items-center gap-4">
+                
+                <label for="filtroMes" class="font-medium">Mes:</label>
+                <select id="filtroMes" class="border-gray-300 rounded-md"></select>
+                
+                <label for="filtroAnio" class="font-medium">Año:</label>
+                <select id="filtroAnio" class="border-gray-300 rounded-md"></select>
 
-    <main class="container mx-auto p-4 md:p-8 flex-grow">
-        <div class="bg-white rounded-xl shadow-lg p-4 mb-8 flex flex-wrap items-center gap-4">
-            
-            <label for="filtroMes" class="font-medium">Mes:</label>
-            <select id="filtroMes" class="border-gray-300 rounded-md"></select>
-            
-            <label for="filtroAnio" class="font-medium">Año:</label>
-            <select id="filtroAnio" class="border-gray-300 rounded-md"></select>
+                <label for="filtroTipo" class="font-medium">Tipo:</label>
+                <select id="filtroTipo" class="border-gray-300 rounded-md">
+                    <option value="todos">Todos</ok>
+                </select>
+                
+                <label for="filtroAsignado" class="font-medium">Asignado a:</label>
+                <select id="filtroAsignado" class="border-gray-300 rounded-md">
+                    <option value="todos">Todos</option>
+                </select>
+                
+                <label for="filtroSede" class="font-medium">Sede:</label>
+                <select id="filtroSede" class="border-gray-300 rounded-md">
+                    <option value="todos">Todos</option>
+                </select>
+                
+                <label for="filtroEstado" class="font-medium">Estado:</label>
+                <select id="filtroEstado" class="border-gray-300 rounded-md">
+                    <option value="todos">Todos</option>
+                    <option value="completados">Completados (100%)</option>
+                    <option value="pendientes">Pendientes</option>
+                </select>
 
-            <label for="filtroTipo" class="font-medium">Tipo:</label>
-            <select id="filtroTipo" class="border-gray-300 rounded-md">
-                <option value="todos">Todos</option>
-            </select>
+            </div>
+
+            <div id="loadingState" class="text-center py-10">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto mb-4"></div>
+                <p class="text-gray-600 text-lg">Cargando eventos...</p>
+            </div>
             
-            <label for="filtroAsignado" class="font-medium">Asignado a:</label>
-            <select id="filtroAsignado" class="border-gray-300 rounded-md">
-                <option value="todos">Todos</option>
-            </select>
-            
-            <label for="filtroSede" class="font-medium">Sede:</label>
-            <select id="filtroSede" class="border-gray-300 rounded-md">
-                <option value="todos">Todos</option>
-            </select>
-            
-            <label for="filtroEstado" class="font-medium">Estado:</label>
-            <select id="filtroEstado" class="border-gray-300 rounded-md">
-                <option value="todos">Todos</option>
-                <option value="completados">Completados (100%)</option>
-                <option value="pendientes">Pendientes</option>
-            </select>
+            <div id="eventosContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
 
         </div>
+        </main>
 
-        <div id="eventosContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        </div>
-        <div id="loadingState" class="text-center py-10 hidden">
-            <p class="text-gray-500">Cargando eventos...</p>
-        </div>
-    </main>
-
-    <footer class="bg-gray-800 text-white text-center p-4">
+    <footer class="bg-gray-800 text-white text-center p-4 mt-12">
         <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
     </footer>
-
     <script src="./dashboard.js"></script>
 </body>
-
 </html>

@@ -426,12 +426,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const adminUsers = ['DIANA', 'HILDING', 'GIOVANNY'];
         const existingAssignOption = document.getElementById('menu-item-assign');
+        const existingCreateEventOption =  document.getElementById('menu-item-event');
+        const existingDashboardOption =  document.getElementById('menu-item-dashboard');
 
         // Verificamos si hay un usuario logueado
         if (!currentUser) {
             // Si no hay usuario, nos aseguramos de que la opción de admin no esté
             if (existingAssignOption) {
                 existingAssignOption.remove();
+                existingCreateEventOption.remove();
+                existingDashboardOption.remove();
             }
             return;
         }
@@ -455,9 +459,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 assignOption.textContent = 'Asignar';
                 menuItemsContainer.appendChild(assignOption);
             }
+            if (!existingCreateEventOption) {
+                const eventOption = document.createElement('a');
+                eventOption.href = '../eventos/';
+                eventOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                eventOption.role = 'menuitem';
+                eventOption.tabindex = '-1';
+                eventOption.id = 'menu-item-assign';
+                eventOption.textContent = 'Crear Eventos';
+                menuItemsContainer.appendChild(eventOption);
+            }
+
+            if (!existingDashboardOption) {
+                const dashOption = document.createElement('a');
+                dashOption.href = '../dashboard/';
+                dashOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                dashOption.role = 'menuitem';
+                dashOption.tabindex = '-1';
+                dashOption.id = 'menu-item-assign';
+                dashOption.textContent = 'Registros Pendientes';
+                menuItemsContainer.appendChild(dashOption);
+            }       
+            
         } else {
             if (existingAssignOption) {
+
                 existingAssignOption.remove();
+                existingCreateEventOption.remove();
+                existingDashboardOption.remove();
             }
         }
     }

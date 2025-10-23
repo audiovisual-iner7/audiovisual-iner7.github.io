@@ -1,7 +1,21 @@
+/*
+ * =================================================================
+ * ARCHIVO JAVASCRIPT FUSIONADO (dashboard.js)
+ * Contiene:
+ * 1. Lógica de Sesión y Autenticación (de scripts.js)
+ * 2. Lógica del Menú de Navegación (de scripts.js)
+ * 3. Lógica del Dashboard de Eventos (de dashboard.js original)
+ * =================================================================
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
     
-    // El mapa de servicios no cambia
+    // --- 1. CONFIGURACIÓN GLOBAL Y URL ---
+    
+    // URL ÚNICA (la misma para ambas aplicaciones)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
+
+    // Mapa de Servicios (del dashboard.js original)
     const SERVICIOS_MAPA = {
         'S1': 'COORTINILLA ANIMADA GENERAL', 'S2': 'CORTINILLA ASISTENCIA SESIÓN GENERAL Y ENF',
         'S3': 'CORTINILLA INSCRIPCIÓN', 'S4': 'CORTINILLA ASISTENCIA',
@@ -26,26 +40,228 @@ document.addEventListener('DOMContentLoaded', function() {
         'S41': 'TRANSMISION ZOOM', 'S42': 'VIDEO CUENTA REGRESIVA',
         'S43': 'VIDEO INTRO DE PROTECCIÓN CIVIL', 'S44': 'VIDEOS SALA DE ESPERA'
     };
-    
 
+    // --- 2. ELEMENTOS DEL DOM (FUSIÓN) ---
+
+    // Elementos de Login y Sesión (de scripts.js)
+    const loginContainer = document.getElementById('loginContainer');
+    const adminPanel = document.getElementById('adminPanel'); // Este es ahora el contenedor del dashboard
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginBtnText = document.getElementById('loginBtnText');
+    const loginSpinner = document.getElementById('loginSpinner');
+    const loginError = document.getElementById('loginError');
+    const userInfo = document.getElementById('userInfo');
+    const welcomeUser = document.getElementById('welcomeUser');
+    const logoutBtn = document.getElementById('logoutBtn');
     
-    // --- ELEMENTOS DEL DOM ---
+    // Elementos del Menú (de scripts.js)
+    const menuBtn = document.getElementById('menuBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    // Elementos del Dashboard (de dashboard.js original)
     const mesSelect = document.getElementById('filtroMes');
     const anioSelect = document.getElementById('filtroAnio');
-    // Nuevos filtros
     const tipoSelect = document.getElementById('filtroTipo');
     const asignadoSelect = document.getElementById('filtroAsignado');
     const sedeSelect = document.getElementById('filtroSede');
     const estadoSelect = document.getElementById('filtroEstado');
-    
     const container = document.getElementById('eventosContainer');
     const loading = document.getElementById('loadingState');
 
-    // --- ESTADO ---
-    let allEventosDelMes = []; // Guardará todos los eventos del mes
+    // --- 3. ESTADO GLOBAL (FUSIÓN) ---
+    
+    let currentUser = null; // Para la sesión (de scripts.js)
+    let allEventosDelMes = []; // Para el dashboard (de dashboard.js original)
+
+    // --- 4. LÓGICA DE SESIÓN Y AUTENTICACIÓN (de scripts.js) ---
+    
+    // Comprobar la sesión al cargar la página
+    const savedUser = localStorage.getItem('adminUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showAdminPanelAndLoadEvents(); // Función modificada para arrancar el dashboard
+        setupDynamicMenu();
+    }
+
+    // Manejador del formulario de login
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showLoginError('Por favor, complete todos los campos.');
+                return;
+            }
+
+            setLoginLoading(true);
+            hideLoginError();
+
+            const dataToSend = {
+                action: 'login',
+                username: username,
+                password: password
+            };
+
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(dataToSend));
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentUser = {
+                        username: username,
+                        name: result.name || username
+                    };
+                    localStorage.setItem('adminUser', JSON.stringify(currentUser));
+                    showAdminPanelAndLoadEvents(); // Arranca el dashboard al loguearse
+                    setupDynamicMenu();
+                } else {
+                    showLoginError(result.message || 'Credenciales incorrectas.');
+                }
+            } catch (error) {
+                console.error('Error en login:', error);
+                showLoginError('Error de conexión o en la respuesta del servidor.');
+            } finally {
+                setLoginLoading(false);
+            }
+        });
+    }
+
+    // Manejador del botón de Logout
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('adminUser');
+            currentUser = null;
+            loginContainer.style.display = 'block';
+            adminPanel.style.display = 'none';
+            adminPanel.classList.remove('fade-in');
+            userInfo.classList.add('hidden');
+            loginForm.reset();
+        });
+    }
+
+    // Funciones auxiliares de UI de Login (de scripts.js)
+    function showLoginError(message) { loginError.textContent = message; loginError.classList.remove('hidden'); }
+    function hideLoginError() { loginError.classList.add('hidden'); }
+    function setLoginLoading(loading) { loginBtn.disabled = loading; loginBtnText.textContent = loading ? 'Iniciando...' : 'Iniciar Sesión'; loginSpinner.classList.toggle('hidden', !loading); }
 
     /**
-     * Función para llamar a Google Apps Script (sin cambios)
+     * NUEVA FUNCIÓN FUSIONADA
+     * Reemplaza a 'showAdminPanel' de scripts.js.
+     * Muestra el panel y, además, inicia la carga de eventos del dashboard.
+     */
+    function showAdminPanelAndLoadEvents() {
+        loginContainer.style.display = 'none';
+        adminPanel.style.display = 'block';
+        adminPanel.classList.add('fade-in'); // Añade la animación
+        userInfo.classList.remove('hidden');
+        welcomeUser.textContent = `Bienvenido, ${currentUser.name}`;
+
+        // Ahora que el panel es visible, inicializamos la lógica del dashboard
+        populateFilters(); // (de dashboard.js)
+        loadEvents(); // (de dashboard.js)
+    }
+
+    // --- 5. LÓGICA DEL MENÚ DE NAVEGACIÓN (de scripts.js) ---
+    
+    if (menuBtn && dropdownMenu) {
+        menuBtn.addEventListener('click', function(event) {
+            dropdownMenu.classList.toggle('hidden');
+            event.stopPropagation(); 
+        });
+
+        window.addEventListener('click', function(event) {
+            if (!dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    }
+
+    /**
+     * Configura el menú dinámicamente (de scripts.js)
+     * NOTA: La lógica de adminUsers se copia tal cual.
+     */
+    function setupDynamicMenu() {
+        const menuItemsContainer = document.querySelector('#dropdownMenu .py-1');
+        if (!menuItemsContainer) return;
+
+        // Esta lista de usuarios admin se trae de scripts.js
+        const adminUsers = ['DIANA', 'HILDING', 'GIOVANNY'];
+        const existingAssignOption = document.getElementById('menu-item-assign');
+        const existingCreateEventOption =  document.getElementById('menu-item-event');
+        const existingDashboardOption =  document.getElementById('menu-item-dashboard');
+
+        if (!currentUser) {
+            if (existingAssignOption) {
+                existingAssignOption.remove();
+                existingCreateEventOption.remove();
+                existingDashboardOption.remove();
+            }
+            return;
+        }
+        
+        const isAdmin = adminUsers.includes(currentUser.username.toUpperCase());
+        console.log(`Comprobando permisos para '${currentUser.username}'. ¿Es admin? ${isAdmin}`);
+
+        if (isAdmin) {
+            if (!existingAssignOption) {
+                const assignOption = document.createElement('a');
+                assignOption.href = '../admin/';
+                assignOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                assignOption.role = 'menuitem';
+                assignOption.tabindex = '-1';
+                assignOption.id = 'menu-item-assign';
+                assignOption.textContent = 'Asignar';
+                menuItemsContainer.appendChild(assignOption);
+            }
+            if (!existingCreateEventOption) {
+                const eventOption = document.createElement('a');
+                eventOption.href = '../eventos/';
+                eventOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                eventOption.role = 'menuitem';
+                eventOption.tabindex = '-1';
+                eventOption.id = 'menu-item-assign';
+                eventOption.textContent = 'Crear Eventos';
+                menuItemsContainer.appendChild(eventOption);
+            }
+
+            if (!existingDashboardOption) {
+                const dashOption = document.createElement('a');
+                dashOption.href = '../dashboard/';
+                dashOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
+                dashOption.role = 'menuitem';
+                dashOption.tabindex = '-1';
+                dashOption.id = 'menu-item-assign';
+                dashOption.textContent = 'Registros Pendientes';
+                menuItemsContainer.appendChild(dashOption);
+            }       
+            
+        } else {
+            if (existingAssignOption) {
+
+                existingAssignOption.remove();
+                existingCreateEventOption.remove();
+                existingDashboardOption.remove();
+            }
+        }
+    }
+
+    // --- 6. LÓGICA DEL DASHBOARD DE EVENTOS (del dashboard.js original) ---
+    // (Toda esta sección se pega sin cambios, ya que está contenida
+    // y solo se ejecuta si el usuario está logueado)
+
+    /**
+     * Función para llamar a Google Apps Script
      */
     function callGAS(action, data) {
         const formData = new FormData();
@@ -60,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Popula los filtros estáticos (Mes y Año) (sin cambios)
+     * Popula los filtros estáticos (Mes y Año)
      */
     function populateFilters() {
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -84,30 +300,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * MODIFICADO: Carga eventos del servidor
-     * Esta función AHORA solo obtiene los datos y los guarda.
-     * Luego llama a las funciones para popular filtros y renderizar.
+     * Carga eventos del servidor
      */
     function loadEvents() {
+        // Asegurarse de que los elementos existan antes de usarlos
+        if (!mesSelect || !anioSelect || !container || !loading) return;
+
         const mes = parseInt(mesSelect.value);
         const anio = parseInt(anioSelect.value);
         
         container.innerHTML = '';
         loading.classList.remove('hidden');
-        resetDynamicFilters(); // Limpia los filtros dinámicos
+        resetDynamicFilters(); 
 
         callGAS('getEventosDelMes', { mes, anio })
             .then(response => {
                 if (response.success) {
-                    allEventosDelMes = response.data || []; // Guarda la lista completa
-                    populateDynamicFilters(allEventosDelMes); // Popula los <select>
-                    applyFiltersAndRender(); // Filtra y muestra
+                    allEventosDelMes = response.data || []; 
+                    populateDynamicFilters(allEventosDelMes); 
+                    applyFiltersAndRender(); 
                 } else {
                     throw new Error(response.message || 'Error desconocido.');
                 }
             })
             .catch(error => {
-                allEventosDelMes = []; // Limpia en caso de error
+                allEventosDelMes = []; 
                 container.innerHTML = `<p class="text-red-500 col-span-full text-center">Error al cargar eventos: ${error.message}</p>`;
             })
             .finally(() => {
@@ -116,30 +333,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * NUEVA FUNCIÓN: Popula los filtros dinámicos (Tipo, Asignado, Sede)
-     * basado en los eventos cargados.
+     * Popula los filtros dinámicos (Tipo, Asignado, Sede)
      */
     function populateDynamicFilters(eventos) {
-        // Obtenemos valores únicos y los ordenamos
+        if (!tipoSelect || !asignadoSelect || !sedeSelect) return;
+
         const tipos = [...new Set(eventos.map(e => e.tipo))].sort();
         const asignados = [...new Set(eventos.map(e => e.asignadoA))].sort();
         const sedes = [...new Set(eventos.map(e => e.sede))].sort();
 
-        // Función helper para rellenar un <select>
         const populateSelect = (selectEl, items) => {
-            const currentValue = selectEl.value; // Guardar valor seleccionado (si existe)
-            selectEl.innerHTML = '<option value="todos">Todos</option>'; // Reset
+            const currentValue = selectEl.value; 
+            selectEl.innerHTML = '<option value="todos">Todos</option>'; 
             items.forEach(item => {
-                if (item) { // Evitar valores nulos o vacíos
+                if (item) { 
                     const option = document.createElement('option');
                     option.value = item;
                     option.textContent = item;
                     selectEl.appendChild(option);
                 }
             });
-            selectEl.value = currentValue; // Intentar restaurar el valor
+            selectEl.value = currentValue; 
             if (selectEl.selectedIndex === -1) {
-                selectEl.value = 'todos'; // Default si el valor ya no existe
+                selectEl.value = 'todos'; 
             }
         };
         
@@ -149,65 +365,48 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * NUEVA FUNCIÓN: Resetea los filtros dinámicos (usado al cambiar de mes)
+     * Resetea los filtros dinámicos
      */
     function resetDynamicFilters() {
+        if (!tipoSelect || !asignadoSelect || !sedeSelect || !estadoSelect) return;
         tipoSelect.innerHTML = '<option value="todos">Todos</option>';
         asignadoSelect.innerHTML = '<option value="todos">Todos</option>';
         sedeSelect.innerHTML = '<option value="todos">Todos</option>';
-        estadoSelect.value = 'todos'; // Resetear el de estado también
+        estadoSelect.value = 'todos'; 
     }
 
     /**
-     * NUEVA FUNCIÓN: Aplica TODOS los filtros (los nuevos) a la lista
-     * `allEventosDelMes` y luego llama a `renderEvents`.
+     * Aplica TODOS los filtros (los nuevos) a la lista
      */
     function applyFiltersAndRender() {
-        // Lee los valores de todos los filtros
+        if (!tipoSelect || !asignadoSelect || !sedeSelect || !estadoSelect) return;
+        
         const tipo = tipoSelect.value;
         const asignado = asignadoSelect.value;
         const sede = sedeSelect.value;
         const estado = estadoSelect.value;
 
-        // Filtra la lista de eventos guardada
         const filteredEventos = allEventosDelMes.filter(evento => {
-            // Filtro Tipo
-            if (tipo !== 'todos' && evento.tipo !== tipo) {
-                return false;
-            }
-            // Filtro Asignado A
-            if (asignado !== 'todos' && evento.asignadoA !== asignado) {
-                return false;
-            }
-            // Filtro Sede
-            if (sede !== 'todos' && evento.sede !== sede) {
-                return false;
-            }
-            // Filtro Estado
+            if (tipo !== 'todos' && evento.tipo !== tipo) return false;
+            if (asignado !== 'todos' && evento.asignadoA !== asignado) return false;
+            if (sede !== 'todos' && evento.sede !== sede) return false;
             if (estado !== 'todos') {
                 const progreso = evento.totalServicios > 0 ? (evento.serviciosEntregados / evento.totalServicios) : 1;
-                
-                if (estado === 'completados' && progreso < 1) { // < 1 porque 1 es 100%
-                    return false;
-                }
-                if (estado === 'pendientes' && progreso === 1) { // === 1 es 100%
-                    return false;
-                }
+                if (estado === 'completados' && progreso < 1) return false;
+                if (estado === 'pendientes' && progreso === 1) return false;
             }
-            return true; // Si pasa todos los filtros, se incluye
+            return true; 
         });
         
-        renderEvents(filteredEventos); // Renderiza solo los eventos filtrados
+        renderEvents(filteredEventos); 
     }
 
-
     /**
-     * MODIFICADO: Renderiza los eventos.
-     * Ahora limpia el contenedor al inicio y muestra un mensaje si
-     * la lista de (eventos filtrados) está vacía.
+     * Renderiza los eventos.
      */
     function renderEvents(eventos) {
-        container.innerHTML = ''; // Limpiar siempre antes de renderizar
+        if (!container) return;
+        container.innerHTML = ''; 
 
         if (!eventos || eventos.length === 0) {
             container.innerHTML = '<p class="text-gray-500 col-span-full text-center">No hay eventos que coincidan con los filtros seleccionados.</p>';
@@ -220,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Función para crear la tarjeta de evento (sin cambios)
+     * Función para crear la tarjeta de evento
      */
     function createEventCard(evento) {
         const progreso = evento.totalServicios > 0 ? (evento.serviciosEntregados / evento.totalServicios) * 100 : 100;
@@ -265,7 +464,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // Lógica del acordeón (sin cambios)
         card.querySelector('.card-header').addEventListener('click', () => {
             const details = card.querySelector('.card-details');
             if (details.style.maxHeight) {
@@ -275,7 +473,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Lógica de entrega (sin cambios)
         card.querySelectorAll('.entregar-btn').forEach(btn => {
             if(btn.textContent.includes('Entregado')) return;
 
@@ -300,8 +497,6 @@ document.addEventListener('DOMContentLoaded', function() {
                            btn.textContent = '✓ Entregado';
                            btn.classList.remove('bg-brand', 'hover:bg-brand-light');
                            btn.classList.add('bg-green-500');
-                           // Idealmente, aquí se debería recargar o actualizar la barra de progreso
-                           // Para una UX instantánea, podríamos llamar a loadEvents() o recalcular
                         } else {
                             throw new Error(response.message);
                         }
@@ -317,19 +512,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return card;
     }
 
-    // --- Inicialización y Event Listeners ---
-    populateFilters(); // Popula Mes/Año
-    loadEvents(); // Carga datos, popula filtros dinámicos y renderiza
-
-    // --- Event Listeners MODIFICADOS ---
+    // --- 7. EVENT LISTENERS DEL DASHBOARD ---
+    // (Estos se inicializan, pero solo se usarán cuando el panel sea visible)
     
-    // Estos recargan los datos desde el servidor
-    mesSelect.addEventListener('change', loadEvents);
-    anioSelect.addEventListener('change', loadEvents);
+    if (mesSelect && anioSelect) {
+        mesSelect.addEventListener('change', loadEvents);
+        anioSelect.addEventListener('change', loadEvents);
+    }
+    if (tipoSelect && asignadoSelect && sedeSelect && estadoSelect) {
+        tipoSelect.addEventListener('change', applyFiltersAndRender);
+        asignadoSelect.addEventListener('change', applyFiltersAndRender);
+        sedeSelect.addEventListener('change', applyFiltersAndRender);
+        estadoSelect.addEventListener('change', applyFiltersAndRender);
+    }
 
-    // Estos SÓLO aplican filtros en el cliente (frontend)
-    tipoSelect.addEventListener('change', applyFiltersAndRender);
-    asignadoSelect.addEventListener('change', applyFiltersAndRender);
-    sedeSelect.addEventListener('change', applyFiltersAndRender);
-    estadoSelect.addEventListener('change', applyFiltersAndRender);
-});
+}); // Fin de DOMContentLoaded

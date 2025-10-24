@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 eventOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
                 eventOption.role = 'menuitem';
                 eventOption.tabindex = '-1';
-                eventOption.id = 'menu-item-assign';
+                eventOption.id = 'menu-item-event';
                 eventOption.textContent = 'Crear Eventos';
                 menuItemsContainer.appendChild(eventOption);
             }
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dashOption.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 font-semibold text-brand';
                 dashOption.role = 'menuitem';
                 dashOption.tabindex = '-1';
-                dashOption.id = 'menu-item-assign';
+                dashOption.id = 'menu-item-dash';
                 dashOption.textContent = 'Registros Pendientes';
                 menuItemsContainer.appendChild(dashOption);
             }       

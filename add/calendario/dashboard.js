@@ -141,6 +141,8 @@ document.addEventListener('DOMContentLoaded', function() {
         welcomeUser.textContent = `Bienvenido, ${currentUser.name}`;
         populateFilters(); 
         loadEvents(); 
+
+        checkForUrgentEvents();
     }
 
     // --- 5. LÓGICA DEL MENÚ DE NAVEGACIÓN ---
@@ -345,14 +347,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * =============================================================
-     * NUEVA FUNCIÓN HELPER: renderServiciosList
-     * Dibuja la lista de servicios dentro de la tarjeta.
-     * Se usa para el renderizado inicial y para el modo de edición.
+     * FUNCIÓN HELPER MODIFICADA: renderServiciosList
+     * - Añadido botón para ELIMINAR SERVICIO (basurero)
      * =============================================================
      */
-    function renderServiciosList(serviciosContainer, evento, isEditing) {
+    function renderServiciosList(serviciosContainer, evento, isEditing, isCanceled) {
         const servicios = evento.servicios || [];
-        serviciosContainer.innerHTML = ''; // Limpiar lista actual
+        serviciosContainer.innerHTML = '';
 
         if (servicios.length === 0) {
             serviciosContainer.innerHTML = '<p class="text-sm text-gray-500">No se solicitaron servicios.</p>';
@@ -365,53 +366,74 @@ document.addEventListener('DOMContentLoaded', function() {
             itemDiv.className = 'flex flex-col gap-1.5';
             
             let htmlInterno = '';
-
-            if (isEditing) {
+            
+            if (isCanceled) {
+                // --- VISTA CANCELADA (NUEVO) ---
+                // Muestra todo deshabilitado en gris
+                htmlInterno = `
+                    <label class="text-sm font-medium text-gray-400 line-through">${nombreServicio}</label>
+                    <div class="flex items-center gap-2" data-service-code="${s.codigo}">
+                        ${s.link
+                            ? `<a href="#" onclick="return false;" class="flex-grow border border-gray-200 bg-gray-100 rounded-md text-sm text-gray-500 px-3 py-1.5 truncate cursor-not-allowed" title="Cancelado: ${s.link}">${s.link}</a>`
+                            : `<input type="text" value="" placeholder="Cancelado" class="flex-grow border-gray-200 bg-gray-100 rounded-md text-sm cursor-not-allowed" disabled>`
+                        }
+                        <button class="px-3 py-1 text-sm rounded-md bg-gray-300 text-white cursor-not-allowed" disabled>
+                            ${s.link ? '✓' : '-'}
+                        </button>
+                    </div>
+                `;
+            } else if (isEditing) {
                 // --- VISTA DE EDICIÓN (ADMIN) ---
                 htmlInterno = `
-                    <label class="text-sm font-medium text-gray-600">${nombreServicio}</label>
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-600">${nombreServicio}</label>
+                        <button class="admin-delete-service-btn text-gray-400 hover:text-red-600" 
+                                title="Eliminar este servicio del evento"
+                                data-service-code-only="${s.codigo}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
                     <div class="flex items-center gap-2" data-service-code="${s.codigo}">
-                        <input type="text" value="${s.link || ''}" placeholder="Pegar nuevo link..." 
-                               class="flex-grow border-gray-300 rounded-md text-sm admin-link-input">
+                        <input type="text" value="${s.link || ''}" placeholder="${s.link ? '' : 'Pegar link de entrega...'}" 
+                               class="flex-grow border-gray-300 rounded-md text-sm admin-link-input ${s.link ? '' : 'pending-delivery-input'}">
                         
                         ${s.link
-                            ? // Si hay link, mostrar botones de Actualizar y Eliminar
+                            ? // Si hay link, mostrar botones de Actualizar y Eliminar (Entrega)
                               `
                               <button class="admin-update-btn px-3 py-1 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
                                       title="Actualizar Link">Actualizar</button>
                               <button class="admin-delete-btn px-2 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
-                                      title="Eliminar Entrega">X</button>
+                                      title="Eliminar Entrega (X)">X</button>
                               `
-                            : // Si no hay link, mostrar botón de Entregar
+                            : // Si no hay link (Pendiente), no mostrar botones extra
                               `
-                              <button class="entregar-btn px-3 py-1 text-sm rounded-md bg-brand text-white hover:bg-brand-light">Entregar</button>
                               `
                         }
                     </div>
                 `;
             } else {
                 // --- VISTA NORMAL (LECTURA) ---
+                // (Esta parte no cambia)
                 htmlInterno = `
                     <label class="text-sm font-medium text-gray-600">${nombreServicio}</label>
                     <div class="flex items-center gap-2" data-service-code="${s.codigo}">
                         ${s.link
-                            ? // Si hay link, mostrar <a>
-                              `
-                              <a href="${s.link}" target="_blank" rel="noopener noreferrer"
+                            ? `<a href="${s.link}" target="_blank" rel="noopener noreferrer"
                                  class="flex-grow border border-gray-200 bg-gray-50 rounded-md text-sm text-blue-600 hover:text-blue-800 hover:bg-gray-100 px-3 py-1.5 truncate transition-colors"
                                  title="Abrir enlace: ${s.link}">
                                   ${s.link}
-                              </a>
-                              `
-                            : // Si no hay link, mostrar <input>
-                              `
-                              <input type="text" value="" placeholder="Pegar link de entrega..." 
+                              </a>`
+                            : `<input type="text" value="" placeholder="Pegar link de entrega..." 
                                      class="flex-grow border-gray-300 rounded-md text-sm">
+                               <button class="entregar-btn px-3 py-1 text-sm rounded-md bg-brand text-white hover:bg-brand-light">Entregar</button>
                               `
                         }
-                        <button class="entregar-btn px-3 py-1 text-sm rounded-md ${s.link ? 'bg-green-500 text-white' : 'bg-brand text-white hover:bg-brand-light'}">
-                            ${s.link ? '✓ Entregado' : 'Entregar'}
-                        </button>
+                        ${s.link 
+                            ? `<button class="entregar-btn px-3 py-1 text-sm rounded-md bg-green-500 text-white" disabled>✓ Entregado</button>`
+                            : ''
+                        }
                     </div>
                 `;
             }
@@ -419,8 +441,6 @@ document.addEventListener('DOMContentLoaded', function() {
             itemDiv.innerHTML = htmlInterno;
             serviciosContainer.appendChild(itemDiv);
         });
-
-    
     }
 
     /**
@@ -464,25 +484,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    /**
+ /**
      * =============================================================
      * FUNCIÓN MODIFICADA: createEventCard
-     * - Lógica de Admin y edición (como antes)
-     * - NUEVO: Revisa si la entrega completa el evento y lanza animación.
+     * - Añade lógica para eventos CANCELADOS (deshabilitar tarjeta)
+     * - Añade botón "Cancelar Evento" para admins.
      * =============================================================
      */
     function createEventCard(evento, isAdmin) {
+       // --- Comprobación de estados ---
+        const isCanceled = evento.status === 'Cancelado';
         const progreso = evento.totalServicios > 0 ? (evento.serviciosEntregados / evento.totalServicios) * 100 : 100;
-        
+        // El evento está completo si el progreso es 100 O si el estado de la hoja ya es "Entregado"
+        const isCompleted = !isCanceled && ((progreso === 100) || (evento.status === 'Entregado'));
+
+        // --- NUEVO: Lógica de color para la barra ---
+        let progressBarColorClass = ''; // Por defecto usa el azul (var(--brand-color))
+        if (isCanceled) {
+            progressBarColorClass = 'bg-gray-400'; // Gris si está cancelado
+        } else if (isCompleted) {
+            progressBarColorClass = 'bg-green-500'; // Verde si está completado
+        }
+        // Si está en progreso, la clase queda vacía y se usa el color azul por defecto de 'progress-bar-fill'
+
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-xl shadow-lg flex flex-col';
+        card.className = `bg-white rounded-xl shadow-lg flex flex-col ${isCanceled ? 'opacity-60 bg-gray-50 pointer-events-none' : ''}`;
         card.dataset.editMode = 'false'; 
-        card.dataset.idEvento = evento.idEvento; 
+        card.dataset.idEvento = evento.idEvento;
 
         card.innerHTML = `
-            <div class="p-5 cursor-pointer card-header">
-                <p class="text-sm text-gray-500">${evento.tipo}</p>
-                <h3 class="font-bold text-lg text-gray-800">${evento.nombre}</h3>
+            <div class="p-5 ${isCanceled ? '' : 'cursor-pointer'} card-header">
+                
+                <div class="flex justify-between items-start gap-2">
+                    <p class="text-sm text-gray-500">${evento.tipo}</p>
+                    ${(isAdmin && !isCanceled) 
+                        ? `<button class="admin-cancel-btn -mt-1 px-3 py-1 text-xs rounded-md bg-red-100 text-red-700 hover:bg-red-200">
+                               Cancelar Evento
+                           </button>` 
+                        : (isCanceled ? '<span class="text-sm font-bold text-red-600">CANCELADO</span>' : (isCompleted ? '<span class="text-sm font-bold text-green-600">COMPLETADO</span>' : ''))
+                        // Añadida etiqueta "COMPLETADO"
+                    }
+                </div>
+                
+                <h3 class="font-bold text-lg text-gray-800 ${isCanceled ? 'line-through' : ''}">${evento.nombre}</h3>
                 <p class="text-sm text-gray-600 mt-1">${new Date(evento.fechaInicio).toLocaleDateString()} - ${new Date(evento.fechaFin).toLocaleDateString()}</p>
                 <p class="text-sm font-medium text-brand mt-1">${evento.sede} / Asignado a: ${evento.asignadoA}</p>
                 <div class="mt-4">
@@ -491,7 +535,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="font-bold">${evento.serviciosEntregados} / ${evento.totalServicios}</span>
                     </div>
                     <div class="w-full progress-bar-bg rounded-full h-2.5">
-                        <div class="progress-bar-fill h-2.5 rounded-full" style="width: ${progreso}%"></div>
+                        
+                        <div class="progress-bar-fill h-2.5 rounded-full ${progressBarColorClass}" style="width: ${progreso}%"></div>
+                        
                     </div>
                 </div>
             </div>
@@ -499,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="p-5 space-y-3">
                     <div class="flex justify-between items-center">
                         <h4 class="font-semibold">Servicios Requeridos</h4>
-                        ${isAdmin 
+                        ${(isAdmin && !isCanceled && !isCompleted) // Ocultar "Modificar" si ya está completado
                             ? `<button class="admin-modify-btn px-3 py-1 text-sm rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
                                   Modificar
                               </button>` 
@@ -512,10 +558,14 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         const serviciosContainer = card.querySelector('.servicios-list-container');
-        renderServiciosList(serviciosContainer, evento, false);
+        // --- MODIFICADO: Pasar 'isCanceled' E 'isCompleted' a la función de renderizado ---
+        // (Aunque renderServiciosList no usa isCompleted aún, es buena práctica)
+        renderServiciosList(serviciosContainer, evento, false, isCanceled);
 
         // --- LÓGICA DE EVENTOS DE LA TARJETA ---
-        card.querySelector('.card-header').addEventListener('click', () => {
+        const header = card.querySelector('.card-header');
+        header.addEventListener('click', (e) => {
+            if (e.target.closest('.admin-cancel-btn') || isCanceled) return; 
             const details = card.querySelector('.card-details');
             if (details.style.maxHeight) {
                 details.style.maxHeight = null;
@@ -523,138 +573,239 @@ document.addEventListener('DOMContentLoaded', function() {
                 details.style.maxHeight = details.scrollHeight + "px";
             }
         });
-        
-        const detailsContainer = card.querySelector('.card-details');
-        
-        detailsContainer.addEventListener('click', (e) => {
-            const target = e.target;
-            
-            // Botón principal "Modificar" (Admin)
-            if (target.classList.contains('admin-modify-btn')) {
-                const isEditing = card.dataset.editMode === 'true';
-                const newEditMode = !isEditing;
-                card.dataset.editMode = newEditMode;
-                target.textContent = newEditMode ? 'Finalizar' : 'Modificar';
-                target.classList.toggle('bg-blue-600', newEditMode);
-                target.classList.toggle('text-white', newEditMode);
-                target.classList.toggle('bg-gray-200', !newEditMode);
-                target.classList.toggle('text-gray-700', !newEditMode);
-                renderServiciosList(serviciosContainer, evento, newEditMode);
-                return;
-            }
 
-            // Botón "Entregar" (para usuarios y admin en modo edición)
-            if (target.classList.contains('entregar-btn') && !target.textContent.includes('Entregado')) {
-                const serviceDiv = target.closest('[data-service-code]');
-                const codigoServicio = serviceDiv.dataset.serviceCode;
-                const input = serviceDiv.querySelector('input[type="text"], .admin-link-input');
-                const link = input.value.trim();
-
-                if(!link) {
-                    alert('Por favor, pega un link antes de entregar.');
+        // 2. Botón Cancelar Evento (NUEVO)
+        const cancelBtn = card.querySelector('.admin-cancel-btn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                if (!confirm(`ADVERTENCIA:\n\n¿Estás seguro de que deseas CANCELAR el evento "${evento.nombre}"?\n\nEste evento se marcará como cancelado y se deshabilitarán todas las acciones.`)) {
                     return;
                 }
-                target.disabled = true;
-                target.textContent = '...';
-                
-                callGAS('entregarServicio', { idEvento: evento.idEvento, codigoServicio, link })
+                cancelBtn.disabled = true;
+                cancelBtn.textContent = '...';
+
+                callGAS('cancelarEvento', { idEvento: evento.idEvento })
                     .then(response => {
-                        if(response.success){
-                           
-                           // --- INICIO DE LA MODIFICACIÓN DE ANIMACIÓN ---
-                           
-                           const totalServicios = evento.totalServicios;
-                           // El nuevo conteo es el anterior + 1
-                           const nuevosEntregados = evento.serviciosEntregados + 1; 
-
-                           if (totalServicios > 0 && nuevosEntregados === totalServicios) {
-                                // ¡EVENTO COMPLETO!
-                                console.log('¡Evento completado!');
-                                // 1. Lanzar animación
-                                showCompletionAnimation();
-                                
-                                // 2. Esperar a que la animación termine para recargar
-                                setTimeout(() => {
-                                    loadEvents(); 
-                                }, 1500); // 1.5 segundos
-                           } else {
-                                // El evento aún no está completo, recargar inmediatamente
-                                loadEvents(); 
-                           }
-                           // --- FIN DE LA MODIFICACIÓN DE ANIMACIÓN ---
-
+                        if (response.success) {
+                            alert('Evento cancelado con éxito.');
+                            loadEvents(); // Recargar todo
                         } else {
                             throw new Error(response.message);
                         }
                     })
                     .catch(error => {
+                        alert('Error al cancelar: ' + error.message);
+                        cancelBtn.disabled = false;
+                        cancelBtn.textContent = 'Cancelar Evento';
+                    });
+            });
+        }
+        
+        // 3. Lógica de botones de detalles (delegación de eventos)
+        const detailsContainer = card.querySelector('.card-details');
+        
+        detailsContainer.addEventListener('click', (e) => {
+            // Si está cancelado, no hacer nada (esto es una doble seguridad)
+            if (isCanceled) return;
+
+            const target = e.target;
+            const modifyBtn = target.closest('.admin-modify-btn');
+            const deliverBtn = target.closest('.entregar-btn');
+            const updateBtn = target.closest('.admin-update-btn');
+            const deleteDeliveryBtn = target.closest('.admin-delete-btn');
+            const deleteServiceBtn = target.closest('.admin-delete-service-btn');
+
+            // Botón principal "Modificar" / "Finalizar" (Admin)
+            if (modifyBtn) {
+                const isEditing = card.dataset.editMode === 'true';
+                const newEditMode = !isEditing;
+                card.dataset.editMode = newEditMode;
+                
+                modifyBtn.textContent = newEditMode ? 'Finalizar' : 'Modificar';
+                modifyBtn.classList.toggle('bg-blue-600', newEditMode);
+                modifyBtn.classList.toggle('text-white', newEditMode);
+                modifyBtn.classList.toggle('bg-gray-200', !newEditMode);
+                modifyBtn.classList.toggle('text-gray-700', !newEditMode);
+                
+                // --- MODIFICADO: Pasar 'isCanceled' ---
+                renderServiciosList(serviciosContainer, evento, newEditMode, isCanceled);
+                return;
+            }
+
+            // Botón "Entregar" (Modo Lectura)
+            if (deliverBtn && !deliverBtn.textContent.includes('Entregado')) {
+                // ... (lógica sin cambios) ...
+                const serviceDiv = deliverBtn.closest('[data-service-code]');
+                const codigoServicio = serviceDiv.dataset.serviceCode;
+                const input = serviceDiv.querySelector('input[type="text"]');
+                const link = input.value.trim();
+                if(!link) return alert('Por favor, pega un link antes de entregar.');
+                deliverBtn.disabled = true;
+                deliverBtn.textContent = '...';
+                
+                callGAS('entregarServicio', { idEvento: evento.idEvento, codigoServicio, link })
+                    .then(response => {
+                        if(response.success){
+                           const totalServicios = evento.totalServicios;
+                           const nuevosEntregados = evento.serviciosEntregados + 1; 
+                           if (totalServicios > 0 && nuevosEntregados === totalServicios) {
+                                console.log('¡Evento completado!');
+                                showCompletionAnimation();
+                                setTimeout(loadEvents, 1500);
+                           } else {
+                                loadEvents(); 
+                           }
+                        } else { throw new Error(response.message); }
+                    })
+                    .catch(error => {
                         alert('Error al entregar: ' + error.message);
-                        target.disabled = false;
-                        target.textContent = 'Entregar';
+                        deliverBtn.disabled = false;
+                        deliverBtn.textContent = 'Entregar';
                     });
                 return;
             }
 
             // Botón "Actualizar" (Admin)
-            if (target.classList.contains('admin-update-btn')) {
-                const serviceDiv = target.closest('[data-service-code]');
+            if (updateBtn) {
+                // ... (lógica sin cambios) ...
+                const serviceDiv = updateBtn.closest('[data-service-code]');
                 const codigoServicio = serviceDiv.dataset.serviceCode;
                 const input = serviceDiv.querySelector('.admin-link-input');
                 const newLink = input.value.trim();
-
-                if (!newLink) {
-                    alert('El campo de link no puede estar vacío para actualizar.');
-                    return;
-                }
-                target.disabled = true;
-                target.textContent = '...';
+                if (!newLink) return alert('El campo de link no puede estar vacío.');
+                updateBtn.disabled = true;
+                updateBtn.textContent = '...';
 
                 callGAS('modificarEntrega', { idEvento: evento.idEvento, codigoServicio, newLink })
                     .then(response => {
                         if(response.success){
                            alert('Link actualizado con éxito.');
                            loadEvents(); 
-                        } else {
-                            throw new Error(response.message);
-                        }
+                        } else { throw new Error(response.message); }
                     })
                     .catch(error => {
                         alert('Error al actualizar: ' + error.message);
-                        target.disabled = false;
-                        target.textContent = 'Actualizar';
+                        updateBtn.disabled = false;
+                        updateBtn.textContent = 'Actualizar';
                     });
                 return;
             }
 
             // Botón "X" (Eliminar Entrega - Admin)
-            if (target.classList.contains('admin-delete-btn')) {
-                if (!confirm('¿Estás seguro de que deseas ELIMINAR esta entrega? Esta acción no se puede deshacer.')) {
-                    return;
-                }
-                const serviceDiv = target.closest('[data-service-code]');
+            if (deleteDeliveryBtn) {
+                // ... (lógica sin cambios) ...
+                if (!confirm('¿Estás seguro de que deseas ELIMINAR esta entrega? El servicio volverá a estar pendiente.')) return;
+                const serviceDiv = deleteDeliveryBtn.closest('[data-service-code]');
                 const codigoServicio = serviceDiv.dataset.serviceCode;
-                target.disabled = true;
-                target.textContent = '...';
+                deleteDeliveryBtn.disabled = true;
+                deleteDeliveryBtn.textContent = '...';
 
                 callGAS('eliminarEntrega', { idEvento: evento.idEvento, codigoServicio })
                     .then(response => {
                         if(response.success){
                            alert('Entrega eliminada con éxito.');
                            loadEvents();
-                        } else {
-                            throw new Error(response.message);
-                        }
+                        } else { throw new Error(response.message); }
                     })
                     .catch(error => {
                         alert('Error al eliminar: ' + error.message);
-                        target.disabled = false;
-                        target.textContent = 'X';
+                        deleteDeliveryBtn.disabled = false;
+                        deleteDeliveryBtn.textContent = 'X';
+                    });
+                return;
+            }
+            
+            // Botón "Basurero" (Eliminar Servicio - Admin)
+            if (deleteServiceBtn) {
+                // ... (lógica sin cambios) ...
+                const codigoServicio = deleteServiceBtn.dataset.serviceCodeOnly;
+                const nombreServicio = SERVICIOS_MAPA[codigoServicio] || codigoServicio;
+                if (!confirm(`ADVERTENCIA:\n\n¿Estás seguro de que deseas ELIMINAR PERMANENTEMENTE el servicio "${nombreServicio}" de este evento?\n\nEsta acción no se puede deshacer.`)) return;
+                deleteServiceBtn.disabled = true;
+                
+                callGAS('eliminarServicioDeEvento', { idEvento: evento.idEvento, codigoServicio })
+                    .then(response => {
+                        if (response.success) {
+                            alert(`Servicio "${nombreServicio}" eliminado permanentemente.`);
+                            loadEvents();
+                        } else { throw new Error(response.message); }
+                    })
+                    .catch(error => {
+                        alert('Error al eliminar el servicio: ' + error.message);
+                        deleteServiceBtn.disabled = false;
                     });
                 return;
             }
         });
 
         return card;
+    }
+
+    /**
+     * =============================================================
+     * NUEVA FUNCIÓN: showToastNotification
+     * Muestra una notificación flotante.
+     * =============================================================
+     */
+    function showToastNotification(title, message) {
+        // Crear el elemento
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.innerHTML = `<h4>${title}</h4><p>${message}</p>`;
+        
+        // Añadir al body
+        document.body.appendChild(toast);
+
+        // 1. Mostrar (después de un pequeño retardo)
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100); // 100ms de retardo
+
+        // 2. Ocultar (después de 5 segundos)
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.add('hide');
+        }, 5000); // 5000ms = 5 segundos
+
+        // 3. Eliminar del DOM (después de que termine la animación de salida)
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 5300); // 5.3 segundos (5000 + 300ms de transición)
+    }
+
+    /**
+     * =============================================================
+     * NUEVA FUNCIÓN: checkForUrgentEvents
+     * Llama al backend para buscar eventos urgentes
+     * =============================================================
+     */
+    function checkForUrgentEvents() {
+        // Solo ejecutar si hay un usuario logueado
+        if (!currentUser || !currentUser.name) {
+            return;
+        }
+
+        console.log('Buscando eventos urgentes para:', currentUser.name);
+        
+        // Usamos currentUser.name porque es el que coincide con la columna "Asignado A"
+        callGAS('getMisEventosUrgentes', { nombreUsuario: currentUser.username })
+            .then(response => {
+                if (response.success && response.data && response.data.length > 0) {
+                    const eventCount = response.data.length;
+                    const eventNames = response.data.join(', ');
+                    
+                    showToastNotification(
+                        `¡Tienes ${eventCount} evento(s) urgentes!`,
+                        `Los siguientes eventos inician pronto: ${eventNames}`
+                    );
+                } else if (!response.success) {
+                    // No mostrar un error al usuario, solo en consola.
+                    console.error('Error al verificar eventos urgentes:', response.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error de red al verificar eventos urgentes:', error);
+            });
     }
 
 

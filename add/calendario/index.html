@@ -75,6 +75,41 @@
             overflow: hidden;
             transition: max-height 0.3s ease-out;
         }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--brand-color-dark, #002a59); /* Usamos tu color de marca */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(20px);
+            visibility: hidden;
+            transition: all 0.3s ease-out;
+            max-width: 350px;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+        .toast-notification.hide {
+            opacity: 0;
+            transform: translateY(20px);
+            visibility: hidden;
+        }
+        .toast-notification h4 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .toast-notification p {
+            font-size: 0.875rem;
+            line-height: 1.3;
+        }
     </style>
 </head>
 <body class="bg-gray-100">

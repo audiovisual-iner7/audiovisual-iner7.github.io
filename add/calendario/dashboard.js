@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'S37': 'PROGRAMACIÓN ZOOM', 'S38': 'REEL DE VIDEO DEL EVENTO (SESIÓN, CURSO, JORNADA, ETC)',
         'S39': 'TRANSMITIR INSTAGRAM Y FACEBOOK', 'S40': 'TRANSMISION EN YOUTUBE',
         'S41': 'TRANSMISION ZOOM', 'S42': 'VIDEO CUENTA REGRESIVA',
-        'S43': 'VIDEO INTRO DE PROTECCIÓN CIVIL', 'S44': 'VIDEOS SALA DE ESPERA'
+        'S43': 'VIDEO INTRO DE PROTECCIÓN CIVIL', 'S44': 'VIDEOS SALA DE ESPERA',
+        'S45': 'PORTADA YOUTUBE'
     };
     // Lista de usuarios admin (la misma de setupDynamicMenu)
     const ADMIN_USERS_LIST = ['DIANA', 'HILDING', 'GIOVANNY'];

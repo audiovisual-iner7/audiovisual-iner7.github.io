@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- 1. Elementos del DOM ---
-    const startRequestBtn = document.getElementById('startRequestBtn');
-    const initialButtonContainer = document.getElementById('initialButtonContainer');
+    // ❌ ELIMINADA: const startRequestBtn = document.getElementById('startRequestBtn');
+    // ❌ ELIMINADA: const initialButtonContainer = document.getElementById('initialButtonContainer');
     const workRequestForm = document.getElementById('workRequestForm'); // ID del formulario
     const form = workRequestForm; // Alias para compatibilidad con lógica de envío
 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- 2. Listas de Opciones y Datos para Comboboxes ---
     
-    // Lista de todas las áreas/departamentos (Se mantiene de tu archivo original)
+    // Lista de todas las áreas/departamentos
     const areas = [
         'Clínica Asma e Inmunoalergia',
         'Clínica Enfermedad Pulmonar Obstructiva Crónica y Bronquiectasias y Tabaquismo ​',
@@ -208,9 +208,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'Otro'
     ];
     
-    // --- 3. Lógica General para Comboboxes (Refactorizada y Reutilizable) ---
+    // --- 3. Lógica General para Comboboxes (Reutilizada de la optimización anterior) ---
 
-    // Función de fábrica para crear la lógica de un combobox específico
     function setupCombobox(inputId, dropdownId, sourceArray) {
         const inputElement = document.getElementById(inputId);
         const dropdownElement = document.getElementById(dropdownId);
@@ -256,7 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
         function selectItem(item) {
             inputElement.value = item;
             hideDropdown();
-            // Disparar un evento 'input' o 'change' si es necesario para lógica externa (como validación)
             inputElement.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
@@ -326,14 +324,10 @@ document.addEventListener('DOMContentLoaded', function() {
     setupCombobox('tipoEvento', 'tipoEventoDropdown', tiposEvento);
     setupCombobox('tipoActividad', 'tipoActividadDropdown', tiposActividad);
 
-    // --- 4. Mostrar el formulario ---
-    startRequestBtn.addEventListener('click', () => {
-        initialButtonContainer.style.display = 'none';
-        workRequestForm.style.display = 'block';
-        workRequestForm.classList.add('fade-in');
-    });
+    // --- 4. Mostrar el formulario (Lógica de bienvenida eliminada) ---
+    // ❌ ELIMINADA: La lógica de startRequestBtn
 
-    // --- 5. Lógica para campos condicionales ---
+    // --- 5. Lógica para campos condicionales (Se mantiene) ---
     modalidadSelect.addEventListener('change', () => {
         // Mostrar/Ocultar Zoom solo si es Virtual o Híbrido
         if (modalidadSelect.value === 'Virtual' || modalidadSelect.value === 'Hibrido') {
@@ -360,11 +354,9 @@ document.addEventListener('DOMContentLoaded', function() {
     modalidadSelect.dispatchEvent(new Event('change'));
     recurrenciaSelect.dispatchEvent(new Event('change'));
 
-    // --- 6. Lógica para enviar el formulario a Google Sheets ---
+    // --- 6. Lógica para enviar el formulario a Google Sheets (Se mantiene) ---
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-
-        // **NOTA:** No se requiere la validación de la tabla de ítems ya que fue eliminada.
 
         submitBtn.disabled = true;
         loadingSpinner.classList.remove('hidden');
@@ -374,23 +366,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         
-        // El formulario no tiene archivos adjuntos en index1.html, por lo que se envía directamente.
-        // Si el formulario de index1.html tuviera un campo de archivos, habría que reintroducir la lógica.
-        // Asumo que el formulario de evento NO maneja archivos, como se eliminó de la estructura.
-
         data.timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
-        data.action = "solicitudEvento"; // Cambié la acción para diferenciar el tipo de solicitud
+        data.action = "solicitudEvento"; 
 
         sendDataToGoogle(data);
     });
 
     function sendDataToGoogle(data) {
-        // URL de tu Apps Script
         const scriptURL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
         
         console.log('Sending data:', data);
 
-        // Crear FormData para enviar JSON como string. Esto es el método más robusto para GS.
         const formData = new FormData();
         formData.append('data', JSON.stringify(data));
 
@@ -399,7 +385,6 @@ document.addEventListener('DOMContentLoaded', function() {
             body: formData
         })
         .then(response => {
-            // Manejar la respuesta como texto primero si hay problemas, luego como JSON
             return response.text().then(text => {
                 try {
                     return JSON.parse(text);
@@ -437,8 +422,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- 7. Lógica del Tour (Shepherd.js) ---
-    // NOTA: Se mantiene la lógica del tour original, pero se ajustan los IDs de los pasos a los campos actuales.
-    // He ajustado los IDs a los campos presentes en index1.html
 
     const tour = new Shepherd.Tour({
         useModalOverlay: true,
@@ -448,31 +431,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Paso 1: Botón inicial
-    tour.addStep({
-        id: 'step-welcome',
-        text: '¡Bienvenido! Para comenzar a llenar tu solicitud de evento o actividad, haz clic aquí.',
-        attachTo: {
-            element: '#startRequestBtn',
-            on: 'bottom'
-        },
-        buttons: [{
-            text: 'Siguiente',
-            action: () => {
-                document.getElementById('startRequestBtn').click();
-                tour.next();
-            }
-        }]
-    });
+    // ❌ ELIMINADO: El paso de bienvenida 'step-welcome'
 
-    // Paso 2: Información del solicitante
+    // Paso 1: Correo Electrónico
     tour.addStep({
         id: 'step-email',
-        text: 'El correo electrónico es obligatorio para que podamos contactarte.',
+        text: '¡Bienvenido! El correo electrónico es el primer paso y es obligatorio para que podamos contactarte.',
         attachTo: { element: '#email', on: 'bottom' },
-        buttons: [{ text: 'Atrás', action: tour.back }, { text: 'Siguiente', action: tour.next }]
+        buttons: [{ text: 'Siguiente', action: tour.next }] // Primer paso, no necesita 'Atrás'
     });
 
+    // Los siguientes pasos se mantienen, pero se ajustó el primer paso del tour.
+    
     tour.addStep({
         id: 'step-nombre',
         text: 'Escribe tu nombre completo.',
@@ -494,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
         buttons: [{ text: 'Atrás', action: tour.back }, { text: 'Siguiente', action: tour.next }]
     });
 
-    // Paso 3: Detalles del Evento
+    // Detalles del Evento
     tour.addStep({
         id: 'step-nombreActividad',
         text: 'Escribe el nombre completo de la actividad académica que se registrará.',
@@ -516,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
         buttons: [{ text: 'Atrás', action: tour.back }, { text: 'Siguiente', action: tour.next }]
     });
 
-    // Paso 4: Requisitos de Fecha y Espacio
+    // Requisitos de Fecha y Espacio
     tour.addStep({
         id: 'step-fechas',
         text: 'Define la fecha y hora de inicio y finalización del evento.',
@@ -545,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
         buttons: [{ text: 'Atrás', action: tour.back }, { text: 'Siguiente', action: tour.next }]
     });
 
-    // Paso 5: Comentarios
+    // Comentarios
     tour.addStep({
         id: 'step-comentarios',
         text: 'Utiliza este campo para cualquier información adicional o equipamiento especial que requieras.',
@@ -553,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
         buttons: [{ text: 'Atrás', action: tour.back }, { text: 'Siguiente', action: tour.next }]
     });
 
-    // Paso Final: Enviar
+    // Final
     tour.addStep({
         id: 'step-finish',
         text: 'Revisa toda la información y presiona **Enviar Solicitud**. El mensaje de estado aparecerá aquí.',

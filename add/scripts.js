@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const fileError = document.getElementById('fileError');
 
     let stagedFiles = [];
-    const MAX_FILES = 5;
-    const MAX_SIZE_MB = 10;
+    const MAX_FILES = 10;
+    const MAX_SIZE_MB = 20;
 
     // Contenedores de campos condicionales
     const digitalPrintContainer = document.getElementById('digitalPrintContainer');

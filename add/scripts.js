@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Elementos del DOM
     const startRequestBtn = document.getElementById('startRequestBtn');
     const initialButtonContainer = document.getElementById('initialButtonContainer');
@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileList = document.getElementById('fileList');
     const fileError = document.getElementById('fileError');
 
+    let stagedFiles = [];
+    const MAX_FILES = 5;
+    const MAX_SIZE_MB = 10;
+
     // Contenedores de campos condicionales
     const digitalPrintContainer = document.getElementById('digitalPrintContainer');
     const plotterContainer = document.getElementById('plotterContainer');
@@ -22,13 +26,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const orientacionContainer = document.getElementById('orientacionContainer');
     const cartelCongresoContainer = document.getElementById('cartelCongresoContainer'); // <-- NUEVO
     const matriculaInput = document.getElementById('matricula');
-    
+
     // --- NUEVO: Elementos para validación de plotter ---
     const plotterWidthInput = document.getElementById('plotterWidth');
     const plotterLengthInput = document.getElementById('plotterLength');
     const plotterWidthError = document.getElementById('plotterWidthError');
     const plotterLengthError = document.getElementById('plotterLengthError');
-    
+
     // --- NUEVO: Elementos para el combobox de área ---
     const areaInput = document.getElementById('area');
     const areaDropdown = document.getElementById('areaDropdown');
@@ -38,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const plotterOption = "IMPRESIÓN EN PLOTTER";
     const engargoladosOption = "ENGARGOLADO";
     const cartelCongresoOption = "CARTEL CONGRESO";
+
+
 
     // Lista de todas las áreas/departamentos
     const areas = [
@@ -208,22 +214,22 @@ document.addEventListener('DOMContentLoaded', function() {
         'Vigilancia Epidemiológica',
         'OTRO'
     ];
-    
+
     let currentHighlightedIndex = -1;
     let filteredAreas = [];
 
     // --- NUEVO: Funciones para el combobox de área ---
     function filterAreas(searchTerm) {
         if (!searchTerm) return areas;
-        return areas.filter(area => 
+        return areas.filter(area =>
             area.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }
-    
+
     function showDropdown(areasToShow) {
         filteredAreas = areasToShow;
         areaDropdown.innerHTML = '';
-        
+
         if (filteredAreas.length === 0) {
             const noResultsOption = document.createElement('div');
             noResultsOption.className = 'combobox-option';
@@ -239,49 +245,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 areaDropdown.appendChild(option);
             });
         }
-        
+
         areaDropdown.classList.remove('hidden');
         currentHighlightedIndex = -1;
     }
-    
+
     function hideDropdown() {
         areaDropdown.classList.add('hidden');
         currentHighlightedIndex = -1;
     }
-    
+
     function selectArea(area) {
         areaInput.value = area;
         hideDropdown();
         areaInput.focus();
     }
-    
+
     function highlightOption(index) {
         const options = areaDropdown.querySelectorAll('.combobox-option');
         options.forEach(option => option.classList.remove('highlighted'));
-        
+
         if (index >= 0 && index < options.length) {
             options[index].classList.add('highlighted');
             currentHighlightedIndex = index;
         }
     }
-    
+
     // Event listeners para el combobox de área
     areaInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value;
         const filtered = filterAreas(searchTerm);
         showDropdown(filtered);
     });
-    
+
     areaInput.addEventListener('focus', () => {
         const searchTerm = areaInput.value;
         const filtered = filterAreas(searchTerm);
         showDropdown(filtered);
     });
-    
+
     areaInput.addEventListener('keydown', (e) => {
         const options = areaDropdown.querySelectorAll('.combobox-option');
-        
-        switch(e.key) {
+
+        switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
                 if (currentHighlightedIndex < options.length - 1) {
@@ -305,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
     });
-    
+
     // Cerrar dropdown al hacer clic fuera
     document.addEventListener('click', (e) => {
         if (!areaInput.contains(e.target) && !areaDropdown.contains(e.target)) {
@@ -334,16 +340,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedValue === digitalPrintOption) digitalPrintContainer.style.display = 'block';
         if (selectedValue === plotterOption) plotterContainer.style.display = 'block';
         if (selectedValue === cartelCongresoOption) {
-        cartelCongresoContainer.style.display = 'block';
-        // Solo cuando el campo es VISIBLE, lo hacemos requerido.
-        matriculaInput.required = true;
-    }
+            cartelCongresoContainer.style.display = 'block';
+            // Solo cuando el campo es VISIBLE, lo hacemos requerido.
+            matriculaInput.required = true;
+        }
         if (selectedValue === engargoladosOption) {
             engarContainer.style.display = 'block';
             orientacionContainer.style.display = 'block';
         }
     });
-    
+
     // --- NUEVO: Listeners para validación en tiempo real del plotter ---
     plotterWidthInput.addEventListener('input', () => {
         if (parseInt(plotterWidthInput.value, 10) > 90) {
@@ -379,14 +385,14 @@ document.addEventListener('DOMContentLoaded', function() {
             productName += ` - Papel: ${paperType}, Tamaño: ${paperSize}`;
             if (isDoubleSided) productName += ' (Ambas Caras)';
         }
-        
+
         if (plotterContainer.style.display === 'block') {
             const width = parseInt(plotterWidthInput.value, 10);
             const length = parseInt(plotterLengthInput.value, 10);
             if (width > 90 || length > 150 || !width || !length) {
                 if (width > 90) plotterWidthError.classList.remove('hidden');
                 if (length > 150) plotterLengthError.classList.remove('hidden');
-                return; 
+                return;
             }
             productName += ` - Medidas: ${width}cm (ancho) x ${length}cm (largo)`;
         }
@@ -406,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
             productName += ` - Matrícula: ${matricula}`;
         }
         // <-- FIN DEL BLOQUE NUEVO -->
-        
+
         if (engarContainer.style.display === 'block') {
             const engargoladoSize = document.getElementById('enType').value;
             const selectedOrientation = document.querySelector('input[name="orientation"]:checked');
@@ -422,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newRow.classList.add('border-b');
             newRow.innerHTML = `<td class="py-2 px-4">${productName}</td><td class="text-center py-2 px-4">${quantity}</td><td class="text-center py-2 px-4"><button type="button" class="text-red-500 hover:text-red-700 font-semibold delete-item-btn">Eliminar</button></td>`;
             itemsTableBody.appendChild(newRow);
-            
+
             // Resetear campos
             quantityInput.value = '1';
             productSelect.value = "";
@@ -451,51 +457,99 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
+
     // --- 5. Validación de archivos en el cliente ---
-    fileUpload.addEventListener('change', () => {
+    // NUEVO: Manejador para cuando se seleccionan archivos
+    fileUpload.addEventListener('change', (e) => {
         fileError.textContent = '';
-        fileList.innerHTML = '';
-        const files = fileUpload.files;
-        
-        if (files.length > 3) {
-            fileError.textContent = 'Error: No puede seleccionar más de 3 archivos.';
-            fileUpload.value = '';
+        const files = e.target.files;
+
+        if (files.length === 0) return;
+
+        // Validar si excedemos el límite total
+        if (stagedFiles.length + files.length > MAX_FILES) {
+            fileError.textContent = `Error: No puede seleccionar más de ${MAX_FILES} archivos en total.`;
+            fileUpload.value = ''; // Limpiar el input
             return;
         }
 
-        for(const file of files) {
-            if (file.size > 10 * 1024 * 1024) { // 10 MB
-                fileError.textContent = `Error: El archivo "${file.name}" excede el límite de 10MB.`;
-                fileUpload.value = '';
-                fileList.innerHTML = '';
-                return;
+        // Validar cada archivo
+        let validFiles = Array.from(files).filter(file => {
+            if (file.size > MAX_SIZE_MB * 1024 * 1024) { // 10 MB
+                fileError.textContent = `Error: El archivo "${file.name}" excede el límite de ${MAX_SIZE_MB}MB.`;
+                return false;
             }
-            const fileItem = document.createElement('p');
-            fileItem.textContent = `Archivo seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-            fileList.appendChild(fileItem);
+            // Evitar duplicados
+            if (stagedFiles.some(sf => sf.name === file.name)) {
+                fileError.textContent = `Info: El archivo "${file.name}" ya está en la lista.`;
+                return false;
+            }
+            return true;
+        });
+
+        // Añadir archivos válidos al array
+        stagedFiles.push(...validFiles);
+
+        // Actualizar la UI
+        updateFileListUI();
+
+        // Limpiar el input para que el usuario pueda agregar más
+        fileUpload.value = '';
+    });
+
+    // NUEVO: Manejador para eliminar un archivo de la lista
+    fileList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('file-remove-btn')) {
+            const filename = e.target.dataset.filename;
+            // Filtrar el array, quitando el archivo
+            stagedFiles = stagedFiles.filter(file => file.name !== filename);
+            // Actualizar la UI
+            updateFileListUI();
         }
     });
 
+    // NUEVO: Función para renderizar la lista de archivos
+    function updateFileListUI() {
+        fileList.innerHTML = '';
+        if (stagedFiles.length === 0) {
+            fileList.innerHTML = '<p>No hay archivos seleccionados.</p>';
+            return;
+        }
+
+        stagedFiles.forEach(file => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-list-item';
+            fileItem.innerHTML = `
+                <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                <button type="button" class="file-remove-btn" data-filename="${file.name}">Quitar</button>
+            `;
+            fileList.appendChild(fileItem);
+        });
+    }
+
+    // Inicializar la lista de archivos
+    updateFileListUI();
+
+
     // --- 6. Lógica para enviar el formulario a Google Sheets ---
-// --- 6. Lógica para enviar el formulario a Google Sheets ---
-    form.addEventListener('submit', function(e) {
+    // Convertir la función en ASÍNCRONA para esperar el zipping
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         // <-- NUEVA VALIDACIÓN INICIA AQUÍ -->
         const servicesRowsCount = itemsTableBody.querySelectorAll('tr:not(#noItemsRow)').length;
-        
+
         if (servicesRowsCount === 0) {
             statusMessage.textContent = 'Error: Debe agregar al menos un servicio a la lista.';
             statusMessage.className = 'text-sm font-medium text-red-600';
-            
+
             // Hacemos scroll y ponemos el foco en el selector de productos para guiar al usuario
             productSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
             productSelect.focus();
 
             // Limpiamos el mensaje después de 5 segundos
             setTimeout(() => { statusMessage.textContent = ''; }, 5000);
-            
+
             return; // Detenemos el envío del formulario aquí mismo
         }
         // <-- NUEVA VALIDACIÓN TERMINA AQUÍ -->
@@ -512,115 +566,132 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
-        
+
         const items = [];
         itemsTableBody.querySelectorAll('tr:not(#noItemsRow)').forEach(row => {
             const cells = row.getElementsByTagName('td');
             if (cells.length > 0) items.push(`${cells[0].innerText} (Cantidad: ${cells[1].innerText})`);
         });
-        
+
         data.items = items.join('; ');
         data.timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
-        
+
         delete data.product;
+        delete data.files;
 
-        const files = fileUpload.files;
-        if (files.length > 0) {
-            statusMessage.textContent = 'Subiendo archivos... Esto puede tardar.';
-            const filePromises = Array.from(files).map(file => {
-                return new Promise((resolve, reject) => {
+        if (stagedFiles.length > 0) {
+            statusMessage.textContent = 'Comprimiendo archivos... Esto puede tardar.';
+            
+            try {
+                const zip = new JSZip();
+                // Añadir cada archivo al zip
+                stagedFiles.forEach(file => {
+                    zip.file(file.name, file);
+                });
+
+                // Generar el blob del zip
+                const zipBlob = await zip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: { level: 6 }
+                });
+
+                // Convertir el blob del zip a base64
+                const zipBase64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.onload = (event) => {
-                        resolve({
-                            filename: file.name,
-                            mimeType: file.type,
-                            data: event.target.result.split(',')[1]
-                        });
-                    };
+                    reader.onload = (event) => resolve(event.target.result.split(',')[1]);
                     reader.onerror = (error) => reject(error);
-                    reader.readAsDataURL(file);
+                    reader.readAsDataURL(zipBlob);
                 });
-            });
+                
+                // Añadir el archivo zip (y solo ese) a los datos
+                data.files = [{
+                    filename: 'archivos_adjuntos.zip',
+                    mimeType: 'application/zip',
+                    data: zipBase64
+                }];
 
-            Promise.all(filePromises)
-                .then(fileDataArray => {
-                    data.files = fileDataArray;
-                    data.action = "solicitud";
-                    sendDataToGoogle(data);
-                })
-                .catch(error => {
-                    console.error('Error al leer archivos:', error);
-                    statusMessage.textContent = 'Error al procesar los archivos.';
-                    statusMessage.className = 'text-red-600';
-                    submitBtn.disabled = false;
-                    loadingSpinner.classList.add('hidden');
-                });
+                data.action = "solicitud";
+                sendDataToGoogle(data);
+
+            } catch (error) {
+                console.error('Error al comprimir archivos:', error);
+                statusMessage.textContent = 'Error al procesar los archivos.';
+                statusMessage.className = 'text-red-600';
+                submitBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
+            }
+            
         } else {
+            // Enviar sin archivos
             data.action = "solicitud";
             sendDataToGoogle(data);
         }
     });
 
-function sendDataToGoogle(data) {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
-    
-
-    console.log('Sending data:', data);
-
-    // Crear FormData en lugar de JSON
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(data));
-
-    fetch(scriptURL, {
-        method: 'POST',
-        body: formData  // Sin headers de Content-Type
-    })
-    .then(response => response.json())
-    .then(res => {
-        if (res.result === 'success') {
-            var folio = res.folio;
-            statusMessage.textContent = '¡Solicitud enviada con éxito! Tu folio es: ' + folio;
-            statusMessage.className = 'text-green-600';
-            form.reset();
-            itemsTableBody.innerHTML = '';
-            if (noItemsRow) {
-                itemsTableBody.appendChild(noItemsRow);
-                noItemsRow.style.display = 'table-row';
-            }
-            fileList.innerHTML = '';
-            digitalPrintContainer.style.display = 'none';
-            plotterContainer.style.display = 'none';
-            engarContainer.style.display = 'none';
-            orientacionContainer.style.display = 'none';
-        } else {
-            throw new Error(res.error || 'Error desconocido del servidor.');
-        }
-    })
-    .catch(error => {
-        console.error('Error!', error.message);
-        statusMessage.textContent = 'Error al enviar. Intente de nuevo.';
-        statusMessage.className = 'text-red-600';
-    })
-    .finally(() => {
-        submitBtn.disabled = false;
-        loadingSpinner.classList.add('hidden');
-        setTimeout(() => { statusMessage.textContent = ''; }, 6000);
-    });
-}
+    function sendDataToGoogle(data) {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
 
 
+        console.log('Sending data:', data);
+
+        // Crear FormData en lugar de JSON
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(data));
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: formData  // Sin headers de Content-Type
+        })
+            .then(response => response.json())
+            .then(res => {
+                if (res.result === 'success') {
+                    var folio = res.folio;
+                    statusMessage.textContent = '¡Solicitud enviada con éxito! Tu folio es: ' + folio;
+                    statusMessage.className = 'text-green-600';
+                    form.reset();
+                    itemsTableBody.innerHTML = '';
+                    if (noItemsRow) {
+                        itemsTableBody.appendChild(noItemsRow);
+                        noItemsRow.style.display = 'table-row';
+                    }
+
+                    stagedFiles = [];
+                    updateFileListUI();
+                    fileList.innerHTML = '';
+                    digitalPrintContainer.style.display = 'none';
+                    plotterContainer.style.display = 'none';
+                    engarContainer.style.display = 'none';
+                    orientacionContainer.style.display = 'none';
+                } else {
+                    throw new Error(res.error || 'Error desconocido del servidor.');
+                }
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                statusMessage.textContent = 'Error al enviar. Intente de nuevo.';
+                statusMessage.className = 'text-red-600';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
+                setTimeout(() => { statusMessage.textContent = ''; }, 6000);
+            });
+    }
 
 
-            const tour = new Shepherd.Tour({
+
+
+    const tour = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
             classes: 'shepherd-theme-arrows', // Un tema visual ya incluido
             scrollTo: true
         }
-        });
+    });
 
-        // Paso 1: Botón inicial
-        tour.addStep({
+    // Paso 1: Botón inicial
+    tour.addStep({
         id: 'step-welcome',
         text: '¡Bienvenido! Para comenzar a llenar tu solicitud de trabajo, haz clic aquí.',
         attachTo: {
@@ -635,11 +706,11 @@ function sendDataToGoogle(data) {
                 tour.next();
             }
         }]
-        });
+    });
 
-        // Paso 2: Información del solicitante
+    // Paso 2: Información del solicitante
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-email',
         text: 'El correo electrónico es obligatorio para que podamos contactarte. Asegúrate de que sea correcto.',
         attachTo: {
@@ -650,11 +721,11 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
 
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-nombre',
         text: 'Escribir el nombre del solicitante es importante para identificar quién está haciendo la solicitud.',
         attachTo: {
@@ -665,9 +736,9 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-area',
         text: 'Selecciona el área a la que pertenece tu solicitud. Esto nos ayuda a dirigirla al departamento correcto. Si no estás seguro, elige "Otro" y especifica en el campo de descripción.',
         attachTo: {
@@ -678,9 +749,9 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-tel',
         text: 'Proporcionar un número de teléfono o extensión de contacto es importante para que podamos comunicarnos contigo si necesitamos más información sobre tu solicitud. \n O para avisarte sobre el estado de la misma.',
         attachTo: {
@@ -691,13 +762,13 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
 
-        // Paso 3: Descripción del trabajo 
-  
+    // Paso 3: Descripción del trabajo 
 
-        tour.addStep({
+
+    tour.addStep({
         id: 'step-items',
         text: 'Puedes agregar varias tareas de trabajo. Por ejemplo, si necesitas imprimir documentos y también engargolarlos, puedes agregar ambos trabajos aquí. \n O si también necesitas imprimir otro documento o solicitar otro servicio, puedes hacerlo.  \n Es importante indicar la cantidad de cada trabajo que necesitas.  \n ¡¡Este paso es opcional!!, si no deseas especificar puedes dejarlo en blanco solo se muy claro en la descripción de tu solicitud.',
         attachTo: {
@@ -708,9 +779,9 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-workType',
         text: 'Aquí debes describir lo mas detalladamente posible el trabajo que necesitas. \n Por ejemplo, si necesitas imprimir un documento, especifica el tipo de papel, tamaño, si es a color o en blanco y negro. Si es un diseño, incluye detalles sobre los elementos gráficos, colores y cualquier otro requisito específico. Además de la Justificación del trabajo.',
         attachTo: {
@@ -721,10 +792,10 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-documents',
         text: 'Puedes enviarnos documentos relacionados con tu solicitud. Asegúrate de que sean claros y legibles. Puedes subir hasta 3 archivos, cada uno con un tamaño máximo de 10 MB. Aceptamos formatos PDF, DOCX, JPG y PNG. Si por ejemplo necesitas impresiones de un archivo o documento o si un diseño debe contener cierta imagen, etc. Si tu archivo pesa mas, contacta a la oficina de Audiovisual o deberás traernos el archivo.',
         attachTo: {
@@ -735,9 +806,9 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Siguiente', action: tour.next }
         ]
-        });
+    });
 
-        tour.addStep({
+    tour.addStep({
         id: 'step-finish',
         text: 'Si ya estas seguro de que toda la información es correcta, puedes enviar tu solicitud. Si quieres hacer alguna modificación, una vez enviado el formulario porfavor contactarnos si tienes dudas o necesitas ayuda a la extensión 5147 o 5239.',
         attachTo: {
@@ -748,14 +819,14 @@ function sendDataToGoogle(data) {
             { text: 'Atrás', action: tour.back },
             { text: 'Finalizar', action: tour.complete }
         ]
-        });
+    });
 
 
-        // Inicia el tutorial solo si no se ha visto antes
-        if (!localStorage.getItem('tutorialSolicitudVisto')) {
+    // Inicia el tutorial solo si no se ha visto antes
+    if (!localStorage.getItem('tutorialSolicitudVisto')) {
         tour.start();
         localStorage.setItem('tutorialSolicitudVisto', 'true');
-        }
+    }
 });
 
 

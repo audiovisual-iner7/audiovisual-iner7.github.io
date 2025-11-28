@@ -61,3 +61,44 @@ button:hover {
   border-radius: 8px;
   display: inline-block; /* Asegura que el borde se ajuste al canvas */
 }
+
+/* Estilos para los nuevos campos */
+.input-group {
+  width: 100%;
+  margin-bottom: 15px;
+  text-align: left;
+}
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.input-group input[type="text"] {
+  width: 100%;
+  box-sizing: border-box; /* Importante */
+  border-radius: 8px; /* Redondeado completo */
+}
+
+button {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+#result-area {
+  margin-top: 20px;
+  width: 100%;
+}
+#result-area input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  font-weight: bold;
+  background: #eee;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
+}

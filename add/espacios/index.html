@@ -274,117 +274,189 @@
             </div>
 
             <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">2. Detalles del
-                    Evento</h3>
+                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">2. Detalles del Evento</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
-                        <label for="nombreActividad" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la
-                            Actividad Académica</label>
+                        <label for="nombreActividad" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Actividad Académica</label>
                         <input type="text" id="nombreActividad" name="nombreActividad" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
                             placeholder="Ej. Sesión General de Neumología">
                     </div>
+                    
                     <div>
-                        <label for="tipoEvento" class="block text-sm font-medium text-gray-700 mb-1">Tipo de
-                            Evento</label>
+                        <label for="tipoEvento" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Evento</label>
                         <div class="combobox-container">
                             <input type="text" id="tipoEvento" name="tipoEvento" required
                                 class="combobox-input w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
-                                placeholder="Escriba para buscar o haga clic..." autocomplete="off">
+                                placeholder="Seleccione..." autocomplete="off">
                             <div id="tipoEventoDropdown" class="combobox-dropdown hidden"></div>
                         </div>
+                        <div id="otroTipoEventoContainer" class="hidden mt-2">
+                            <label for="otroTipoEvento" class="block text-xs text-gray-500 mb-1">Especifique el tipo de evento:</label>
+                            <input type="text" id="otroTipoEvento" name="otroTipoEvento"
+                                class="w-full px-3 py-1 border border-gray-300 rounded-md focus:ring-brand text-sm bg-gray-50">
+                        </div>
                     </div>
+
                     <div>
-                        <label for="tipoActividad" class="block text-sm font-medium text-gray-700 mb-1">Tipo de
-                            Actividad</label>
+                        <label for="tipoActividad" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Actividad</label>
                         <div class="combobox-container">
                             <input type="text" id="tipoActividad" name="tipoActividad" required
                                 class="combobox-input w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
-                                placeholder="Escriba para buscar o haga clic..." autocomplete="off">
+                                placeholder="Seleccione..." autocomplete="off">
                             <div id="tipoActividadDropdown" class="combobox-dropdown hidden"></div>
+                        </div>
+                        <div id="otroTipoActividadContainer" class="hidden mt-2">
+                            <label for="otroTipoActividad" class="block text-xs text-gray-500 mb-1">Especifique el tipo de actividad:</label>
+                            <input type="text" id="otroTipoActividad" name="otroTipoActividad"
+                                class="w-full px-3 py-1 border border-gray-300 rounded-md focus:ring-brand text-sm bg-gray-50">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">3. Requisitos de
-                    Fecha y Espacio</h3>
+                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">3. Fechas, Horarios y Modalidad</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">Fecha de
-                            Inicio</label>
+                        <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio (Primer día)</label>
                         <input type="date" id="fechaInicio" name="fechaInicio" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
                     </div>
                     <div>
-                        <label for="fechaFin" class="block text-sm font-medium text-gray-700 mb-1">Fecha de
-                            Finalización</label>
+                        <label for="fechaFin" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Finalización (Último día)</label>
                         <input type="date" id="fechaFin" name="fechaFin" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
+                        <p class="text-xs text-gray-500 mt-1">Si es un solo día, ponga la misma fecha que el inicio.</p>
                     </div>
+
                     <div>
-                        <label for="horaInicio" class="block text-sm font-medium text-gray-700 mb-1">Horario de
-                            Inicio</label>
+                        <label for="horaInicio" class="block text-sm font-medium text-gray-700 mb-1">Horario de Inicio</label>
                         <input type="time" id="horaInicio" name="horaInicio" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
                     </div>
                     <div>
-                        <label for="horaFin" class="block text-sm font-medium text-gray-700 mb-1">Horario de
-                            Finalización</label>
+                        <label for="horaFin" class="block text-sm font-medium text-gray-700 mb-1">Horario de Finalización</label>
                         <input type="time" id="horaFin" name="horaFin" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
                     </div>
+
                     <div>
-                        <label for="aforoRequerido" class="block text-sm font-medium text-gray-700 mb-1">Número de
-                            Asistentes (Aforo)</label>
+                        <label for="recurrencia" class="block text-sm font-medium text-gray-700 mb-1">Patrón de Repetición</label>
+                        <select id="recurrencia" name="recurrencia" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+                            <option value="unaVez">Una sola vez</option>
+                            <option value="personalizada">Varios días (Seleccionar abajo)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="aforoRequerido" class="block text-sm font-medium text-gray-700 mb-1">Número de Asistentes</label>
                         <input type="number" id="aforoRequerido" name="aforoRequerido" min="1" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
                             placeholder="Ej. 50">
                     </div>
-                    <div>
-                        <label for="recurrencia"
-                            class="block text-sm font-medium text-gray-700 mb-1">Recurrencia</label>
-                        <select id="recurrencia" name="recurrencia" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="unaVez">Una sola vez</option>
-                            <option value="diaria">Se repite Diariamente</option>
-                            <option value="semanal">Se repite Semanalmente</option>
-                            <option value="mensual">Se repite Mensualmente</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="modalidad" class="block text-sm font-medium text-gray-700 mb-1">Modalidad</label>
-                        <select id="modalidad" name="modalidad" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
-                            <option value="Presencial">Presencial</option>
-                            <option value="Virtual">Virtual</option>
-                            <option value="Hibrido">Híbrido</option>
-                        </select>
-                    </div>
                 </div>
-            </div>
 
-            <div class="space-y-4">
-                <div id="zoomContainer" class="conditional-field bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div id="diasSemanaContainer" class="hidden mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Seleccione los días que se repite el evento:</label>
+                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_lunes" name="dias[]" value="Lunes" class="peer hidden">
+                            <label for="dia_lunes" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">L</label>
+                        </div>
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_martes" name="dias[]" value="Martes" class="peer hidden">
+                            <label for="dia_martes" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">M</label>
+                        </div>
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_miercoles" name="dias[]" value="Miércoles" class="peer hidden">
+                            <label for="dia_miercoles" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">M</label>
+                        </div>
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_jueves" name="dias[]" value="Jueves" class="peer hidden">
+                            <label for="dia_jueves" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">J</label>
+                        </div>
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_viernes" name="dias[]" value="Viernes" class="peer hidden">
+                            <label for="dia_viernes" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">V</label>
+                        </div>
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_sabado" name="dias[]" value="Sábado" class="peer hidden">
+                            <label for="dia_sabado" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">S</label>
+                        </div>
+                        <div class="day-selector">
+                            <input type="checkbox" id="dia_domingo" name="dias[]" value="Domingo" class="peer hidden">
+                            <label for="dia_domingo" class="block w-10 h-10 rounded-full border-2 border-gray-300 text-center leading-9 cursor-pointer hover:bg-gray-100 peer-checked:bg-brand peer-checked:border-brand peer-checked:text-white transition-all select-none font-bold">D</label>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">El evento se programará en estos días seleccionados que caigan entre la Fecha de Inicio y la Fecha de Fin.</p>
+                </div>
+
+                <div class="mt-6">
+                    <label for="modalidad" class="block text-sm font-medium text-gray-700 mb-1">Modalidad</label>
+                    <select id="modalidad" name="modalidad" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand bg-white">
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                        <option value="Hibrido">Híbrido</option>
+                    </select>
+                </div>
+
+                <div id="zoomContainer" class="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
                     <div class="flex items-center">
                         <input id="crearZoom" name="crearZoom" type="checkbox"
                             class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
-                        <label for="crearZoom" class="ml-3 block text-sm font-medium text-gray-900">Crear
-                            automáticamente una reunión de Zoom para este evento.</label>
+                        <label for="crearZoom" class="ml-3 block text-sm font-medium text-gray-900">
+                            Crear automáticamente una reunión de Zoom para este evento.
+                        </label>
                     </div>
-                </div>
-                <div id="recurrenciaContainer"
-                    class="conditional-field bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <label for="recurrenciaHasta" class="block text-sm font-medium text-gray-700 mb-1">Repetir hasta la
-                        fecha:</label>
-                    <input type="date" id="recurrenciaHasta" name="recurrenciaHasta"
-                        class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand">
                 </div>
             </div>
 
             <div>
-                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">4. Comentarios
+                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">4. Requerimientos Técnicos y Mobiliario</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div class="flex items-center p-3 border border-gray-200 rounded hover:bg-gray-50">
+                        <input id="req_proyector" name="requerimientos[]" value="Videoproyector" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                        <label for="req_proyector" class="ml-3 block text-sm text-gray-700 font-medium">Videoproyector</label>
+                    </div>
+
+                    <div class="flex items-center p-3 border border-gray-200 rounded hover:bg-gray-50">
+                        <input id="req_pizarron" name="requerimientos[]" value="Pizarrón Blanco" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                        <label for="req_pizarron" class="ml-3 block text-sm text-gray-700 font-medium">Pizarrón Blanco</label>
+                    </div>
+
+                    <div class="flex items-center p-3 border border-gray-200 rounded hover:bg-gray-50">
+                        <input id="req_plumones" name="requerimientos[]" value="Plumones/Borrador" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                        <label for="req_plumones" class="ml-3 block text-sm text-gray-700 font-medium">Plumones / Borrador</label>
+                    </div>
+
+                    <div class="flex items-center p-3 border border-gray-200 rounded hover:bg-gray-50">
+                        <input id="req_internet" name="requerimientos[]" value="Acceso a Internet" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                        <label for="req_internet" class="ml-3 block text-sm text-gray-700 font-medium">Acceso a Internet</label>
+                    </div>
+
+                    <div class="flex items-center p-3 border border-gray-200 rounded hover:bg-gray-50">
+                        <input id="req_sonido" name="requerimientos[]" value="Sonido" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                        <label for="req_sonido" class="ml-3 block text-sm text-gray-700 font-medium">Sonido / Micrófono</label>
+                    </div>
+
+                    <div class="md:col-span-2 bg-gray-50 p-3 border border-gray-200 rounded">
+                        <div class="flex items-center mb-2">
+                            <input id="req_otro" name="requerimientos[]" value="Otro" type="checkbox" class="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand">
+                            <label for="req_otro" class="ml-3 block text-sm text-gray-700 font-medium">Otro requerimiento</label>
+                        </div>
+                        <input type="text" id="req_otro_texto" name="otroRequerimientoTexto" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand hidden"
+                            placeholder="Especifique qué otro material o equipo necesita...">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-6">5. Comentarios
                     Adicionales</h3>
                 <div>
                     <label for="comentarios" class="block text-sm font-medium text-gray-700 mb-1">Comentarios</label>

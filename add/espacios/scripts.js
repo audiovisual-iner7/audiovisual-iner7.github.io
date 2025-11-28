@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // --- 1. Elementos del DOM ---
     // ❌ ELIMINADA: const startRequestBtn = document.getElementById('startRequestBtn');
     // ❌ ELIMINADA: const initialButtonContainer = document.getElementById('initialButtonContainer');
@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const recurrenciaSelect = document.getElementById('recurrencia');
     const zoomContainer = document.getElementById('zoomContainer');
     const recurrenciaContainer = document.getElementById('recurrenciaContainer');
-    
+
     // --- 2. Listas de Opciones y Datos para Comboboxes ---
-    
+
     // Lista de todas las áreas/departamentos
     const areas = [
         'Clínica Asma e Inmunoalergia',
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'Vigilancia Epidemiológica',
         'OTRO'
     ];
-    
+
     const tiposEvento = [
         'Congreso',
         'Curso',
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'Conferencia',
         'Otro'
     ];
-    
+
     const tiposActividad = [
         'Presentación Oral',
         'Mesa Redonda',
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'Sesión de Preguntas y Respuestas (Q&A)',
         'Otro'
     ];
-    
+
     // --- 3. Lógica General para Comboboxes (Reutilizada de la optimización anterior) ---
 
     function setupCombobox(inputId, dropdownId, sourceArray) {
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function filterItems(searchTerm) {
             if (!searchTerm) return sourceArray;
-            return sourceArray.filter(item => 
+            return sourceArray.filter(item =>
                 item.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function showDropdown(itemsToShow) {
             filteredSource = itemsToShow;
             dropdownElement.innerHTML = '';
-            
+
             if (filteredSource.length === 0) {
                 const noResultsOption = document.createElement('div');
                 noResultsOption.className = 'combobox-option';
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     dropdownElement.appendChild(option);
                 });
             }
-            
+
             dropdownElement.classList.remove('hidden');
             currentHighlightedIndex = -1;
         }
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function highlightOption(index) {
             const options = dropdownElement.querySelectorAll('.combobox-option');
             options.forEach(option => option.classList.remove('highlighted'));
-            
+
             if (index >= 0 && index < options.length) {
                 options[index].classList.add('highlighted');
                 currentHighlightedIndex = index;
@@ -283,8 +283,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         inputElement.addEventListener('keydown', (e) => {
             const options = dropdownElement.querySelectorAll('.combobox-option');
-            
-            switch(e.key) {
+
+            switch (e.key) {
                 case 'ArrowDown':
                     e.preventDefault();
                     if (currentHighlightedIndex < options.length - 1) {
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
             }
         });
-        
+
         // Cerrar dropdown al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (!inputElement.contains(e.target) && !dropdownElement.contains(e.target)) {
@@ -328,35 +328,91 @@ document.addEventListener('DOMContentLoaded', function() {
     // ❌ ELIMINADA: La lógica de startRequestBtn
 
     // --- 5. Lógica para campos condicionales (Se mantiene) ---
-    modalidadSelect.addEventListener('change', () => {
-        // Mostrar/Ocultar Zoom solo si es Virtual o Híbrido
-        if (modalidadSelect.value === 'Virtual' || modalidadSelect.value === 'Hibrido') {
-            zoomContainer.style.display = 'block';
+    // A. Lógica "OTRO" para Comboboxes (Tipo Evento y Actividad)
+    function handleOtherInput(inputId, dropdownId, containerId, otherInputId) {
+        const input = document.getElementById(inputId);
+        const container = document.getElementById(containerId);
+        const otherInput = document.getElementById(otherInputId);
+
+        // Observer para detectar cambios en el valor del input principal
+        // Como usamos un combobox personalizado, el evento 'change' se dispara manualmente
+        input.addEventListener('change', () => {
+            const val = input.value.trim().toUpperCase();
+            if (val === 'OTRO' || val === 'OTROS') {
+                container.classList.remove('hidden');
+                otherInput.setAttribute('required', 'required');
+                otherInput.focus(); // Foco automático para mejorar UX
+            } else {
+                container.classList.add('hidden');
+                otherInput.removeAttribute('required');
+                otherInput.value = ''; // Limpiar si se oculta
+            }
+        });
+    }
+
+    // Inicializar listeners para "Otro"
+    handleOtherInput('tipoEvento', 'tipoEventoDropdown', 'otroTipoEventoContainer', 'otroTipoEvento');
+    handleOtherInput('tipoActividad', 'tipoActividadDropdown', 'otroTipoActividadContainer', 'otroTipoActividad');
+
+
+   
+
+    // C. Lógica de Recurrencia (Selector de Días)
+    const diasSemanaContainer = document.getElementById('diasSemanaContainer');
+
+    recurrenciaSelect.addEventListener('change', () => {
+        if (recurrenciaSelect.value === 'personalizada') {
+            // Mostrar selector de días
+            diasSemanaContainer.classList.remove('hidden');
+            diasSemanaContainer.classList.add('fade-in'); // Animación opcional
+
+            // Hacer que al menos un día sea obligatorio seleccionar
+            // (Esto se valida mejor al enviar, pero visualmente ayuda)
         } else {
-            zoomContainer.style.display = 'none';
-            document.getElementById('crearZoom').checked = false; // Desmarcar si se oculta
+            // Ocultar y limpiar
+            diasSemanaContainer.classList.add('hidden');
+
+            // Desmarcar todos los días si se oculta
+            const checkboxes = diasSemanaContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
         }
     });
 
-    recurrenciaSelect.addEventListener('change', () => {
-        // Mostrar/Ocultar Recurrencia Hasta si no es 'Una sola vez'
-        if (recurrenciaSelect.value !== 'unaVez') {
-            recurrenciaContainer.style.display = 'block';
-            document.getElementById('recurrenciaHasta').setAttribute('required', 'required');
-        } else {
-            recurrenciaContainer.style.display = 'none';
-            document.getElementById('recurrenciaHasta').removeAttribute('required');
-            document.getElementById('recurrenciaHasta').value = ''; // Limpiar campo
-        }
-    });
-    
-    // Ejecutar al cargar para establecer el estado inicial correcto
+
+    // D. Lógica de Requerimientos "OTRO"
+    const reqOtroCheckbox = document.getElementById('req_otro');
+    const reqOtroTexto = document.getElementById('req_otro_texto');
+
+    if (reqOtroCheckbox) {
+        reqOtroCheckbox.addEventListener('change', () => {
+            if (reqOtroCheckbox.checked) {
+                reqOtroTexto.classList.remove('hidden');
+                reqOtroTexto.setAttribute('required', 'required');
+                reqOtroTexto.focus();
+            } else {
+                reqOtroTexto.classList.add('hidden');
+                reqOtroTexto.removeAttribute('required');
+                reqOtroTexto.value = '';
+            }
+        });
+    }
+
+
+    // Inicializar estados al cargar
     modalidadSelect.dispatchEvent(new Event('change'));
     recurrenciaSelect.dispatchEvent(new Event('change'));
 
-    // --- 6. Lógica para enviar el formulario a Google Sheets (Se mantiene) ---
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // Validación extra: Si es recurrente, verificar que al menos 1 día esté seleccionado
+        if (recurrenciaSelect.value === 'personalizada') {
+            const diasSeleccionados = document.querySelectorAll('input[name="dias[]"]:checked');
+            if (diasSeleccionados.length === 0) {
+                alert('Por favor, selecciona al menos un día de la semana para la repetición.');
+                return; // Detener envío
+            }
+        }
 
         submitBtn.disabled = true;
         loadingSpinner.classList.remove('hidden');
@@ -364,8 +420,43 @@ document.addEventListener('DOMContentLoaded', function() {
         statusMessage.className = 'text-sm font-medium text-blue-600';
 
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
         
+        // Convertimos FormData a objeto, pero manejando los Arrays (Días y Requerimientos) manualmente
+        const data = {};
+        formData.forEach((value, key) => {
+            // Si la llave termina en [], es un array
+            if (key.endsWith('[]')) {
+                const cleanKey = key.slice(0, -2); // quitar []
+                if (!data[cleanKey]) {
+                    data[cleanKey] = [];
+                }
+                data[cleanKey].push(value);
+            } else {
+                data[key] = value;
+            }
+        });
+        
+        // Procesar campos "OTRO" para que se guarden en el campo principal si aplica
+        if (data.tipoEvento === 'OTRO' && data.otroTipoEvento) {
+            data.tipoEvento = 'OTRO: ' + data.otroTipoEvento;
+        }
+        if (data.tipoActividad === 'OTRO' && data.otroTipoActividad) {
+            data.tipoActividad = 'OTRO: ' + data.otroTipoActividad;
+        }
+
+        // Unir arrays para enviarlos como string (opcional, o enviarlos como array al backend)
+        // Para simplificar la hoja de cálculo, los uniremos con comas aquí:
+        if (data.dias && Array.isArray(data.dias)) data.dias = data.dias.join(', ');
+        if (data.requerimientos && Array.isArray(data.requerimientos)) {
+             // Si hay "Otro" y texto especificado, agregarlo al string de requerimientos
+             if (data.requerimientos.includes('Otro') && data.otroRequerimientoTexto) {
+                 // Removemos "Otro" literal y ponemos el texto
+                 data.requerimientos = data.requerimientos.filter(r => r !== 'Otro');
+                 data.requerimientos.push('Otro: ' + data.otroRequerimientoTexto);
+             }
+             data.requerimientos = data.requerimientos.join(', ');
+        }
+
         data.timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
         data.action = "solicitudEvento"; 
 
@@ -374,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function sendDataToGoogle(data) {
         const scriptURL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
-        
+
         console.log('Sending data:', data);
 
         const formData = new FormData();
@@ -384,41 +475,41 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => {
-            return response.text().then(text => {
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('Failed to parse JSON:', text);
-                    throw new Error('Respuesta no válida del servidor.');
+            .then(response => {
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('Failed to parse JSON:', text);
+                        throw new Error('Respuesta no válida del servidor.');
+                    }
+                });
+            })
+            .then(res => {
+                if (res.result === 'success') {
+                    var folio = res.folio || 'N/A';
+                    statusMessage.textContent = '¡Solicitud enviada con éxito! Tu folio es: ' + folio;
+                    statusMessage.className = 'text-green-600';
+                    form.reset();
+
+                    // Reiniciar los estados condicionales y de combobox
+                    zoomContainer.style.display = 'none';
+                    recurrenciaContainer.style.display = 'none';
+
+                } else {
+                    throw new Error(res.error || 'Error desconocido del servidor.');
                 }
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                statusMessage.textContent = 'Error al enviar. Intente de nuevo.';
+                statusMessage.className = 'text-red-600';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
+                setTimeout(() => { statusMessage.textContent = ''; }, 6000);
             });
-        })
-        .then(res => {
-            if (res.result === 'success') {
-                var folio = res.folio || 'N/A';
-                statusMessage.textContent = '¡Solicitud enviada con éxito! Tu folio es: ' + folio;
-                statusMessage.className = 'text-green-600';
-                form.reset();
-                
-                // Reiniciar los estados condicionales y de combobox
-                zoomContainer.style.display = 'none';
-                recurrenciaContainer.style.display = 'none';
-                
-            } else {
-                throw new Error(res.error || 'Error desconocido del servidor.');
-            }
-        })
-        .catch(error => {
-            console.error('Error!', error.message);
-            statusMessage.textContent = 'Error al enviar. Intente de nuevo.';
-            statusMessage.className = 'text-red-600';
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            loadingSpinner.classList.add('hidden');
-            setTimeout(() => { statusMessage.textContent = ''; }, 6000);
-        });
     }
 
     // --- 7. Lógica del Tour (Shepherd.js) ---
@@ -426,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tour = new Shepherd.Tour({
         useModalOverlay: true,
         defaultStepOptions: {
-            classes: 'shepherd-theme-arrows', 
+            classes: 'shepherd-theme-arrows',
             scrollTo: true
         }
     });
@@ -442,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Los siguientes pasos se mantienen, pero se ajustó el primer paso del tour.
-    
+
     tour.addStep({
         id: 'step-nombre',
         text: 'Escribe tu nombre completo.',
@@ -478,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
         attachTo: { element: '#tipoEvento', on: 'bottom' },
         buttons: [{ text: 'Atrás', action: tour.back }, { text: 'Siguiente', action: tour.next }]
     });
-    
+
     tour.addStep({
         id: 'step-tipoActividad',
         text: 'Indica el tipo de actividad, como Presentación Oral o Mesa Redonda.',

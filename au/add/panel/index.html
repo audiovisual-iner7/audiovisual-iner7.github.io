@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Oficina de Audiovisual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Usamos la fuente Inter para un look más profesional */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para el color principal de la institución */
+        :root {
+            --brand-color: #003C7D;
+            --brand-color-light: #0056b3;
+            --brand-color-dark: #002a59;
+        }
+        .bg-brand { background-color: var(--brand-color); }
+        .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
+        .border-brand { border-color: var(--brand-color); }
+        .text-brand { color: var(--brand-color); }
+        
+        /* Ocultar elementos inicialmente */
+        #adminPanel {
+            display: none;
+        }
+        
+        /* Animación suave para mostrar el panel */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Estilos para el logo en el header */
+        .header-logo {
+            height: 50px;
+            width: auto;
+            max-width: 137px;
+            object-fit: contain;
+        }
+        
+        /* Responsive para el logo */
+        @media (max-width: 768px) {
+            .header-logo {
+                height: 40px;
+                max-width: 110px;
+            }
+        }
+        
+        /* Ajuste del header para acomodar el logo */
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Estilos para la tabla de pendientes */
+        .pending-table {
+            font-size: 0.875rem;
+        }
+        
+        .pending-table th {
+            background-color: var(--brand-color);
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: left;
+        }
+        
+        .pending-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        
+        .pending-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Estilos para el modal de asignación */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Estilos para badges de estatus */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pendiente {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-proceso {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-revision {
+            background-color: #fce7f3;
+            color: #be185d;
+        }
+
+        /* Estilos para badges de estatus */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pendiente {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-proceso {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-revision {
+            background-color: #fce7f3;
+            color: #be185d;
+        }
+
+                /* --- ESTILOS PARA EL COMBOBOX (Añadir o reemplazar si ya existen) --- */
+        .combobox-container {
+            position: relative;
+        }
+
+        .combobox-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .combobox-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.875rem;
+        }
+
+        .combobox-option:hover {
+            background-color: #f9fafb;
+        }
+
+        .combobox-option.highlighted {
+            background-color: var(--brand-color);
+            color: white;
+        }
+
+        .combobox-option:last-child {
+            border-bottom: none;
+        }
+
+        .combobox-input {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        /* Layout de dos columnas */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Responsive para móviles */
+        @media (max-width: 1024px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* Layout de dos columnas */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Responsive para móviles */
+        @media (max-width: 1024px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .cart-item {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-search-container {
+            position: relative;
+        }
+
+        .service-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-dropdown-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .service-dropdown-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .service-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .cart-item:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-brand shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="header-content">
+                <a href="index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
+                <div class="flex-1">
+                    <a href="index.html"><h1 class="text-2xl font-bold text-white">Panel de Administración - Oficina de Audiovisual</h1></a>
+                </div>
+                <div class="relative" id="navMenu">
+                    <button id="menuBtn" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand focus:ring-white">
+                        <span>Menú</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    <div id="dropdownMenu" class="hidden absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-out duration-100"
+                        role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                        <div class="py-1" role="none">
+                            <a href="../panel/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">Inicio</a>
+                            <a href="../entrega/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">Entregar</a>
+                            <a href="../calendario/index.html" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-2">Eventos</a>
+                            <a href="../request/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-3">Solicitudes</a>
+                            <a href="../../sqr/index.html" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-4">QR's</a>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div id="userInfo" class="text-white text-sm hidden">
+                    <span id="welcomeUser"></span>
+                    <button id="logoutBtn" class="ml-4 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container max-w-full mx-auto p-4 md:p-8">
+        
+        <!-- Pantalla de Login -->
+        <div id="loginContainer" class="max-w-md mx-auto mt-20">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Acceso Administrativo</h2>
+                    <p class="text-gray-600">Ingrese sus credenciales para continuar</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                        <input type="text" id="username" name="username" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+                               placeholder="Ingrese su usuario">
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                        <input type="password" id="password" name="password" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+                               placeholder="Ingrese su contraseña">
+                    </div>
+                    
+                    <div id="loginError" class="hidden text-red-600 text-sm text-center"></div>
+                    
+                    <button type="submit" id="loginBtn" 
+                            class="w-full bg-brand text-white font-bold py-3 px-4 rounded-lg hover:bg-brand-light transition-colors duration-300">
+                        <span id="loginBtnText">Iniciar Sesión</span>
+                        <div id="loginSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Panel de Administración -->
+        <div id="adminPanel">
+            <div class="two-column-layout">
+                
+                 <!-- Columna izquierda: Solicitudes Pendientes -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Solicitudes Pendientes</h2>
+                        <button id="refreshBtn" class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Actualizar
+                        </button>
+                    </div>
+                    
+                    <div id="loadingPendientes" class="text-center py-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto mb-4"></div>
+                        <p class="text-gray-600">Cargando solicitudes pendientes...</p>
+                    </div>
+                    
+                    <div id="pendientesContainer" class="hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full pending-table">
+                               <thead>
+                                    <tr>
+                                        <th class="w-24">Folio</th>
+                                        <th class="w-24">Fecha</th>
+                                        <th class="w-32">Solicitante</th>
+                                        <th class="w-32">Área</th>
+                                        <th class="w-32">Descripción</th>
+                                        <th class="w-24">Acciones</th> </tr>
+                                </thead>
+                                <tbody id="pendientesTableBody">
+                                    <!-- Los datos se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="noPendientes" class="hidden text-center py-8 text-gray-500">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-lg font-medium">¡Excelente trabajo!</p>
+                            <p>No tienes registros pendientes por registrar.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha: Formulario de Asignación -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Registrar Folio</h2>
+                    
+                    <form id="nuevaSolicitudForm" class="space-y-4">
+                        <!-- Primera fila: Folio, Fecha Solicitud, Fecha Entrega -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label for="folioSolicitud" class="block text-sm font-medium text-gray-700 mb-1">Folio de Solicitud</label>
+                                <select id="folioSolicitud" name="folio" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm">
+                                    <option value="">Seleccione un folio</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="fechaSolicitud" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Solicitud</label>
+                                <input type="date" id="fechaSolicitud" name="fechaSolicitud" required 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm">
+                            </div>
+                            <div>
+                                <label for="fechaEntrega" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega</label>
+                                <input type="date" id="fechaEntrega" name="fechaEntrega" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Segunda fila: Nombre del Solicitante (ancho completo) -->
+                        <div>
+                            <label for="nombreSolicitante" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Solicitante</label>
+                            <input type="text" id="nombreSolicitante" name="nombreSolicitante" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm"
+                                placeholder="Ingrese el nombre completo">
+                        </div>
+                        <div>
+                            <label for="emailSolicitante" class="block text-sm font-medium text-gray-700 mb-1">Correo del Solicitante (Opcional)</label>
+                            <input type="email" id="emailSolicitante" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="ejemplo@iner.com">
+                        </div>
+
+                        <!-- Tercera fila: Área, Vale, Elaboró -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label for="area" class="block text-sm font-medium text-gray-700 mb-1">Área</label>
+                                <div class="combobox-container">
+                                    <input type="text" id="area" name="area" required 
+                                        class="combobox-input w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm"
+                                        placeholder="Escriba para buscar un área..."
+                                        autocomplete="off">
+                                    <div id="areaDropdown" class="combobox-dropdown hidden"></div>
+                                </div>
+                            </div>
+                                                        <div>
+                                <label for="vale" class="block text-sm font-medium text-gray-700 mb-1">Vale</label>
+                                <select id="vale" name="vale" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm">
+                                    <option value="">Seleccione estado del vale</option>
+                                    <option value="con_vale">CON VALE</option>
+                                    <option value="vale_pendiente">VALE PENDIENTE</option>
+                                    <option value="no_requiere">NO REQUIERE VALE</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="elaboro" class="block text-sm font-medium text-gray-700 mb-1">Elaboró</label>
+                                <select id="elaboro" name="elaboro" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm">
+                                    <option value="">Seleccione quien elabora</option>
+                                    <option value='CARLOS'>CARLOS</option>
+                                    <option value='DANIEL'>DANIEL</option>
+                                    <option value='DIANA'>DIANA</option>
+                                    <option value='GIOVANNY'>GIOVANNY</option>
+                                    <option value='HILDING'>HILDING</option>
+                                    <option value='MARICELA'>MARICELA</option>
+                                    <option value='MIGUEL'>MIGUEL</option>
+                                    <option value='SAM'>SAM</option>
+                                    <option value='SCARLET'>SCARLET</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Cuarta fila: Tipo de Trabajo y Clave -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="tipoTrabajo" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Trabajo</label>
+                                <select id="tipoTrabajo" name="tipoTrabajo" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm">
+                                    <option value="">Seleccione el tipo de trabajo</option>
+                                    <option value='AA'>AA - APOYO ADMINISTRATIVO</option>
+                                    <option value='AAV'>AAV - APOYO AUDIOVISUAL</option>
+                                    <option value='AG'>AG - AUDIOGRABACIÓN</option>
+                                    <option value='ANI'>ANI - ANIMACIÓN</option>
+                                    <option value='ATE'>ATE - APOYO TÉCNICO</option>
+                                    <option value='ATI'>ATI - APOYO TÉCNICO INFORMATICO</option>
+                                    <option value='BC'>BC - BOND CARTA</option>
+                                    <option value='BO'>BO - BOND OFICIO</option>
+                                    <option value='BT'>BT - BOND TABLOIDE</option>
+                                    <option value='CD'>CD - CD: GRABADO O EN BLANCO</option>
+                                    <option value='COC'>COC - CARTULINA OPALINA CARTA</option>
+                                    <option value='D'>D - DISEÑO</option>
+                                    <option value='DD'>DD - DUPLICADOR DIGITAL</option>
+                                    <option value='DEI'>DEI - DIBUJO E ILUSTRACIÓN</option>
+                                    <option value='DIMC'>DIMC - DISEÑO, IMPRESIÓN, MONTAJE Y CORTE</option>
+                                    <option value='DVD'>DVD - DVD: GRABADO O EN BLANCO</option>
+                                    <option value='EFD'>EFD - EDICIÓN DE FOTOGRAFÍA DIGITAL</option>
+                                    <option value='ENG'>ENG - ENGARGOLADO</option>
+                                    <option value='ES'>ES - ESCANEOS</option>
+                                    <option value='FBI'>FBI - FOTOGRAFÍA BANCO DE IMAGEN</option>
+                                    <option value='FC'>FC - FOTOGRAFÍAS COMPARTIDAS</option>
+                                    <option value='IMPD'>IMPD - IMPRESIÓN DIGITAL</option>
+                                    <option value='IMPP'>IMPP - IMPRESIÓN PLOTTER</option>
+                                    <option value='MAT'>MAT - MATERIAL</option>
+                                    <option value='MB'>MB - MONTAJE EN BATERÍA</option>
+                                    <option value='MF'>MF - MONTAJE FOAMBOARD</option>
+                                    <option value='NA'>NA - NO APLICA</option>
+                                    <option value='NOMENCLATURA TIPOS DE IMPRESIÓN'>NOMENCLATURA TIPOS DE IMPRESIÓN - TIPOS DE IMPRESIÓN </option>
+                                    <option value='OT'>OT - OPALINA TABLOIDE</option>
+                                    <option value='PA'>PA - PRODUCCIÓN AUDIOVISUAL</option>
+                                    <option value='PAP'>PAP - PLOTTER ADHERIBLE PAPEL</option>
+                                    <option value='PAV'>PAV - PLOTTER ADHERIBLE  VINIL</option>
+                                    <option value='PB'>PB - PLOTTER BOND</option>
+                                    <option value='PE'>PE - PAPEL ESPECIAL</option>
+                                    <option value='PEQ'>PEQ - PRESTAMO DE EQUIPO</option>
+                                    <option value='PFB'>PFB - PLOTTER FOTOGRAFICO BRILLANTE</option>
+                                    <option value='PFM'>PFM - PLOTTER FOTOGRAFICO MATE</option>
+                                    <option value='POC'>POC - PAPEL OPALINA CARTA</option>
+                                    <option value='PRU'>PRU - PEPEL DE REUSO </option>
+                                    <option value='VBI'>VBI - VIDEO BANCO DE IMÁGEN</option>
+                                    <option value='VC'>VC - VIDEOS COMPARTIDOS</option>
+                                    <option value='VE'>VE - VIDEOS EDITADOS</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="clave" class="block text-sm font-medium text-gray-700 mb-1">Clave <span class="text-gray-400">(Opcional)</span></label>
+                                <input type="text" id="clave" name="clave" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm"
+                                    placeholder="Ingrese clave si aplica">
+                            </div>
+                        </div>
+
+                        <!-- Checkbox Duplicador Digital -->
+                        <div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="duplicadorDigital" name="duplicadorDigital" 
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="duplicadorDigital" class="ml-2 block text-sm text-gray-700">
+                                    Duplicador Digital
+                                </label>
+                            </div>
+                            <div id="numeroMasters" class="mt-2 hidden">
+                                <label for="cantidadMasters" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Número de Masters
+                                </label>
+                                <input type="number" id="cantidadMasters" name="cantidadMasters" min="1" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Ingrese la cantidad">
+                            </div>
+                        </div>
+
+                        <!-- Quinta fila: Descripción (ancho completo) -->
+                        <div>
+                            <label for="descripcionTrabajo" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                            <textarea id="descripcionTrabajo" name="descripcion" required rows="3"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm resize-none"
+                                    placeholder="Describa los detalles del trabajo a realizar"></textarea>
+                        </div>
+
+                        <!-- Sección de Servicios -->
+                        <div>
+                            <label for="serviciosBusqueda" class="block text-sm font-medium text-gray-700 mb-1">Buscar y Agregar Servicio</label>
+                            <div class="combobox-container">
+                                <input type="text" id="serviciosBusqueda"
+                                    class="combobox-input w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand text-sm"
+                                    placeholder="Escriba para buscar un servicio..."
+                                    autocomplete="off">
+                                <div id="serviciosDropdown" class="combobox-dropdown hidden"></div>
+                            </div>
+                        </div>
+
+                        <!-- Servicios seleccionados -->
+                        <div id="serviciosSeleccionados" class="mb-4 hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Servicios Seleccionados</label>
+                            <div id="serviciosCart" class="space-y-2">
+                                <!-- Los servicios se agregarán aquí dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" 
+                                    class="flex-1 bg-brand text-white font-medium py-2 px-4 rounded-lg hover:bg-brand-light transition-colors text-sm">
+                                Registrar Solicitud
+                            </button>
+                            <button type="button" id="clearForm"
+                                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                                Limpiar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="detailsModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h3 class="text-xl font-bold text-gray-800">Detalles de la Solicitud</h3>
+                    <button id="closeModalBtn" class="text-gray-500 hover:text-gray-800">&times;</button>
+                </div>
+                <div id="modalContent" class="p-6 overflow-y-auto">
+                    <div class="text-center text-gray-500">Cargando...</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+
+
+    <footer class="bg-gray-800 text-white text-center p-4 mt-12">
+        <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="./scripts.js"></script>
+</body>
+</html>

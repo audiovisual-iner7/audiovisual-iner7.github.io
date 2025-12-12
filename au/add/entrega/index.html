@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Oficina de Audiovisual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Usamos la fuente Inter para un look más profesional */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para el color principal de la institución */
+        :root {
+            --brand-color: #003C7D;
+            --brand-color-light: #0056b3;
+            --brand-color-dark: #002a59;
+        }
+        .bg-brand { background-color: var(--brand-color); }
+        .hover\:bg-brand-light:hover { background-color: var(--brand-color-light); }
+        .border-brand { border-color: var(--brand-color); }
+        .text-brand { color: var(--brand-color); }
+        
+        /* Ocultar elementos inicialmente */
+        #adminPanel {
+            display: none;
+        }
+        
+        /* Animación suave para mostrar el panel */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Estilos para el logo en el header */
+        .header-logo {
+            height: 50px;
+            width: auto;
+            max-width: 137px;
+            object-fit: contain;
+        }
+        
+        /* Responsive para el logo */
+        @media (max-width: 768px) {
+            .header-logo {
+                height: 40px;
+                max-width: 110px;
+            }
+        }
+        
+        /* Ajuste del header para acomodar el logo */
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Estilos para la tabla de pendientes */
+        .pending-table {
+            font-size: 0.875rem;
+        }
+        
+        .pending-table th {
+            background-color: var(--brand-color);
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: left;
+        }
+        
+        .pending-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        
+        .pending-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Estilos para el modal de asignación */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Estilos para badges de estatus */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pendiente {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-proceso {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-revision {
+            background-color: #fce7f3;
+            color: #be185d;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-brand shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="header-content">
+                <a href="index.html"><img src="../img/logo iner blanco-04.png" alt="Logo Institucional" class="header-logo"></a>
+                <div class="flex-1">
+                    <a href="index.html"><h1 class="text-2xl font-bold text-white">Panel de Administración - Oficina de Audiovisual</h1></a>
+                </div>
+                <div class="relative" id="navMenu">
+                    <button id="menuBtn" type="button" class="inline-flex items-center gap-x-1.5 rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand focus:ring-white">
+                        <span>Menú</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    <div id="dropdownMenu" class="hidden absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition ease-out duration-100"
+                        role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                        <div class="py-1" role="none">
+                            <a href="../panel/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-0">Inicio</a>
+                            <a href="../entrega/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-1">Entregar</a>
+                            <a href="../calendario/index.html" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-2">Eventos</a>
+                            <a href="../request/" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-3">Solicitudes</a>
+                            <a href="../../sqr/index.html" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" tabindex="-1" id="menu-item-4">QR's</a>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div id="userInfo" class="text-white text-sm hidden">
+                    <span id="welcomeUser"></span>
+                    <button id="logoutBtn" class="ml-4 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- Pantalla de Login -->
+        <div id="loginContainer" class="max-w-md mx-auto mt-20">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Acceso Administrativo</h2>
+                    <p class="text-gray-600">Ingrese sus credenciales para continuar</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                        <input type="text" id="username" name="username" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+                               placeholder="Ingrese su usuario">
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                        <input type="password" id="password" name="password" required 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand" 
+                               placeholder="Ingrese su contraseña">
+                    </div>
+                    
+                    <div id="loginError" class="hidden text-red-600 text-sm text-center"></div>
+                    
+                    <button type="submit" id="loginBtn" 
+                            class="w-full bg-brand text-white font-bold py-3 px-4 rounded-lg hover:bg-brand-light transition-colors duration-300">
+                        <span id="loginBtnText">Iniciar Sesión</span>
+                        <div id="loginSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Panel de Administración -->
+        <div id="adminPanel">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Entrega Servicios</h2>
+                    <button id="refreshBtn" class="bg-brand text-white px-4 py-2 rounded-lg hover:bg-brand-light transition-colors">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+                
+                <div id="loadingPendientes" class="text-center py-8">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto mb-4"></div>
+                    <p class="text-gray-600">Cargando solicitudes pendientes...</p>
+                </div>
+                
+                <div id="pendientesContainer" class="hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full pending-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-24">Folio</th>
+                                    <th class="w-24">Fecha</th>
+                                    <th class="w-32">Solicitante</th>
+                                    <th class="w-40">Área</th>
+                                    <th class="w-32">Descripción</th>
+                                    <th class="w-32">Artículos</th>
+                                    <th class="w-24">Estatus</th>
+                                    <th class="w-32">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendientesTableBody">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="noPendientes" class="hidden text-center py-8 text-gray-500">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-lg font-medium">¡Excelente trabajo!</p>
+                        <p>No hay solicitudes pendientes por asignar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal de Entrega -->
+    <div id="deliverModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <form id="deliverForm" onsubmit="return false;">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">Confirmar Entrega</h3>
+                    <button type="button" id="closeModalBtn" class="text-gray-400 hover:text-gray-600">&times;</button>
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="deliveryDate" class="block text-sm font-medium text-gray-700">Fecha de Entrega</label>
+                        <input type="date" id="deliveryDate" name="fechaEntrega" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="deliveredTo" class="block text-sm font-medium text-gray-700">Entregado a (Nombre Completo)</label>
+                        <input type="text" id="deliveredTo" name="recibe" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Nombre de la persona que recibe...">
+                    </div>
+                    <div>
+                        <label for="deliveryObservations" class="block text-sm font-medium text-gray-700">Observaciones (Opcional)</label>
+                        <textarea id="deliveryObservations" name="observaciones" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="Cualquier detalle adicional sobre la entrega..."></textarea>
+                    </div>
+                    <div id="deliverError" class="text-red-600 text-sm hidden"></div>
+                </div>
+                
+                <div class="flex justify-end p-4 bg-gray-50 border-t space-x-2">
+                    <button type="button" id="cancelDeliverBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" id="confirmDeliverBtn" class="bg-brand text-white font-bold py-2 px-4 rounded-lg hover:bg-brand-light">
+                        <span id="deliverBtnText">Confirmar Entrega</span>
+                        <div id="deliverSpinner" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+</div>
+
+    <footer class="bg-gray-800 text-white text-center p-4 mt-12">
+        <p>&copy; 2025 Instituto Nacional de Enfermedades Respiratorias INER. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="./entrega.js"></script>
+</body>
+</html>

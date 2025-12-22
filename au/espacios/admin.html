@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Gestión de Espacios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<div id="modalAsignacion"
+    class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
+
+        <div class="bg-[#003C7D] p-4 flex justify-between items-center text-white">
+            <h3 class="font-bold text-lg">Confirmar Asignación</h3>
+            <button onclick="cerrarModal()"
+                class="hover:bg-white/20 rounded-full p-1 w-8 h-8 flex items-center justify-center">✕</button>
+        </div>
+
+        <div class="p-6 space-y-6">
+
+            <div class="bg-blue-50 p-3 rounded border border-blue-100 text-sm text-blue-900">
+                Vas a asignar el espacio <span id="modalEspacioNombre" class="font-bold">AULA X</span>
+                a la solicitud <span id="modalFolio" class="font-bold">E-25-XXX</span>.
+            </div>
+
+            <div class="border-b pb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Días a Asignar</h4>
+                    <span id="contadorDiasBadge" class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full transition-all">0 días</span>
+                </div>
+                <p class="text-xs text-gray-500 mb-2">Desmarca los días conflictivos. Se creará una nueva solicitud pendiente para ellos.</p>
+                
+                <div id="listaCheckFechas" class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-gray-200 rounded p-2 bg-white">
+                    </div>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Gestión de Requerimientos</h4>
+                <p class="text-xs text-gray-500 mb-3">Desmarca los elementos que NO podrás proporcionar:</p>
+
+                <div id="listaCheckRequerimientos"
+                    class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nota para el registro (Opcional)</label>
+                <textarea id="modalComentarioAdmin" rows="2" class="w-full border border-gray-300 rounded p-2 text-sm"
+                    placeholder="Ej: El proyector se entrega en recepción..."></textarea>
+            </div>
+        </div>
+
+        <div class="p-4 bg-gray-100 flex justify-end gap-3 border-t">
+            <button onclick="cerrarModal()"
+                class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded">Cancelar</button>
+            <button id="btnConfirmarAsignacion"
+                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded shadow flex items-center gap-2">
+                <span>✅ Confirmar Asignación</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-[#003C7D] text-white shadow-md z-10">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-bold">Gestión de Espacios INER</h1>
+                <span class="bg-blue-800 text-xs px-2 py-1 rounded text-blue-200">Admin v1.0</span>
+            </div>
+            <button onclick="cargarSolicitudes()"
+                class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition">
+                Actualizar Lista ↻
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+
+        <aside class="w-1/4 bg-white border-r border-gray-200 flex flex-col z-0">
+            <div class="p-4 border-b border-gray-100 bg-gray-50">
+                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Solicitudes Pendientes</h2>
+            </div>
+            <div id="listaSolicitudes" class="flex-1 overflow-y-auto p-2 space-y-2">
+                <div class="text-center text-gray-400 text-sm mt-10">Cargando...</div>
+            </div>
+        </aside>
+
+        <section class="flex-1 flex overflow-hidden relative">
+
+            <div id="panelDetalle" class="w-1/2 p-8 overflow-y-auto bg-white hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="flex justify-between items-start mb-6 border-b pb-4">
+                        <div>
+                            <h2 id="detFolio" class="text-2xl font-bold text-gray-800">E-25-XXX</h2>
+                            <p id="detActividad" class="text-lg text-[#003C7D] font-medium mt-1">Nombre Actividad</p>
+                        </div>
+                        <span id="detFechaSol"
+                            class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">12/12/2025</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-8 text-sm mb-8">
+                        <div class="col-span-2 bg-blue-50 p-2 rounded border border-blue-100 mb-2">
+                             <p class="text-xs text-blue-800 font-bold uppercase inline-block mr-2">Modalidad:</p>
+                             <span id="detModalidad" class="text-blue-900 font-medium">Cargando...</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Solicitante</p>
+                            <p id="detSolicitante" class="font-medium">Nombre</p>
+                            <p id="detArea" class="text-gray-600 text-xs">Área</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Aforo Requerido</p>
+                            <p id="detAforo" class="font-medium text-lg">0 Pax</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Fechas y Horario</p>
+                            <p id="detFechas" class="font-medium">01/01/2025 - 05/01/2025</p>
+                            <p id="detHoras" class="font-medium text-[#003C7D]">10:00 - 12:00</p>
+                            <p id="detDias" class="text-xs text-gray-500 italic mt-1">Recurrencia: NO</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Requerimientos</p>
+                            <p id="detRequerimientos" class="font-medium">Ninguno</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 text-center">
+                        <p class="text-gray-600 mb-4 text-sm">¿Deseas buscar disponibilidad para esta solicitud?</p>
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 mt-6">
+                            <p class="text-xs font-bold text-gray-500 uppercase mb-4 tracking-wide text-center">Acciones
+                                de Gestión</p>
+
+                            <div class="flex flex-col gap-3">
+                                <button id="btnBuscarDispo"
+                                    class="w-full bg-[#003C7D] hover:bg-[#002a59] text-white font-bold py-3 px-6 rounded-lg shadow transition-all flex items-center justify-center gap-2">
+                                    <span>🔍 Buscar Disponibilidad y Asignar</span>
+                                </button>
+
+                                <div class="flex gap-3 mt-2">
+                                    <button onclick="abrirModalEdicion()"
+                                        class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg shadow text-sm flex items-center justify-center gap-1">
+                                        <span>✏️ Modificar Datos</span>
+                                    </button>
+
+                                    <button onclick="abrirModalRechazo()"
+                                        class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-2 px-4 rounded-lg border border-red-200 text-sm flex items-center justify-center gap-1">
+                                        <span>✕ Rechazar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emptyState" class="absolute inset-0 flex items-center justify-center bg-gray-50 z-0">
+                <div class="text-center text-gray-400">
+                    <p class="text-4xl mb-2">👈</p>
+                    <p>Selecciona una solicitud para comenzar</p>
+                </div>
+            </div>
+
+            <aside id="panelResultados"
+                class="w-1/2 bg-gray-50 border-l border-gray-200 overflow-y-auto p-6 hidden absolute right-0 top-0 bottom-0 shadow-xl transition-all transform translate-x-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-700">Disponibilidad de Espacios</h3>
+                    <button onclick="cerrarPanelResultados()" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+
+                <div id="spinnerResultados" class="hidden text-center py-10">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#003C7D] mx-auto"></div>
+                    <p class="text-sm text-gray-500 mt-3">Analizando agenda y capacidades...</p>
+                </div>
+
+                <div id="listaResultados" class="space-y-4"></div>
+            </aside>
+
+        </section>
+
+        <div id="modalRechazo"
+            class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+                <h3 class="font-bold text-lg text-red-700 mb-4">Denegar Solicitud</h3>
+
+                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo</label>
+                <select id="rechazoMotivo" class="w-full border border-gray-300 rounded p-2 mb-3 text-sm">
+                    <option value="Capacidad Excedida">Capacidad Excedida</option>
+                    <option value="Sin Disponibilidad de Horario">Sin Disponibilidad de Horario</option>
+                    <option value="Mantenimiento del Espacio">Mantenimiento del Espacio</option>
+                    <option value="Traslape con Evento Institucional">Traslape con Evento Institucional</option>
+                    <option value="Solicitud Incompleta/Errónea">Solicitud Incompleta/Errónea</option>
+                    <option value="Otro">Otro (Especificar abajo)</option>
+                </select>
+
+                <label class="block text-sm font-medium text-gray-700 mb-1">Comentario Adicional</label>
+                <textarea id="rechazoComentario" rows="3" class="w-full border border-gray-300 rounded p-2 text-sm"
+                    placeholder="Explique brevemente la razón..."></textarea>
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="document.getElementById('modalRechazo').classList.add('hidden')"
+                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded text-sm">Cancelar</button>
+                    <button onclick="confirmarRechazo()"
+                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded text-sm">Confirmar
+                        Rechazo</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modalEdicion"
+            class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+                <h3 class="font-bold text-lg text-[#003C7D] mb-4 border-b pb-2">Modificar Solicitud</h3>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Fecha Inicio</label>
+                        <input type="date" id="editFechaInicio"
+                            class="w-full border border-gray-300 rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Fecha Fin</label>
+                        <input type="date" id="editFechaFin" class="w-full border border-gray-300 rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Hora Inicio</label>
+                        <input type="time" id="editHoraInicio"
+                            class="w-full border border-gray-300 rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Hora Fin</label>
+                        <input type="time" id="editHoraFin" class="w-full border border-gray-300 rounded p-2 text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Aforo (Pax)</label>
+                        <input type="number" id="editAforo" class="w-full border border-gray-300 rounded p-2 text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Días Recurrencia (Texto)</label>
+                        <input type="text" id="editDias" class="w-full border border-gray-300 rounded p-2 text-sm"
+                            placeholder="Ej: Lunes, Miércoles">
+                        <p class="text-[10px] text-gray-400 mt-1">Escribe los días separados por coma (tal cual como los
+                            días de la semana).</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6 border-t pt-4">
+                    <button onclick="document.getElementById('modalEdicion').classList.add('hidden')"
+                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded text-sm">Cancelar</button>
+                    <button onclick="guardarEdicion()"
+                        class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded text-sm">Guardar
+                        Cambios</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="./admin.js"></script>
+</body>
+
+</html>

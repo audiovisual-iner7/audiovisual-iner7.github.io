@@ -63,12 +63,16 @@
             <div class="border-b pb-4">
                 <div class="flex justify-between items-center mb-2">
                     <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wide">Días a Asignar</h4>
-                    <span id="contadorDiasBadge" class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full transition-all">0 días</span>
+                    <span id="contadorDiasBadge"
+                        class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full transition-all">0
+                        días</span>
                 </div>
-                <p class="text-xs text-gray-500 mb-2">Desmarca los días conflictivos. Se creará una nueva solicitud pendiente para ellos.</p>
-                
-                <div id="listaCheckFechas" class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-gray-200 rounded p-2 bg-white">
-                    </div>
+                <p class="text-xs text-gray-500 mb-2">Desmarca los días conflictivos. Se creará una nueva solicitud
+                    pendiente para ellos.</p>
+
+                <div id="listaCheckFechas"
+                    class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-gray-200 rounded p-2 bg-white">
+                </div>
             </div>
 
             <div>
@@ -113,185 +117,290 @@
         </div>
     </header>
 
-    <main class="flex-1 flex overflow-hidden">
+    <div class="bg-white border-b border-gray-200 px-6 py-2 flex items-center gap-4 shadow-sm z-20 relative">
+        <button onclick="cambiarVista('pendientes')" id="tabPendientes"
+            class="px-4 py-2 text-sm font-bold text-[#003C7D] border-b-2 border-[#003C7D] transition-colors">
+            📥 Solicitudes Pendientes
+        </button>
+        <button onclick="cambiarVista('dashboard')" id="tabDashboard"
+            class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-[#003C7D] border-b-2 border-transparent transition-colors">
+            📅 Calendario Aprobadas
+        </button>
+    </div>
 
-        <aside class="w-1/4 bg-white border-r border-gray-200 flex flex-col z-0">
-            <div class="p-4 border-b border-gray-100 bg-gray-50">
-                <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Solicitudes Pendientes</h2>
-            </div>
-            <div id="listaSolicitudes" class="flex-1 overflow-y-auto p-2 space-y-2">
-                <div class="text-center text-gray-400 text-sm mt-10">Cargando...</div>
-            </div>
-        </aside>
+    <main class="flex-1 flex overflow-hidden relative">
 
-        <section class="flex-1 flex overflow-hidden relative">
+        <div id="vistaPendientes" class="w-full h-full flex">
+            <aside class="w-1/4 bg-white border-r border-gray-200 flex flex-col z-0">
+                <div class="p-4 border-b border-gray-100 bg-gray-50 space-y-2">
+                    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Solicitudes Pendientes
+                    </h2>
+                    <div class="relative">
+                        <input type="text" id="inputBusqueda" onkeyup="filtrarSolicitudes()"
+                            class="w-full pl-8 pr-3 py-2 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500"
+                            placeholder="Buscar folio, nombre, área...">
+                        <span class="absolute left-2.5 top-2.5 text-gray-400 text-xs">🔍</span>
+                    </div>
+                </div>
+                <div id="listaSolicitudes" class="flex-1 overflow-y-auto p-2 space-y-2">
+                    <div class="text-center text-gray-400 text-sm mt-10">Cargando...</div>
+                </div>
+            </aside>
 
-            <div id="panelDetalle" class="w-1/2 p-8 overflow-y-auto bg-white hidden">
-                <div class="max-w-2xl mx-auto">
-                    <div class="flex justify-between items-start mb-6 border-b pb-4">
-                        <div>
-                            <h2 id="detFolio" class="text-2xl font-bold text-gray-800">E-25-XXX</h2>
-                            <p id="detActividad" class="text-lg text-[#003C7D] font-medium mt-1">Nombre Actividad</p>
+            <section class="flex-1 flex overflow-hidden relative">
+                <div id="emptyState" class="absolute inset-0 flex items-center justify-center bg-gray-50 z-0">
+                    <div class="text-center text-gray-400">
+                        <p class="text-4xl mb-2">👈</p>
+                        <p>Selecciona una solicitud para comenzar</p>
+                    </div>
+                </div>
+
+                <div id="panelDetalle" class="w-1/2 p-8 overflow-y-auto bg-white hidden z-10 relative">
+
+                    <div class="mb-6 border-b pb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h2 id="detActividad" class="text-2xl font-bold text-[#003C7D] leading-tight">Actividad</h2>
+                            <span
+                                class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">PENDIENTE</span>
                         </div>
-                        <span id="detFechaSol"
-                            class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">12/12/2025</span>
+                        <p class="text-sm text-gray-500">Folio: <span id="detFolio"
+                                class="font-mono font-bold text-gray-700">---</span></p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-y-4 gap-x-8 text-sm mb-8">
+
                         <div class="col-span-2 bg-blue-50 p-2 rounded border border-blue-100 mb-2">
-                             <p class="text-xs text-blue-800 font-bold uppercase inline-block mr-2">Modalidad:</p>
-                             <span id="detModalidad" class="text-blue-900 font-medium">Cargando...</span>
+                            <p class="text-xs text-blue-800 font-bold uppercase inline-block mr-2">Modalidad:</p>
+                            <span id="detModalidad" class="text-blue-900 font-medium">---</span>
                         </div>
+
                         <div>
                             <p class="text-gray-500 text-xs uppercase">Solicitante</p>
-                            <p id="detSolicitante" class="font-medium">Nombre</p>
-                            <p id="detArea" class="text-gray-600 text-xs">Área</p>
+                            <p id="detSolicitante" class="font-medium text-gray-800">---</p>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-xs uppercase">Aforo Requerido</p>
-                            <p id="detAforo" class="font-medium text-lg">0 Pax</p>
+                            <p class="text-gray-500 text-xs uppercase">Área / Depto</p>
+                            <p id="detArea" class="font-medium text-gray-800">---</p>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-xs uppercase">Fechas y Horario</p>
-                            <p id="detFechas" class="font-medium">01/01/2025 - 05/01/2025</p>
-                            <p id="detHoras" class="font-medium text-[#003C7D]">10:00 - 12:00</p>
-                            <p id="detDias" class="text-xs text-gray-500 italic mt-1">Recurrencia: NO</p>
+                            <p class="text-gray-500 text-xs uppercase">Aforo Esperado</p>
+                            <p id="detAforo" class="font-medium text-gray-800">---</p>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-xs uppercase">Requerimientos</p>
-                            <p id="detRequerimientos" class="font-medium">Ninguno</p>
+                            <p class="text-gray-500 text-xs uppercase">Fecha Solicitud</p>
+                            <p id="detFechaSol" class="font-medium text-gray-800">---</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500 text-xs uppercase">Fechas del Evento</p>
+                            <p id="detFechas" class="font-bold text-gray-800 text-base">---</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500 text-xs uppercase">Horario</p>
+                            <p id="detHoras" class="font-bold text-gray-800">---</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500 text-xs uppercase">Días (Recurrencia)</p>
+                            <p id="detDias" class="font-medium text-gray-800">---</p>
+                        </div>
+                        <div class="col-span-2 bg-gray-50 p-3 rounded border border-gray-200">
+                            <p class="text-gray-500 text-xs uppercase mb-1">Requerimientos Especiales</p>
+                            <p id="detRequerimientos" class="text-gray-700 italic">---</p>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 text-center">
-                        <p class="text-gray-600 mb-4 text-sm">¿Deseas buscar disponibilidad para esta solicitud?</p>
-                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 mt-6">
-                            <p class="text-xs font-bold text-gray-500 uppercase mb-4 tracking-wide text-center">Acciones
-                                de Gestión</p>
+                    <div class="bg-gray-100 p-4 rounded-lg space-y-3">
+                        <h3 class="text-sm font-bold text-gray-700 uppercase mb-2">Acciones Administrativas</h3>
 
-                            <div class="flex flex-col gap-3">
-                                <button id="btnBuscarDispo"
-                                    class="w-full bg-[#003C7D] hover:bg-[#002a59] text-white font-bold py-3 px-6 rounded-lg shadow transition-all flex items-center justify-center gap-2">
-                                    <span>🔍 Buscar Disponibilidad y Asignar</span>
-                                </button>
+                        <button id="btnBuscarDispo" onclick="buscarDisponibilidad(false)"
+                            class="w-full bg-[#003C7D] hover:bg-blue-900 text-white font-bold py-3 px-6 rounded-lg shadow transition-all flex justify-center items-center gap-2">
+                            <span>🔍 Buscar Disponibilidad de Espacios</span>
+                        </button>
 
-                                <div class="flex gap-3 mt-2">
-                                    <button onclick="abrirModalEdicion()"
-                                        class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg shadow text-sm flex items-center justify-center gap-1">
-                                        <span>✏️ Modificar Datos</span>
-                                    </button>
-
-                                    <button onclick="abrirModalRechazo()"
-                                        class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-2 px-4 rounded-lg border border-red-200 text-sm flex items-center justify-center gap-1">
-                                        <span>✕ Rechazar</span>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button onclick="abrirModalEdicion()"
+                                class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-2 px-4 rounded shadow-sm text-xs">
+                                ✏️ Editar Datos
+                            </button>
+                            <button onclick="abrirModalRechazo()"
+                                class="bg-white border border-red-200 hover:bg-red-50 text-red-600 font-bold py-2 px-4 rounded shadow-sm text-xs">
+                                ✕ Rechazar Solicitud
+                            </button>
                         </div>
+                    </div>
+                </div>
+                <aside id="panelResultados" class="w-1/2 bg-gray-50 border-l border-gray-200 overflow-y-auto p-6 hidden absolute right-0 top-0 bottom-0 shadow-xl transition-all transform translate-x-full z-20">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="font-bold text-gray-700 uppercase text-sm">Resultados de Búsqueda</h3>
+                        <button onclick="cerrarPanelResultados()" class="text-gray-400 hover:text-gray-600 font-bold text-xl">✕</button>
+                    </div>
+                    
+                    <div id="spinnerResultados" class="hidden flex justify-center items-center py-10">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003C7D]"></div>
+                    </div>
+
+                    <div id="listaResultados" class="space-y-3"></div>
+                </aside>
+            </section>
+        </div>
+
+        <div id="vistaDashboard" class="w-full h-full hidden flex-col bg-gray-50 p-6 overflow-y-auto">
+
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center bg-white rounded-lg shadow-sm border p-1">
+                        <button onclick="cambiarMes(-1)" class="p-2 hover:bg-gray-100 rounded text-gray-600">◀</button>
+                        <span id="dashTituloMes" class="px-4 font-bold text-gray-800 w-40 text-center">Enero 2025</span>
+                        <button onclick="cambiarMes(1)" class="p-2 hover:bg-gray-100 rounded text-gray-600">▶</button>
+                    </div>
+
+                    <select id="filtroEspacio" onchange="renderizarCalendario()"
+                        class="bg-white border border-gray-300 text-sm rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                        <option value="TODOS">Todos los Espacios</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <div class="flex items-center gap-2 text-xs mr-4">
+                        <span class="w-3 h-3 rounded-full bg-blue-100 border border-blue-300"></span> Aprobado
+                        <span class="w-3 h-3 rounded-full bg-green-100 border border-green-300"></span> Confirmado
                     </div>
                 </div>
             </div>
 
-            <div id="emptyState" class="absolute inset-0 flex items-center justify-center bg-gray-50 z-0">
-                <div class="text-center text-gray-400">
-                    <p class="text-4xl mb-2">👈</p>
-                    <p>Selecciona una solicitud para comenzar</p>
-                </div>
-            </div>
-
-            <aside id="panelResultados"
-                class="w-1/2 bg-gray-50 border-l border-gray-200 overflow-y-auto p-6 hidden absolute right-0 top-0 bottom-0 shadow-xl transition-all transform translate-x-full">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-gray-700">Disponibilidad de Espacios</h3>
-                    <button onclick="cerrarPanelResultados()" class="text-gray-400 hover:text-gray-600">✕</button>
+            <div class="bg-white rounded-xl shadow border border-gray-200 flex-1 flex flex-col overflow-hidden">
+                <div class="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Dom</div>
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Lun</div>
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Mar</div>
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Mié</div>
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Jue</div>
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Vie</div>
+                    <div class="py-3 text-center text-xs font-bold text-gray-500 uppercase">Sáb</div>
                 </div>
 
-                <div id="spinnerResultados" class="hidden text-center py-10">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#003C7D] mx-auto"></div>
-                    <p class="text-sm text-gray-500 mt-3">Analizando agenda y capacidades...</p>
-                </div>
-
-                <div id="listaResultados" class="space-y-4"></div>
-            </aside>
-
-        </section>
-
-        <div id="modalRechazo"
-            class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-                <h3 class="font-bold text-lg text-red-700 mb-4">Denegar Solicitud</h3>
-
-                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo</label>
-                <select id="rechazoMotivo" class="w-full border border-gray-300 rounded p-2 mb-3 text-sm">
-                    <option value="Capacidad Excedida">Capacidad Excedida</option>
-                    <option value="Sin Disponibilidad de Horario">Sin Disponibilidad de Horario</option>
-                    <option value="Mantenimiento del Espacio">Mantenimiento del Espacio</option>
-                    <option value="Traslape con Evento Institucional">Traslape con Evento Institucional</option>
-                    <option value="Solicitud Incompleta/Errónea">Solicitud Incompleta/Errónea</option>
-                    <option value="Otro">Otro (Especificar abajo)</option>
-                </select>
-
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comentario Adicional</label>
-                <textarea id="rechazoComentario" rows="3" class="w-full border border-gray-300 rounded p-2 text-sm"
-                    placeholder="Explique brevemente la razón..."></textarea>
-
-                <div class="flex justify-end gap-2 mt-4">
-                    <button onclick="document.getElementById('modalRechazo').classList.add('hidden')"
-                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded text-sm">Cancelar</button>
-                    <button onclick="confirmarRechazo()"
-                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded text-sm">Confirmar
-                        Rechazo</button>
+                <div id="gridCalendario" class="grid grid-cols-7 flex-1 auto-rows-fr">
                 </div>
             </div>
         </div>
 
-        <div id="modalEdicion"
-            class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-                <h3 class="font-bold text-lg text-[#003C7D] mb-4 border-b pb-2">Modificar Solicitud</h3>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Fecha Inicio</label>
-                        <input type="date" id="editFechaInicio"
-                            class="w-full border border-gray-300 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Fecha Fin</label>
-                        <input type="date" id="editFechaFin" class="w-full border border-gray-300 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Hora Inicio</label>
-                        <input type="time" id="editHoraInicio"
-                            class="w-full border border-gray-300 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Hora Fin</label>
-                        <input type="time" id="editHoraFin" class="w-full border border-gray-300 rounded p-2 text-sm">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Aforo (Pax)</label>
-                        <input type="number" id="editAforo" class="w-full border border-gray-300 rounded p-2 text-sm">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Días Recurrencia (Texto)</label>
-                        <input type="text" id="editDias" class="w-full border border-gray-300 rounded p-2 text-sm"
-                            placeholder="Ej: Lunes, Miércoles">
-                        <p class="text-[10px] text-gray-400 mt-1">Escribe los días separados por coma (tal cual como los
-                            días de la semana).</p>
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-2 mt-6 border-t pt-4">
-                    <button onclick="document.getElementById('modalEdicion').classList.add('hidden')"
-                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded text-sm">Cancelar</button>
-                    <button onclick="guardarEdicion()"
-                        class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded text-sm">Guardar
-                        Cambios</button>
-                </div>
-            </div>
-        </div>
     </main>
+
+    <div id="modalEvento" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+            
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="evtTitulo" class="font-bold text-lg text-[#003C7D] leading-tight">Título Actividad</h3>
+                <button onclick="cerrarModalEvento()" class="text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+
+            <div class="space-y-3 text-sm text-gray-600 mb-4">
+                <div class="bg-blue-50 p-2 rounded border border-blue-100">
+                    <p class="font-bold text-blue-800" id="evtEspacio">Auditorio 1</p>
+                    <p class="text-xs text-blue-600" id="evtFolio">Folio: E-25-100</p>
+                </div>
+                <p>📅 <span id="evtFecha" class="font-medium">---</span></p>
+                <p>⏰ <span id="evtHora" class="font-medium">---</span></p>
+            </div>
+
+            <div id="modalFooterNormal" class="pt-4 border-t mt-4 flex justify-between items-center">
+                <button onclick="mostrarOpcionesLiberacion()" class="text-blue-600 hover:text-blue-800 text-xs font-bold underline">
+                    ✏️ Modificar / Reprogramar
+                </button>
+                <button onclick="mostrarOpcionesConfirmacion()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow transition-all flex items-center gap-2">
+                    <span>✅ Confirmar Evento</span>
+                </button>
+            </div>
+
+            <div id="modalFooterConfirmacion" class="hidden pt-4 border-t mt-4 bg-green-50 -mx-6 -mb-6 p-4 rounded-b-xl border-t-green-100">
+                <p class="text-xs text-green-800 font-bold mb-3 text-center">¿Confirmar toda la serie?</p>
+                <div class="flex gap-2 justify-center">
+                    <button onclick="ejecutarConfirmacion(false)" class="bg-white border border-green-600 text-green-700 hover:bg-green-50 text-xs font-bold py-2 px-3 rounded shadow-sm">Solo este</button>
+                    <button onclick="ejecutarConfirmacion(true)" class="bg-green-700 hover:bg-green-800 text-white text-xs font-bold py-2 px-3 rounded shadow-sm">Confirmar TODOS</button>
+                    <button onclick="restaurarFooterNormal()" class="text-gray-400 hover:text-gray-600 text-xs font-bold px-2">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="modalFooterLiberacion" class="hidden pt-4 border-t mt-4 bg-orange-50 -mx-6 -mb-6 p-4 rounded-b-xl border-t-orange-100">
+                <p class="text-xs text-orange-800 font-bold mb-3 text-center">⚠️ ¿Liberar espacio para editar?</p>
+                <div class="flex gap-2 justify-center">
+                    <button onclick="ejecutarLiberacion(false)" class="bg-white border border-orange-600 text-orange-700 hover:bg-orange-50 text-xs font-bold py-2 px-3 rounded shadow-sm">Solo este</button>
+                    <button onclick="ejecutarLiberacion(true)" class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2 px-3 rounded shadow-sm">Liberar TODOS</button>
+                    <button onclick="restaurarFooterNormal()" class="text-gray-400 hover:text-gray-600 text-xs font-bold px-2">Cancelar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modalEdicion" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+            <h3 class="font-bold text-lg text-[#003C7D] mb-4">Editar Solicitud</h3>
+            
+            <div class="space-y-3 text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-600 text-xs font-bold mb-1">Fecha Inicio</label>
+                        <input type="date" id="editFechaInicio" class="w-full border rounded p-2">
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-xs font-bold mb-1">Fecha Fin</label>
+                        <input type="date" id="editFechaFin" class="w-full border rounded p-2">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-gray-600 text-xs font-bold mb-1">Hora Inicio</label>
+                        <input type="time" id="editHoraInicio" class="w-full border rounded p-2">
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-xs font-bold mb-1">Hora Fin</label>
+                        <input type="time" id="editHoraFin" class="w-full border rounded p-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-600 text-xs font-bold mb-1">Aforo</label>
+                    <input type="number" id="editAforo" class="w-full border rounded p-2">
+                </div>
+                <div>
+                    <label class="block text-gray-600 text-xs font-bold mb-1">Días (Recurrencia)</label>
+                    <input type="text" id="editDias" class="w-full border rounded p-2" placeholder="Ej: Lunes, Martes">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="document.getElementById('modalEdicion').classList.add('hidden')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                <button onclick="guardarEdicion()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded shadow">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalRechazo" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+            <h3 class="font-bold text-lg text-red-600 mb-4">Rechazar Solicitud</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Motivo</label>
+                    <select id="rechazoMotivo" class="w-full border border-gray-300 rounded p-2 text-sm">
+                        <option value="Espacio no disponible">No hay espacios disponibles</option>
+                        <option value="Aforo excedido">El aforo excede la capacidad</option>
+                        <option value="Fuera de horario">Fuera de horario laboral</option>
+                        <option value="Datos incompletos">Faltan datos en la solicitud</option>
+                        <option value="Otro">Otro motivo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Comentario</label>
+                    <textarea id="rechazoComentario" rows="3" class="w-full border border-gray-300 rounded p-2 text-sm" placeholder="Razón..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="document.getElementById('modalRechazo').classList.add('hidden')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                <button onclick="confirmarRechazo()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded shadow">Confirmar Rechazo</button>
+            </div>
+        </div>
+    </div>
 
     <script src="./admin.js"></script>
 </body>

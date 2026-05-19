@@ -1,4 +1,56 @@
+// ============================================
+// 🔵 DEFINIR ESTO ANTES DE DOMContentLoaded
+// ============================================
+
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4aIKStwstRyJs3Q3KO44myLzBKw-zIJbIIZrA2W5Ml__5y6WrAv-OZALTnuuNLWlhWg/exec';
+let areas = [];
+
+async function loadAreas() {
+    try {
+        // Crear FormData en lugar de enviar JSON directamente
+        const formData = new FormData();
+        formData.append('data', JSON.stringify({
+            action: 'getAreas'
+        }));
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: formData  // ← Usar 'body' en lugar de 'payload'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            areas = data.areas;
+            populateAreaDropdown();
+            console.log('✅ Áreas cargadas:', areas.length);
+        } else {
+            throw new Error(data.message || 'Error al cargar áreas');
+        }
+    } catch (error) {
+        console.error('❌ Error cargando áreas:', error);
+        areas = ['Otra'];
+    }
+}
+
+function populateAreaDropdown() {
+    const areaDropdown = document.getElementById('areaDropdown');
+    if (!areaDropdown) return;
+
+    areaDropdown.innerHTML = '<option value="">-- Selecciona una área --</option>';
+    areas.forEach(area => {
+        const option = document.createElement('option');
+        option.value = area;
+        option.textContent = area;
+        areaDropdown.appendChild(option);
+    });
+}
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. CARGAR ÁREAS PRIMERO
+    loadAreas();
     // Elementos del DOM
     const startRequestBtn = document.getElementById('startRequestBtn');
     const initialButtonContainer = document.getElementById('initialButtonContainer');
@@ -39,175 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const engargoladosOption = "ENGARGOLADO";
     const cartelCongresoOption = "CARTEL CONGRESO";
 
-    // Lista de todas las áreas/departamentos
-    const areas = [
-        'Clínica Asma e Inmunoalergia',
-        'Clínica Enfermedad Pulmonar Obstructiva Crónica y Bronquiectasias y Tabaquismo ​',
-        'Clínica Enfermedades Intersticiales del Pulmón ​',
-        'Clínica Fibrosis Quística ​',
-        'Clínica Implante Coclear',
-        'Clínica Inmunocompromiso por Enfermedades Infecciosas ​',
-        'Clínica Intolerancia a la Aspirina, Poliposis y Asma (IAPA) ​',
-        'Clínica Investigación Traslacional en Envejecimiento y Enfermedades Fibrosantes ​',
-        'Clínica Laringología, Fonocirugía y Cirugía de Cabeza y Cuello ​',
-        'Clínica Pleura',
-        'Clínica Tuberculosis',
-        'Clínica Vasculitis Sistémicas Primarias',
-        'Coordinación Administración Clínica de Enfermería ​',
-        'Coordinación Administración de Recursos Humanos de Enfermería',
-        'Coordinación Admisión Hospitalaria y Registros Médicos',
-        'Coordinación Ambulancias',
-        'Coordinación Arte y Cultura',
-        'Coordinación Atención Médica Ambulatoria',
-        'Coordinación Atención Médica de Hospitalización',
-        'Coordinación Camillería',
-        'Coordinación Cardiología y ecocardiografía ​',
-        'Coordinación Centro de Simulación Clínica en Medicina Respiratoria',
-        'Coordinación Clínicas',
-        'Coordinación Desarrollo Tecnológico',
-        'Coordinación Donación de Órganos y Tejidos',
-        'Coordinación Enseñanza de Enfermería ​',
-        'Coordinación Enseñanza y Capacitación',
-        'Coordinación Epidemiología y Estadística',
-        'Coordinación Geriatría y Cuidados Paliativos',
-        'Coordinación Gestión de Tecnología Médica',
-        'Coordinación Gestión del Cuidado y Calidad de Enfermería',
-        'Coordinación Hemodinamia',
-        'Coordinación Hipertensión Pulmonar',
-        'Coordinación Infectología',
-        'Coordinación Ingeniería en Servicio',
-        'Coordinación Investigación de Enfermería ​',
-        'Coordinación Investigación Educativa en Medicina Basada en Evidencia',
-        'Coordinación Medicina Interna',
-        'Coordinación Nefrología',
-        'Coordinación Oncología Torácica',
-        'Coordinación Salud Mental',
-        'Coordinación Salud Ocupacional y Preventiva ​',
-        'Coordinación Síndrome metabólico',
-        'Coordinación Supervisión de Trabajo Social',
-        'Coordinación Trasplante',
-        'Coordinación Vigilancia Epidemiológica',
-        'Departamento Adquisiciones',
-        'Departamento Apoyo Técnico',
-        'Departamento Apoyo Técnico en Administración',
-        'Departamento Apoyo Técnico en Enseñanza',
-        'Departamento Áreas Críticas',
-        'Departamento Asuntos Jurídicos y Unidad de Transparencia',
-        'Departamento Biomedicina Molecular e Investigación Traslacional',
-        'Departamento Calidad',
-        'Departamento Centro de Investigación en Enfermedades Infecciosas',
-        'Departamento Control de Bienes',
-        'Departamento Coordinación Técnica',
-        'Departamento Educación Continua',
-        'Departamento Empleo y Capacitación',
-        'Departamento Enfermería',
-        'Departamento Enlace Administrativo',
-        'Departamento Epidemiología Hospitalaria e Infectología',
-        'Departamento Farmacia Hospitalaria',
-        'Departamento Fisiología Respiratoria',
-        'Departamento Formación de Posgrado',
-        'Departamento Formación de Pregrado',
-        'Departamento Imagenología',
-        'Departamento Ingeniería Biomédica',
-        'Departamento Investigación en Cirugía Experimental',
-        'Departamento Investigación en Enfermedades Crónico-Degenerativas',
-        'Departamento Investigación en Fibrosis Pulmonar',
-        'Departamento Investigación en Hiperreactividad Bronquial',
-        'Departamento Investigación en Inmunogenética y Alergia',
-        'Departamento Investigación en Microbiología ​',
-        'Departamento Investigación en Tabaquismo y EPOC ​',
-        'Departamento Investigación en Toxicología y Medicina Ambiental',
-        'Departamento Investigación en Virología y Micología',
-        'Departamento Laboratorio Clínico',
-        'Departamento Nutrición Clínica',
-        'Departamento Otorrinolaringología y Cirugía de Cabeza y Cuello',
-        'Departamento Rehabilitación Pulmonar',
-        'Departamento Relaciones Laborales',
-        'Departamento Relaciones Públicas y Comunicación',
-        'Departamento Remuneraciones',
-        'Departamento Tecnologías de la Información y Comunicaciones',
-        'Departamento Trabajo Social',
-        'Departamento Unidad de Igualdad, Género e Inclusión',
-        'Dirección Enseñanza',
-        'Dirección General',
-        'Dirección Investigación',
-        'Dirección Médica',
-        'Laboratorio Biología Celular',
-        'Laboratorio Biología Computacional',
-        'Laboratorio Biología Molecular',
-        'Laboratorio Biología Molecular de Enfermedades Emergentes y EPOC',
-        'Laboratorio Biopatología Pulmonar INER-Ciencias, UNAM',
-        'Laboratorio Cáncer Pulmonar',
-        'Laboratorio Farmacología Clínica y Experimental',
-        'Laboratorio Inmunobiología de la Tuberculosis',
-        'Laboratorio Inmunobiología y Genética',
-        'Laboratorio Inmunofarmacología',
-        'Laboratorio Inmunología Integrativa',
-        'Laboratorio Investigación en Enfermedades Reumáticas',
-        'Laboratorio Investigación en Epidemiología e Infectología ​',
-        'Laboratorio LACBio',
-        'Laboratorio Morfología',
-        'Laboratorio Nacional Conahcyt de Investigación y Diagnóstico por Inmunocitofluorometría (LANCIDI) ​',
-        'Laboratorio Neumogenómica',
-        'Laboratorio Onco-Inmunobiología',
-        'Laboratorio Secuenciación y Biología Molecular',
-        'Laboratorio Transcriptómica e Inmunología Molecular',
-        'Laboratorio Transducción de Señales',
-        'Laboratorio Trasplante Pulmonar Experimental',
-        'Oficina Apoyo Técnico de la Dirección Médica ​',
-        'Oficina Audiovisual',
-        'Oficina Biblioteca y Editorial',
-        'Oficina Bioterio',
-        'Oficina Capacitación y Desarrollo',
-        'Oficina Coordinación de Protección Civil Institucional y Gestión Ambiental ​',
-        'Oficina Escuela de Enfermería',
-        'Oficina Escuela Superior de Terapia Respiratoria',
-        'Oficina Movimientos de Personal',
-        'Oficina Seguridad Radiológica',
-        'Programa Apoyo a Pacientes y Familiares (PAPyF) ​',
-        'Servicio Anatomía Patológica',
-        'Servicio Anestesia y Clínica del Dolor',
-        'Servicio Banco de Sangre',
-        'Servicio Broncoscopía y Endoscopía',
-        'Servicio Cardiología',
-        'Servicio Cirugía de Tórax',
-        'Servicio Cirugía Maxilo Facial y Estomatología',
-        'Servicio Clínico 1',
-        'Servicio Clínico 2',
-        'Servicio Clínico 3',
-        'Servicio Clínico 4',
-        'Servicio Clínico 7',
-        'Servicio Clínico 8',
-        'Servicio Consulta Externa',
-        'Servicio Cuidados Intensivos Respiratorios',
-        'Servicio Hospital de Día',
-        'Servicio Medicina del Sueño',
-        'Servicio Medicina Nuclear e Imagen Molecular',
-        'Servicio Microbiología Clínica',
-        'Servicio Oncología Médica',
-        'Servicio Terapia Intermedia',
-        'Servicio Terapia Postquirúrgica',
-        'Servicio Terapia Respiratoria',
-        'Servicio Urgencias Respiratorias',
-        'Sindicato Sindicato',
-        'Subdirección Atención Médica de Neumología',
-        'Subdirección Cirugía',
-        'Subdirección Enseñanza',
-        'Subdirección Investigación Biomédica',
-        'Subdirección Recursos Humanos y Organización',
-        'Subdirección Recursos Materiales',
-        'Subdirección Servicios Auxiliares de Diagnóstico y Paramédicos',
-        'Transportes',
-        'Trasplante',
-        'Trasplante Pulmonar Experimental',
-        'Tuberculosis',
-        'Unidad de Administración y Finanzas',
-        'Unidad de Igualdad, Género e Inclusión',
-        'Urgencias Respiratorias',
-        'Vasculitis Sistémicas Primarias',
-        'Vigilancia Epidemiológica',
-        'OTRO'
-    ];
+    
     
     let currentHighlightedIndex = -1;
     let filteredAreas = [];

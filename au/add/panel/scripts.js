@@ -500,8 +500,8 @@ function renderServicesCart() {
                     `;
                 }
                 
-                const specificationsHTML = `<div><input type="text" placeholder="Especificaciones adicionales..." value="${service.specifications}" class="w-full p-1 border rounded text-sm" data-index="${index}" data-field="specifications"></div>`;
-                itemEl.innerHTML = mainRowHTML + (dynamicFieldsHTML ? `<div class="pl-4 border-l-2 border-gray-200 space-y-2">${dynamicFieldsHTML}</div>` : '') + specificationsHTML;
+                //const specificationsHTML = `<div><input type="text" placeholder="Especificaciones adicionales..." value="${service.specifications}" class="w-full p-1 border rounded text-sm" data-index="${index}" data-field="specifications"></div>`;
+                itemEl.innerHTML = mainRowHTML + (dynamicFieldsHTML ? `<div class="pl-4 border-l-2 border-gray-200 space-y-2">${dynamicFieldsHTML}</div>` : '') ;
                 serviciosCart.appendChild(itemEl);
             });
         }
